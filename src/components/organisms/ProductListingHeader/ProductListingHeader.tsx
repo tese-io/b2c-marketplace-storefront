@@ -1,29 +1,67 @@
-'use client';
+'use client'
 
-import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 
-import { SelectField } from '@/components/molecules';
+import { SelectField } from '@/components/molecules'
 
 const selectOptions = [
   { label: 'Newest', value: 'created_at' },
   { label: 'Price: Low to High', value: 'price_asc' },
   { label: 'Price: High to Low', value: 'price_desc' }
-];
+]
 
-export const ProductListingHeader = ({ total }: { total: number }) => {
-  const router = useRouter();
-  const pathname = usePathname();
+function listingTypeLink (pathname: string, searchParams: URLSearchParams | null, type: 'product' | 'service' | null): string {
+  const params = new URLSearchParams(searchParams?.toString() ?? '')
+  if (type) params.set('listing_type', type)
+  else params.delete('listing_type')
+  const q = params.toString()
+  return q ? `${pathname}?${q}` : pathname
+}
 
-  const selectOptionHandler = (value: string) => {
-    router.push(`${pathname}?sortBy=${value}`);
-  };
+export const ProductListingHeader = ({
+  total,
+  listingType,
+}: {
+  total: number
+  listingType?: 'product' | 'service' | null
+}) => {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const current = searchParams.get('listing_type')
 
   return (
     <div
-      className="flex w-full items-center justify-between"
+      className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
       data-testid="product-listing-header"
     >
-      <div data-testid="product-listing-total">{total} listings</div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span data-testid="product-listing-total">{total} listings</span>
+        <span className="text-muted-foreground">|</span>
+        <nav className="flex gap-2" aria-label="Filter by listing type">
+          <Link
+            href={listingTypeLink(pathname, searchParams, null)}
+            className={`text-sm font-medium ${!current ? 'text-foreground underline' : 'text-muted-foreground hover:text-foreground'}`}
+            data-testid="listing-type-filter-all"
+          >
+            All
+          </Link>
+          <Link
+            href={listingTypeLink(pathname, searchParams, 'product')}
+            className={`text-sm font-medium ${current === 'product' ? 'text-foreground underline' : 'text-muted-foreground hover:text-foreground'}`}
+            data-testid="listing-type-filter-product"
+          >
+            Product
+          </Link>
+          <Link
+            href={listingTypeLink(pathname, searchParams, 'service')}
+            className={`text-sm font-medium ${current === 'service' ? 'text-foreground underline' : 'text-muted-foreground hover:text-foreground'}`}
+            data-testid="listing-type-filter-service"
+          >
+            Service
+          </Link>
+        </nav>
+      </div>
       {/* <div className='hidden md:flex gap-2 items-center'>
         Sort by:{' '}
         <SelectField

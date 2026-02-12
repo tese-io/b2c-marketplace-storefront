@@ -1,12 +1,31 @@
-import { ProductPageAccordion } from '@/components/molecules';
+import { ProductPageAccordion } from '@/components/molecules'
 
-export const ProductDetailsShipping = () => {
+type ProductDetailsShippingProps = {
+  product?: { metadata?: Record<string, unknown> } | null
+}
+
+export const ProductDetailsShipping = ({ product }: ProductDetailsShippingProps) => {
+  const isService = (product?.metadata?.listing_type as string) === 'service'
+
+  if (isService) {
+    return (
+      <ProductPageAccordion
+        heading="Service delivery"
+        defaultOpen={true}
+      >
+        <div className="product-details">
+          <p>This is a service listing. No physical delivery. Contact the seller for terms and availability.</p>
+        </div>
+      </ProductPageAccordion>
+    )
+  }
+
   return (
     <ProductPageAccordion
-      heading='Shipping & Returns'
-      defaultOpen={false}
+      heading="Shipping & Returns"
+      defaultOpen={true}
     >
-      <div className='product-details'>
+      <div className="product-details">
         <ul>
           <li>
             Free standard shipping on all orders within the
@@ -24,5 +43,5 @@ export const ProductDetailsShipping = () => {
         </ul>
       </div>
     </ProductPageAccordion>
-  );
-};
+  )
+}

@@ -122,6 +122,14 @@ export const ProductDetailsHeader = ({
 
   const isAddToCartDisabled = !variantStock || !variantHasPrice || !hasAnyPrice || isVariantStockMaxLimitReached
 
+  const metadata = product?.metadata as { listing_type?: string; request_quote_only?: boolean; price_range_min?: number; price_range_max?: number; duration_text?: string } | undefined
+  const isService = metadata?.listing_type === 'service'
+  const requestQuoteOnly = !!metadata?.request_quote_only
+  const priceMin = metadata?.price_range_min != null ? Number(metadata.price_range_min) : null
+  const priceMax = metadata?.price_range_max != null ? Number(metadata.price_range_max) : null
+  const hasPriceRange = isService && (priceMin != null || priceMax != null)
+  const durationText = isService && metadata?.duration_text?.trim() ? metadata.duration_text.trim() : null
+
   return (
     <div className="border rounded-sm p-5" data-testid="product-details-header">
       <div className="flex justify-between">
@@ -129,10 +137,33 @@ export const ProductDetailsHeader = ({
           <h2 className="label-md text-secondary">
             {/* {product?.brand || "No brand"} */}
           </h2>
-          <h1 className="heading-lg text-primary" data-testid="product-title">{product.title}</h1>
-          <div className="mt-2 flex gap-2 items-center" data-testid="product-price-container">
-            {hasAnyPrice && variantPrice ? (
-              <>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="heading-lg text-primary" data-testid="product-title">{product.title}</h1>
+            {isService && (
+              <span className="rounded bg-primary/90 px-2 py-0.5 text-xs font-medium text-primary-foreground uppercase" data-testid="product-service-badge">
+                Service
+              </span>
+            )}
+          </div>
+          {durationText && (
+            <p className="mt-1 label-sm text-secondary" data-testid="product-duration">
+              Duration: {durationText}
+            </p>
+          )}
+          <div className="mt-2 flex flex-col gap-1" data-testid="product-price-container">
+            {hasPriceRange && (
+              <span className="label-md text-primary" data-testid="product-price-range">
+                {priceMin != null && priceMax != null && priceMin > 0 && priceMax > 0
+                  ? `€${priceMin} – €${priceMax}`
+                  : priceMin != null && priceMin > 0
+                    ? `From €${priceMin}`
+                    : priceMax != null && priceMax > 0
+                      ? `Up to €${priceMax}`
+                      : null}
+              </span>
+            )}
+            {hasAnyPrice && variantPrice && !hasPriceRange ? (
+              <div className="flex gap-2 items-center">
                 <span className="heading-md text-primary" data-testid="product-price-current">
                   {variantPrice.calculated_price}
                 </span>
@@ -142,12 +173,12 @@ export const ProductDetailsHeader = ({
                     {variantPrice.original_price}
                   </span>
                 )}
-              </>
-            ) : (
+              </div>
+            ) : !hasPriceRange ? (
               <span className="label-md text-secondary pt-2 pb-4" data-testid="product-price-unavailable">
                 Not available in your region
               </span>
-            )}
+            ) : null}
           </div>
         </div>
         <div>
@@ -163,21 +194,39 @@ export const ProductDetailsHeader = ({
       {hasAnyPrice && (
         <ProductVariants product={product} selectedVariant={selectedVariant} />
       )}
-      {/* Add to Cart */}
-      <Button
-        onClick={handleAddToCart}
-        disabled={isAddToCartDisabled}
-        loading={isAddingItem}
-        className="w-full uppercase mb-4 py-3 flex justify-center"
-        size="large"
-        data-testid="product-add-to-cart-button"
-      >
-        {!hasAnyPrice
-          ? "NOT AVAILABLE IN YOUR REGION"
-          : variantStock && variantHasPrice
-          ? "ADD TO CART"
-          : "OUT OF STOCK"}
-      </Button>
+      {/* Service: Request quote CTA (no direct booking link to preserve TESE commission) */}
+      {isService && requestQuoteOnly && (
+        <div className="flex flex-col gap-2 mb-4">
+          <Button
+            asChild
+            variant="secondary"
+            className="w-full uppercase py-3"
+            size="large"
+            data-testid="product-request-quote-button"
+          >
+            <a href={`mailto:${product.seller?.email || ''}?subject=Quote request: ${encodeURIComponent(product.title || '')}`}>
+              Request quote
+            </a>
+          </Button>
+        </div>
+      )}
+      {/* Add to Cart - hide when service is quote-only */}
+      {!(isService && requestQuoteOnly) && (
+        <Button
+          onClick={handleAddToCart}
+          disabled={isAddToCartDisabled}
+          loading={isAddingItem}
+          className="w-full uppercase mb-4 py-3 flex justify-center"
+          size="large"
+          data-testid="product-add-to-cart-button"
+        >
+          {!hasAnyPrice
+            ? "NOT AVAILABLE IN YOUR REGION"
+            : variantStock && variantHasPrice
+            ? "ADD TO CART"
+            : "OUT OF STOCK"}
+        </Button>
+      )}
       {/* Seller message */}
 
       {user && product.seller && (

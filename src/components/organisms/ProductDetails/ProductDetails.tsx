@@ -43,7 +43,7 @@ export const ProductDetails = async ({
       <ProductAdditionalAttributes
         attributes={product?.attribute_values || []}
       />
-      <ProductDetailsShipping />
+      <ProductDetailsShipping product={product} />
       <ProductDetailsSeller seller={product?.seller} />
       <ProductDetailsFooter
         tags={product?.tags || []}

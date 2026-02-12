@@ -14,12 +14,14 @@ export const ProductListing = async ({
   seller_id,
   showSidebar = false,
   locale = process.env.NEXT_PUBLIC_DEFAULT_REGION || "pl",
+  listing_type,
 }: {
   category_id?: string
   collection_id?: string
   seller_id?: string
   showSidebar?: boolean
   locale?: string
+  listing_type?: 'product' | 'service'
 }) => {
   const { response } = await listProductsWithSort({
     seller_id,
@@ -30,17 +32,16 @@ export const ProductListing = async ({
     queryParams: {
       limit: PRODUCT_LIMIT,
     },
+    listing_type,
   })
 
-  const { products } = await response
-
-  const count = products.length
+  const { products, count } = response
 
   const pages = Math.ceil(count / PRODUCT_LIMIT) || 1
 
   return (
     <div className="py-4" data-testid="product-listing-container">
-      <ProductListingHeader total={count} />
+      <ProductListingHeader total={count} listingType={listing_type} />
       <div className="hidden md:block">
         <ProductListingActiveFilters />
       </div>

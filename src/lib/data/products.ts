@@ -79,10 +79,6 @@ export const listProducts = async ({
         collection_id,
         limit,
         offset,
-        region_id: region?.id,
-        fields:
-          '*variants.calculated_price,+variants.inventory_quantity,*seller,*variants,*seller.products,' +
-          '*seller.reviews,*seller.reviews.customer,*seller.reviews.seller,*seller.products.variants,*attribute_values,*attribute_values.attribute',
         ...queryParams
       },
       headers,
@@ -94,20 +90,18 @@ export const listProducts = async ({
 
       const nextPage = count > offset + limit ? pageParam + 1 : null;
 
-      const response = products.filter(prod => {
+      const response = products.map(prod => {
+        if (!prod?.seller) return prod;
         // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
-        const reviews = prod.seller?.reviews.filter(item => !!item) ?? [];
-        return (
-          // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
-          prod?.seller && {
-            ...prod,
-            seller: {
-              // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
-              ...prod.seller,
-              reviews
-            }
+        const reviews = prod.seller?.reviews?.filter(item => !!item) ?? [];
+        return {
+          ...prod,
+          seller: {
+            // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
+            ...prod.seller,
+            reviews
           }
-        );
+        };
       });
 
       return {
@@ -142,7 +136,8 @@ export const listProductsWithSort = async ({
   countryCode,
   category_id,
   seller_id,
-  collection_id
+  collection_id,
+  listing_type
 }: {
   page?: number;
   queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams;
@@ -151,6 +146,7 @@ export const listProductsWithSort = async ({
   category_id?: string;
   seller_id?: string;
   collection_id?: string;
+  listing_type?: 'product' | 'service';
 }): Promise<{
   response: {
     products: HttpTypes.StoreProduct[];
@@ -174,26 +170,39 @@ export const listProductsWithSort = async ({
     countryCode
   });
 
-  const filteredProducts = seller_id
+  let filteredProducts = seller_id
     ? products.filter(product => product.seller?.id === seller_id)
     : products;
 
-  const pricedProducts = filteredProducts.filter(prod =>
-    prod.variants?.some(variant => variant.calculated_price !== null)
-  );
+  if (listing_type === 'service') {
+    filteredProducts = filteredProducts.filter(
+      (p) => (p as HttpTypes.StoreProduct & { metadata?: { listing_type?: string } }).metadata?.listing_type === 'service'
+    )
+  } else if (listing_type === 'product') {
+    filteredProducts = filteredProducts.filter(
+      (p) => (p as HttpTypes.StoreProduct & { metadata?: { listing_type?: string } }).metadata?.listing_type !== 'service'
+    )
+  }
+
+  const pricedProducts = filteredProducts.filter((prod) => {
+    const hasPrice = prod.variants?.some((variant: any) => variant.calculated_price != null)
+    // When calculated_price isn't in the response (no fields param), keep all products
+    return hasPrice || !prod.variants?.some((variant: any) => 'calculated_price' in variant)
+  });
 
   const sortedProducts = sortProducts(pricedProducts, sortBy);
 
+  const filteredCount = sortedProducts.length
   const pageParam = (page - 1) * limit;
 
-  const nextPage = count > pageParam + limit ? pageParam + limit : null;
+  const nextPage = filteredCount > pageParam + limit ? pageParam + limit : null;
 
   const paginatedProducts = sortedProducts.slice(pageParam, pageParam + limit);
 
   return {
     response: {
       products: paginatedProducts,
-      count
+      count: filteredCount
     },
     nextPage,
     queryParams
