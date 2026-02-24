@@ -1,17 +1,26 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
 
-import { Button } from '@/components/atoms';
-import { ColorFilter, ConditionFilter, PriceFilter, SizeFilter } from '@/components/cells';
-import { ProductListingActiveFilters } from '@/components/organisms';
-import useFilters from '@/hooks/useFilters';
-import { CloseIcon } from '@/icons';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/atoms'
+import { PriceFilter } from '@/components/cells'
+import { ProductListingActiveFilters } from '@/components/organisms'
+import useFilters from '@/hooks/useFilters'
+import { CloseIcon } from '@/icons'
+import { cn } from '@/lib/utils'
+
+const ESG_CATEGORIES = [
+  { label: 'Sustainable Products', handle: 'sustainable-products' },
+  { label: 'ESG Audits', handle: 'esg-audits' },
+  { label: 'Consulting & Advisory', handle: 'consulting' },
+  { label: 'Reporting & Disclosure', handle: 'reporting' },
+  { label: 'Carbon & Climate', handle: 'carbon-climate' },
+  { label: 'Circular Economy', handle: 'circular-economy' },
+]
 
 export const ProductSidebar = () => {
-  const [filterModal, setFilterModal] = useState(false);
-  const { clearAllFilters } = useFilters('');
+  const [filterModal, setFilterModal] = useState(false)
+  const { clearAllFilters } = useFilters('')
 
   return (
     <aside
@@ -20,7 +29,7 @@ export const ProductSidebar = () => {
     >
       <div
         className={cn(
-          'pointer-events-none left-0 top-0 h-full w-full bg-primary blur-sm transition-opacity duration-100 md:relative',
+          'left-0 top-0 h-full w-full bg-primary transition-opacity duration-100 md:relative',
           filterModal ? 'opacity-1 z-20' : '-z-10 opacity-0 md:z-10 md:opacity-100'
         )}
       >
@@ -49,10 +58,22 @@ export const ProductSidebar = () => {
           className="no-scrollbar h-[calc(100vh-200px)] overflow-y-scroll px-2 md:h-full md:overflow-y-auto md:px-0"
           data-testid="sidebar-filters"
         >
+          <div className="mb-4">
+            <h4 className="heading-sm mb-3 uppercase">Categories</h4>
+            <ul className="flex flex-col gap-2">
+              {ESG_CATEGORIES.map((cat) => (
+                <li key={cat.handle}>
+                  <a
+                    href={`/pl/categories/${cat.handle}`}
+                    className="label-md block rounded-md px-3 py-2 transition-colors hover:bg-secondary"
+                  >
+                    {cat.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
           <PriceFilter />
-          <SizeFilter />
-          <ColorFilter />
-          <ConditionFilter />
         </div>
         <div
           className="absolute bottom-0 left-0 flex w-full items-center gap-2 border-y bg-primary px-4 py-4 md:hidden"
@@ -71,13 +92,10 @@ export const ProductSidebar = () => {
             onClick={() => setFilterModal(false)}
             data-testid="sidebar-view-listings-button"
           >
-            View 222 listings
+            View listings
           </Button>
         </div>
       </div>
-      <div className="heading-md absolute top-4 z-10 w-full rounded-lg bg-primary p-8 text-center shadow-md">
-        Set your Algolia ID and configure filters to enable product filtering
-      </div>
     </aside>
-  );
-};
+  )
+}

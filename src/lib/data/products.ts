@@ -301,3 +301,100 @@ export const searchProducts = async (params: {
       };
     });
 };
+
+export const aiSearchProducts = async (params: {
+  query: string;
+  page?: number;
+  hitsPerPage?: number;
+  facets?: string[];
+  currency_code?: string;
+  countryCode?: string;
+  region_id?: string;
+  customer_id?: string;
+  enable_ai?: boolean;
+}): Promise<{
+  products: (HttpTypes.StoreProduct & { seller?: SellerProps })[];
+  nbHits: number;
+  page: number;
+  nbPages: number;
+  hitsPerPage: number;
+  facets: Record<string, any>;
+  processingTimeMS: number;
+  ai_metadata?: {
+    parsed_query: any;
+    applied_filters: string;
+    confidence: number;
+    processing_time_ms: number;
+  };
+}> => {
+  if (!params.countryCode && !params.region_id) {
+    throw new Error('Country code or region ID is required');
+  }
+
+  let region_id = params.region_id;
+
+  if (!region_id && params.countryCode) {
+    const region = await getRegion(params.countryCode);
+    if (!region) {
+      throw new Error(`Region not found for country code: ${params.countryCode}`);
+    }
+    region_id = region.id;
+  }
+
+  const headers = {
+    ...(await getAuthHeaders())
+  };
+
+  let customer_id = params.customer_id;
+
+  if (!customer_id) {
+    const customer = await retrieveCustomer();
+    if (customer) {
+      customer_id = customer.id;
+    }
+  }
+
+  let facets = params.facets;
+
+  if (!facets) {
+    facets = ["variants.condition", "variants.color", "variants.size", "categories.name"];
+  }
+
+  const { countryCode, ...bodyParams } = params;
+
+  return sdk.client
+    .fetch<{
+      products: (HttpTypes.StoreProduct & { seller?: SellerProps })[];
+      nbHits: number;
+      page: number;
+      nbPages: number;
+      hitsPerPage: number;
+      facets: Record<string, any>;
+      processingTimeMS: number;
+      ai_metadata?: {
+        parsed_query: any;
+        applied_filters: string;
+        confidence: number;
+        processing_time_ms: number;
+      };
+    }>(`/store/products/ai-search`, {
+      method: 'POST',
+      body: {
+        ...bodyParams,
+        region_id,
+        customer_id,
+        facets,
+        enable_ai: params.enable_ai ?? true,
+      },
+      headers,
+      cache: 'no-cache'
+    })
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error('AI search failed, falling back to regular search:', error);
+      // Fallback to regular search
+      return searchProducts(params);
+    });
+};

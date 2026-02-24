@@ -14,17 +14,18 @@ type HeroProps = {
 export const Hero = ({ image, heading, paragraph, buttons }: HeroProps) => {
   return (
     <section className="w-full flex container mt-5 flex-col lg:flex-row text-primary">
-      <Image
-        src={decodeURIComponent(image)}
-        width={700}
-        height={600}
-        alt={`Hero banner - ${heading}`}
-        className="w-full order-2 lg:order-1"
-        priority
-        fetchPriority="high"
-        quality={50}
-        sizes="(min-width: 1024px) 50vw, 100vw"
-      />
+      <div className="relative w-full order-2 lg:order-1 lg:max-w-[50vw] aspect-[4/3] lg:aspect-[7/6] min-h-[280px] overflow-hidden rounded-sm">
+        <Image
+          src={decodeURIComponent(image)}
+          fill
+          alt={`Hero banner - ${heading}`}
+          className="object-cover object-center"
+          priority
+          fetchPriority="high"
+          quality={75}
+          sizes="(min-width: 1024px) 50vw, 100vw"
+        />
+      </div>
       <div className="w-full lg:order-2">
         <div className="border rounded-sm w-full px-6 flex items-end h-[calc(100%-144px)]">
           <div>

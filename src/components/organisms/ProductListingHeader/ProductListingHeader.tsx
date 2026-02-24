@@ -22,9 +22,11 @@ function listingTypeLink (pathname: string, searchParams: URLSearchParams | null
 export const ProductListingHeader = ({
   total,
   listingType,
+  showTypeFilters = true,
 }: {
   total: number
   listingType?: 'product' | 'service' | null
+  showTypeFilters?: boolean
 }) => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -37,30 +39,34 @@ export const ProductListingHeader = ({
     >
       <div className="flex items-center gap-2 flex-wrap">
         <span data-testid="product-listing-total">{total} listings</span>
-        <span className="text-muted-foreground">|</span>
-        <nav className="flex gap-2" aria-label="Filter by listing type">
-          <Link
-            href={listingTypeLink(pathname, searchParams, null)}
-            className={`text-sm font-medium ${!current ? 'text-foreground underline' : 'text-muted-foreground hover:text-foreground'}`}
-            data-testid="listing-type-filter-all"
-          >
-            All
-          </Link>
-          <Link
-            href={listingTypeLink(pathname, searchParams, 'product')}
-            className={`text-sm font-medium ${current === 'product' ? 'text-foreground underline' : 'text-muted-foreground hover:text-foreground'}`}
-            data-testid="listing-type-filter-product"
-          >
-            Product
-          </Link>
-          <Link
-            href={listingTypeLink(pathname, searchParams, 'service')}
-            className={`text-sm font-medium ${current === 'service' ? 'text-foreground underline' : 'text-muted-foreground hover:text-foreground'}`}
-            data-testid="listing-type-filter-service"
-          >
-            Service
-          </Link>
-        </nav>
+        {showTypeFilters && (
+          <>
+            <span className="text-muted-foreground">|</span>
+            <nav className="flex gap-2" aria-label="Filter by listing type">
+              <Link
+                href={listingTypeLink(pathname, searchParams, null)}
+                className={`text-sm font-medium ${!current ? 'text-foreground underline' : 'text-muted-foreground hover:text-foreground'}`}
+                data-testid="listing-type-filter-all"
+              >
+                All
+              </Link>
+              <Link
+                href={listingTypeLink(pathname, searchParams, 'product')}
+                className={`text-sm font-medium ${current === 'product' ? 'text-foreground underline' : 'text-muted-foreground hover:text-foreground'}`}
+                data-testid="listing-type-filter-product"
+              >
+                Product
+              </Link>
+              <Link
+                href={listingTypeLink(pathname, searchParams, 'service')}
+                className={`text-sm font-medium ${current === 'service' ? 'text-foreground underline' : 'text-muted-foreground hover:text-foreground'}`}
+                data-testid="listing-type-filter-service"
+              >
+                Service
+              </Link>
+            </nav>
+          </>
+        )}
       </div>
       {/* <div className='hidden md:flex gap-2 items-center'>
         Sort by:{' '}

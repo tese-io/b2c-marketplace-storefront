@@ -53,9 +53,9 @@ export function Input({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
       <label className="label-md">{label}</label>
-      <div className="relative mt-2">
+      <div className="relative mt-2 w-full">
         {icon && onIconClick && (
           <button
             onClick={onIconClick}

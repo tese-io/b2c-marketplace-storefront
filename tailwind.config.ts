@@ -10,11 +10,20 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Poppins", "system-ui", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
+      },
       backgroundColor: {
         primary: "rgba(var(--bg-primary))",
         secondary: "rgba(var(--bg-secondary))",
         tertiary: "rgba(var(--bg-tertiary))",
+        accent: "rgba(var(--bg-accent))",
         disabled: "rgba(var(--bg-disabled))",
+        nav: "rgba(var(--bg-nav))",
+        "nav-secondary": "rgba(var(--bg-nav-secondary))",
+        card: "rgba(var(--bg-card))",
+        "card-hover": "rgba(var(--bg-card-hover))",
         component: {
           DEFAULT: "rgba(var(--bg-component-primary))",
           hover: "rgba(var(--bg-component-primary-hover))",
@@ -37,6 +46,15 @@ export default {
             hover: "var(--bg-action-tertiary-hover)",
             pressed: "var(--bg-action-tertiary-pressed)",
           },
+          ice: {
+            DEFAULT: "rgba(var(--bg-action-ice))",
+            hover: "rgba(var(--bg-action-ice-hover))",
+            pressed: "rgba(var(--bg-action-ice-pressed))",
+          },
+        },
+        "accent-purple": {
+          DEFAULT: "rgba(var(--bg-accent-purple))",
+          hover: "rgba(var(--bg-accent-purple-hover))",
         },
         positive: {
           DEFAULT: "rgba(var(--bg-positive-primary))",
@@ -68,12 +86,20 @@ export default {
             pressed: "rgba(var(--bg-warning-secondary-pressed))",
           },
         },
+        /* Direct TESE brand color shortcuts */
+        "tese-green": "rgba(var(--tese-green))",
+        "tese-ice": "rgba(var(--tese-ice))",
+        "tese-purple": "rgba(var(--tese-purple))",
       },
       colors: {
         primary: "rgba(var(--content-primary))",
         secondary: "rgba(var(--content-secondary))",
         tertiary: "rgba(var(--content-tertiary))",
         disabled: "rgba(var(--content-disabled))",
+        "tese-green": "rgba(var(--tese-green))",
+        "tese-ice": "rgba(var(--tese-ice))",
+        "tese-purple": "rgba(var(--tese-purple))",
+        "tese-dark": "rgba(var(--tese-dark-green))",
         action: {
           DEFAULT: "rgba(var(--content-action-primary))",
           hover: "rgba(var(--content-action-primary-hover))",
@@ -129,6 +155,7 @@ export default {
         xs: "4px",
         sm: "8px",
         md: "16px",
+        lg: "24px",
         full: "1000px",
       },
       fill: {
@@ -136,15 +163,18 @@ export default {
         secondary: "rgba(var(--content-action-on-secondary))",
         disabled: "rgba(var(--content-disabled))",
       },
+      boxShadow: {
+        "card": "0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06)",
+        "card-hover": "0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
+        "elevated": "0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05)",
+      },
     },
   },
   plugins: [
     plugin(function ({ addUtilities }) {
       addUtilities({
         '.scrollbar-hide': {
-          /* Firefox */
           'scrollbar-width': 'none',
-          /* Safari and Chrome */
           '&::-webkit-scrollbar': {
             display: 'none'
           }

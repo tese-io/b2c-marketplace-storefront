@@ -1,4 +1,4 @@
-import { HomeProductsCarousel } from "@/components/organisms"
+import { ProductCard } from "@/components/organisms"
 import { Product } from "@/types/product"
 
 export const HomeProductSection = async ({
@@ -12,16 +12,23 @@ export const HomeProductSection = async ({
   products?: Product[]
   home?: boolean
 }) => {
+  const displayProducts = products.slice(0, 4)
+
+  if (!displayProducts.length) return null
+
   return (
     <section className="py-8 w-full">
-      <h2 className="mb-6 heading-lg font-bold tracking-tight uppercase">
+      <h2 className="mb-6 heading-lg text-primary uppercase">
         {heading}
       </h2>
-      <HomeProductsCarousel
-        locale={locale}
-        sellerProducts={products.slice(0, 4)}
-        home={home}
-      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {displayProducts.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+          />
+        ))}
+      </div>
     </section>
   )
 }

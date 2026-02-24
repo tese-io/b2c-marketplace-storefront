@@ -9,32 +9,32 @@ export const BannerSection = () => {
         <div className="py-6 px-6 flex flex-col h-full justify-between border border-secondary rounded-sm">
           <div className="mb-8 lg:mb-48">
             <span className="text-sm inline-block px-4 py-1 border border-secondary rounded-sm">
-              #COLLECTION
+              #ESG & IMPACT
             </span>
             <h2 className="display-sm">
-              BOHO VIBES: WHERE COMFORT MEETS CREATIVITY
+              TRUSTED VENDORS FOR A SUSTAINABLE FUTURE
             </h2>
             <p className="text-lg text-tertiary max-w-lg">
-              Discover boho styles that inspire adventure and embrace the beauty
-              of the unconventional.
+              Connect with verified providers of ESG audits, sustainability
+              consulting, and impact solutions. Quality and transparency built in.
             </p>
           </div>
-          <LocalizedClientLink href="/collections/boho">
+          <LocalizedClientLink href="/categories">
             <Button size="large" className="w-fit bg-secondary/10">
-              EXPLORE
+              EXPLORE VENDORS
             </Button>
           </LocalizedClientLink>
         </div>
-        <div className="relative aspect-[4/3] lg:aspect-auto lg:h-full flex justify-end rounded-sm">
+        <div className="relative aspect-[4/3] lg:aspect-[4/3] lg:max-w-[560px] lg:max-h-[420px] lg:ml-auto flex justify-end rounded-sm overflow-hidden">
           <Image
             loading="lazy"
             fetchPriority="high"
             src="/images/banner-section/Image.jpg"
-            alt="Boho fashion collection - Model wearing a floral dress with yellow boots"
+            alt="Sustainability and ESG – trusted marketplace for responsible business"
             width={700}
-            height={600}
-            className="object-cover object-top rounded-sm"
-            sizes="(min-width: 1024px) 50vw, 100vw"
+            height={525}
+            className="object-cover object-top rounded-sm w-full h-full"
+            sizes="(min-width: 1024px)  min(50vw, 560px), 100vw"
           />
         </div>
       </div>

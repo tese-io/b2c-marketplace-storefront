@@ -1,26 +1,29 @@
-"use client"
+'use client'
 
 import {
   Badge,
   Divider,
   LogoutButton,
   NavigationItem,
-} from "@/components/atoms"
-import { Dropdown } from "@/components/molecules"
-import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
-import { ProfileIcon } from "@/icons"
-import { HttpTypes } from "@medusajs/types"
-import { useUnreads } from "@talkjs/react"
-import { useState } from "react"
+} from '@/components/atoms'
+import { Dropdown } from '@/components/molecules'
+import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
+import { ProfileIcon } from '@/icons'
+import { HttpTypes } from '@medusajs/types'
+import { useUnreads } from '@talkjs/react'
+import { useState } from 'react'
 
-export const UserDropdown = ({
-  isLoggedIn,
+const MATRIX_CHAT_ENABLED = process.env.NEXT_PUBLIC_MATRIX_CHAT_ENABLED === 'true'
+
+export function UserDropdown ({
+  isLoggedIn
 }: {
   isLoggedIn: boolean
-}) => {
+}) {
   const [open, setOpen] = useState(false)
 
   const unreads = useUnreads()
+  const displayUnreads = MATRIX_CHAT_ENABLED ? [] : (unreads ?? [])
 
   return (
     <div
@@ -47,9 +50,9 @@ export const UserDropdown = ({
             <NavigationItem href="/user/orders">Orders</NavigationItem>
             <NavigationItem href="/user/messages" className="relative">
               Messages
-              {Boolean(unreads?.length) && (
+              {Boolean(displayUnreads?.length) && (
                 <Badge className="absolute top-3 left-24 w-4 h-4 p-0">
-                  {unreads?.length}
+                  {displayUnreads.length}
                 </Badge>
               )}
             </NavigationItem>

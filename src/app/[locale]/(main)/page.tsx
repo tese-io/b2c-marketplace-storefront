@@ -50,7 +50,7 @@ export async function generateMetadata({
 
   const title = "Home"
   const description =
-    "Welcome to Mercur B2C Demo! Create a modern marketplace that you own and customize in every aspect with high-performance, fully customizable storefront."
+    "tese.io Sustainability Marketplace – discover sustainable products and ESG services. ESG audits, consulting, reporting tools, and solutions from verified vendors."
   const ogImage = "/B2C_Storefront_Open_Graph.png"
   const canonical = `${baseUrl}/${locale}`
 
@@ -84,7 +84,7 @@ export async function generateMetadata({
       url: canonical,
       siteName:
         process.env.NEXT_PUBLIC_SITE_NAME ||
-        "Mercur B2C Demo - Marketplace Storefront",
+        "tese.io Sustainability Marketplace",
       type: "website",
       images: [
         {
@@ -93,7 +93,7 @@ export async function generateMetadata({
           height: 630,
           alt:
             process.env.NEXT_PUBLIC_SITE_NAME ||
-            "Mercur B2C Demo - Marketplace Storefront",
+            "tese.io Sustainability Marketplace",
         },
       ],
     },
@@ -120,15 +120,15 @@ export default async function Home({
 
   const siteName =
     process.env.NEXT_PUBLIC_SITE_NAME ||
-    "Mercur B2C Demo - Marketplace Storefront"
+    "tese.io Sustainability Marketplace"
 
   return (
     <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start text-primary">
       <link
         rel="preload"
         as="image"
-        href="/images/hero/Image.jpg"
-        imageSrcSet="/images/hero/Image.jpg 700w"
+        href="/images/hero/hero-sustainability.png"
+        imageSrcSet="/images/hero/hero-sustainability.png 700w"
         imageSizes="(min-width: 1024px) 50vw, 100vw"
       />
       {/* Organization JSON-LD */}
@@ -141,7 +141,8 @@ export default async function Home({
             "@type": "Organization",
             name: siteName,
             url: `${baseUrl}/${locale}`,
-            logo: `${baseUrl}/favicon.ico`,
+            logo: `${baseUrl}/Logo.png`,
+            description: "Sustainability and ESG marketplace for products and services.",
           }),
         }}
       />
@@ -161,13 +162,13 @@ export default async function Home({
       />
 
       <Hero
-        image="/images/hero/Image.jpg"
-        heading="Snag your style in a flash"
-        paragraph="Buy, sell, and discover pre-loved gems from the trendiest brands."
+        image="/images/hero/hero-sustainability.png"
+        heading="Sustainability & ESG in one place"
+        paragraph="Discover sustainable products and trusted ESG services—audits, consulting, reporting, and more—from verified vendors."
         buttons={[
-          { label: "Buy now", path: "/categories" },
+          { label: "Browse marketplace", path: "/categories" },
           {
-            label: "Sell now",
+            label: "Sell as vendor",
             path:
               process.env.NEXT_PUBLIC_VENDOR_URL ||
               "https://vendor.mercurjs.com",
@@ -175,10 +176,10 @@ export default async function Home({
         ]}
       />
       <div className="px-4 lg:px-8 w-full">
-        <HomeProductSection heading="trending listings" locale={locale} home />
+        <HomeProductSection heading="Featured products & services" locale={locale} home />
       </div>
       <div className="px-4 lg:px-8 w-full">
-        <HomeCategories heading="SHOP BY CATEGORY" />
+        <HomeCategories heading="BROWSE BY CATEGORY" />
       </div>
       <BannerSection />
       <ShopByStyleSection />

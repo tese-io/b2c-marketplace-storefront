@@ -41,7 +41,11 @@ export const ProductListing = async ({
 
   return (
     <div className="py-4" data-testid="product-listing-container">
-      <ProductListingHeader total={count} listingType={listing_type} />
+      <ProductListingHeader
+        total={count}
+        listingType={listing_type}
+        showTypeFilters={!listing_type}
+      />
       <div className="hidden md:block">
         <ProductListingActiveFilters />
       </div>

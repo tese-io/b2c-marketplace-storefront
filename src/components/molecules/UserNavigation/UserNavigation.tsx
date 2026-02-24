@@ -1,13 +1,16 @@
-"use client"
+'use client'
+
 import {
   Badge,
   Card,
   Divider,
   LogoutButton,
   NavigationItem,
-} from "@/components/atoms"
-import { useUnreads } from "@talkjs/react"
-import { usePathname } from "next/navigation"
+} from '@/components/atoms'
+import { useUnreads } from '@talkjs/react'
+import { usePathname } from 'next/navigation'
+
+const MATRIX_CHAT_ENABLED = process.env.NEXT_PUBLIC_MATRIX_CHAT_ENABLED === 'true'
 
 const navigationItems = [
   {
@@ -36,8 +39,9 @@ const navigationItems = [
   },
 ]
 
-export const UserNavigation = () => {
+export function UserNavigation () {
   const unreads = useUnreads()
+  const displayUnreads = MATRIX_CHAT_ENABLED ? [] : (unreads ?? [])
   const path = usePathname()
 
   return (
@@ -50,9 +54,9 @@ export const UserNavigation = () => {
           className="relative"
         >
           {item.label}
-          {item.label === "Messages" && Boolean(unreads?.length) && (
+          {item.label === 'Messages' && Boolean(displayUnreads?.length) && (
             <Badge className="absolute top-3 left-24 w-4 h-4 p-0">
-              {unreads?.length}
+              {displayUnreads.length}
             </Badge>
           )}
         </NavigationItem>

@@ -2,7 +2,7 @@ import { ProductListingSkeleton } from "@/components/organisms/ProductListingSke
 import { Suspense } from "react"
 
 import { Breadcrumbs } from "@/components/atoms"
-import { AlgoliaProductsListing, ProductListing } from "@/components/sections"
+import { HomeCategories, ProductListing, AlgoliaProductsListing } from "@/components/sections"
 import { getRegion } from "@/lib/data/regions"
 import isBot from "@/lib/helpers/isBot"
 import { headers } from "next/headers"
@@ -41,9 +41,9 @@ export async function generateMetadata({
     languages = { [toHreflang(locale)]: `${baseUrl}/${locale}/categories` }
   }
 
-  const title = "All Products"
-  const description = `Browse all products on ${
-    process.env.NEXT_PUBLIC_SITE_NAME || "our store"
+  const title = "Categories"
+  const description = `Browse sustainable products and ESG services by category—ESG audits, consulting, reporting, carbon & climate, circular economy. ${
+    process.env.NEXT_PUBLIC_SITE_NAME || "tese.io Sustainability Marketplace"
   }`
   const canonical = `${baseUrl}/${locale}/categories`
 
@@ -56,33 +56,36 @@ export async function generateMetadata({
     },
     robots: { index: true, follow: true },
     openGraph: {
-      title: `${title} | ${process.env.NEXT_PUBLIC_SITE_NAME || "Storefront"}`,
+      title: `${title} | ${process.env.NEXT_PUBLIC_SITE_NAME || "tese.io Sustainability Marketplace"}`,
       description,
       url: canonical,
-      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "Storefront",
+      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "tese.io Sustainability Marketplace",
       type: "website",
     },
   }
 }
 
-const ALGOLIA_ID = process.env.NEXT_PUBLIC_ALGOLIA_ID
-const ALGOLIA_SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY
-
 async function AllCategories({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>
+  searchParams?: Promise<{ listing_type?: string; query?: string; ai_search?: string }>
 }) {
   const { locale } = await params
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const listing_type = resolvedSearchParams?.listing_type === 'service' || resolvedSearchParams?.listing_type === 'product'
+    ? resolvedSearchParams.listing_type
+    : undefined
+  const query = resolvedSearchParams?.query
+  const ai_search = resolvedSearchParams?.ai_search
 
   const ua = (await headers()).get("user-agent") || ""
   const bot = isBot(ua)
 
   const breadcrumbsItems = [
-    {
-      path: "/",
-      label: "All Products",
-    },
+    { path: "/", label: "Home" },
+    { path: "/categories", label: "Categories" },
   ]
 
   const currency_code = (await getRegion(locale))?.currency_code || "usd"
@@ -119,7 +122,7 @@ async function AllCategories({
               {
                 "@type": "ListItem",
                 position: 1,
-                name: "All Products",
+                name: "Categories",
                 item: `${baseUrl}/${locale}/categories`,
               },
             ],
@@ -137,22 +140,33 @@ async function AllCategories({
           }),
         }}
       />
-      <div className="hidden md:block mb-2">
+      <div className="hidden md:block mb-6">
         <Breadcrumbs items={breadcrumbsItems} />
       </div>
 
-      <h1 className="heading-xl uppercase">All Products</h1>
+      <div className="mb-8">
+        <h1 className="heading-xl text-primary mb-2">
+          {query ? `Search Results for "${query}"` : 'Categories'}
+        </h1>
+        <p className="text-lg text-secondary max-w-2xl">
+          {query
+            ? `Showing products matching your search ${ai_search === 'true' ? 'using AI-powered natural language understanding' : ''}`
+            : 'Explore our comprehensive range of sustainable products and ESG services organized by category.'}
+        </p>
+      </div>
 
-      <Suspense fallback={<div data-testid="all-categories-page-loading"><ProductListingSkeleton /></div>}>
-        {bot || !ALGOLIA_ID || !ALGOLIA_SEARCH_KEY ? (
-          <ProductListing showSidebar locale={locale} />
-        ) : (
+      {query ? (
+        <Suspense fallback={<ProductListingSkeleton />}>
           <AlgoliaProductsListing
             locale={locale}
             currency_code={currency_code}
           />
-        )}
-      </Suspense>
+        </Suspense>
+      ) : (
+        <section>
+          <HomeCategories heading="BROWSE BY CATEGORY" useGrid={true} />
+        </section>
+      )}
     </main>
   )
 }

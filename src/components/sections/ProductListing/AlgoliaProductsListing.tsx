@@ -2,10 +2,10 @@
 
 import { HttpTypes } from "@medusajs/types"
 import {
-  AlgoliaProductSidebar,
   ProductListingActiveFilters,
   ProductsPagination,
 } from "@/components/organisms"
+import { ProductFilters } from "@/components/products/ProductFilters"
 import {
   ProductListingLoadingView,
   ProductListingNoResultsView,
@@ -16,8 +16,17 @@ import { getFacedFilters } from "@/lib/helpers/get-faced-filters"
 import { PRODUCT_LIMIT } from "@/const"
 import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
 import { useEffect, useMemo, useState } from "react"
-import { searchProducts } from "@/lib/data/products"
-import { FacetModel } from "@/components/organisms/ProductSidebar/AlgoliaProductSidebar"
+import { searchProducts, aiSearchProducts } from "@/lib/data/products"
+import { SparkIcon } from "@/icons"
+
+const PRODUCT_CATEGORIES = [
+  { value: 'clothing', label: 'Sustainable Clothing' },
+  { value: 'home', label: 'Home & Living' },
+  { value: 'office', label: 'Office Supplies' },
+  { value: 'electronics', label: 'Electronics' },
+  { value: 'food', label: 'Food & Beverages' },
+  { value: 'beauty', label: 'Beauty & Personal Care' },
+]
 
 export const AlgoliaProductsListing = ({
   category_id,
@@ -37,6 +46,7 @@ export const AlgoliaProductsListing = ({
   const facetFilters: string = getFacedFilters(searchParams)
   const query: string = searchParams.get("query") || ""
   const page: number = +(searchParams.get("page") || 1)
+  const category = searchParams.get("category") || undefined
 
   const filters = `${
     seller_handle
@@ -59,6 +69,7 @@ export const AlgoliaProductsListing = ({
         filters={filters}
         query={query}
         page={page}
+        activeCategory={category}
       />
   )
 }
@@ -69,22 +80,25 @@ const ProductsListing = ({
   filters,
   query,
   page,
+  activeCategory,
 }: {
   locale?: string
   currency_code: string
   filters: string
   query: string
   page: number
+  activeCategory?: string
 }) => {
   const [products, setProducts] = useState<
     (HttpTypes.StoreProduct & { seller?: any })[]
   >([])
-  const [facets, setFacets] = useState<Record<string, FacetModel[]>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [count, setCount] = useState(0)
   const [pages, setPages] = useState(1)
+  const [aiMetadata, setAiMetadata] = useState<any>(null)
 
   const searchParams = useSearchParams()
+  const useAiSearch = searchParams.get("ai_search") === "true"
 
   useEffect(() => {
     async function fetchProducts() {
@@ -92,46 +106,95 @@ const ProductsListing = ({
 
       try {
         setIsLoading(true)
-        const result = await searchProducts({
-          query: query || undefined,
-          page: page - 1,
-          hitsPerPage: PRODUCT_LIMIT,
-          filters,
-          currency_code,
-          countryCode: locale,
-        })
+
+        // Use AI search if ai_search parameter is true
+        const result = useAiSearch
+          ? await aiSearchProducts({
+              query: query || "",
+              page: page - 1,
+              hitsPerPage: PRODUCT_LIMIT,
+              currency_code,
+              countryCode: locale,
+              enable_ai: true,
+            })
+          : await searchProducts({
+              query: query || undefined,
+              page: page - 1,
+              hitsPerPage: PRODUCT_LIMIT,
+              filters,
+              currency_code,
+              countryCode: locale,
+            })
 
         setProducts(result.products)
-        setFacets(result.facets)
         setCount(result.nbHits)
         setPages(result.nbPages)
+        setAiMetadata(result.ai_metadata || null)
       } catch (error) {
         setProducts([])
-        setFacets({})
         setCount(0)
         setPages(0)
+        setAiMetadata(null)
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchProducts()
-  }, [locale, filters, query, page, currency_code])
+  }, [locale, filters, query, page, currency_code, useAiSearch])
 
   if (isLoading && products.length === 0) return <ProductListingSkeleton />
 
   return (
-    <div className="min-h-[70vh]">
-      <div className="flex justify-between w-full items-center">
-        <div className="my-4 label-md">{`${count} listings`}</div>
-      </div>
-      <div className="hidden md:block">
-        <ProductListingActiveFilters />
-      </div>
-      <div className="md:flex gap-4">
-        <div className="w-[280px] flex-shrink-0 hidden md:block">
-          <AlgoliaProductSidebar facets={facets} />
+    <div className="flex flex-col lg:flex-row gap-8">
+      {/* Sidebar with filters */}
+      <aside className="w-full lg:w-64 flex-shrink-0">
+        <ProductFilters
+          categories={PRODUCT_CATEGORIES}
+          activeCategory={activeCategory}
+        />
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 min-h-[70vh]">
+        <div className="flex justify-between w-full items-center mb-4">
+          <div className="label-md">{`${count} listings`}</div>
         </div>
+
+        {/* AI Search Indicator */}
+        {useAiSearch && aiMetadata && (
+          <div className="mb-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+            <div className="flex items-center gap-2 text-sm">
+              <SparkIcon size={16} className="text-purple-600" />
+              <span className="font-medium text-purple-900">AI-Powered Search Active</span>
+              {aiMetadata.confidence && (
+                <span className="text-purple-600">
+                  • Confidence: {Math.round(aiMetadata.confidence * 100)}%
+                </span>
+              )}
+            </div>
+            {aiMetadata.intent && (
+              <p className="text-xs text-purple-700 mt-1 ml-6">
+                {aiMetadata.intent}
+              </p>
+            )}
+            {aiMetadata.applied_filters && (
+              <details className="text-xs text-purple-600 mt-2 ml-6">
+                <summary className="cursor-pointer hover:text-purple-800">
+                  View applied filters
+                </summary>
+                <code className="block mt-1 p-2 bg-white rounded text-purple-900 overflow-x-auto">
+                  {aiMetadata.applied_filters}
+                </code>
+              </details>
+            )}
+          </div>
+        )}
+
+        <div className="hidden md:block mb-4">
+          <ProductListingActiveFilters />
+        </div>
+
         <div className="w-full flex flex-col">
           {isLoading && <ProductListingLoadingView />}
 

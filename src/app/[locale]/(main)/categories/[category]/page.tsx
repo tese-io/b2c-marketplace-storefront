@@ -4,12 +4,12 @@ import { Suspense } from "react"
 
 import type { Metadata } from "next"
 import { Breadcrumbs } from "@/components/atoms"
-import { AlgoliaProductsListing, ProductListing } from "@/components/sections"
+import { ProductListing } from "@/components/sections"
+import { ProductFilters } from "@/components/products/ProductFilters"
 import { notFound } from "next/navigation"
-import isBot from "@/lib/helpers/isBot"
 import { headers } from "next/headers"
 import Script from "next/script"
-import { getRegion, listRegions } from "@/lib/data/regions"
+import { listRegions } from "@/lib/data/regions"
 import { listProducts } from "@/lib/data/products"
 import { toHreflang } from "@/lib/helpers/hreflang"
 
@@ -49,10 +49,8 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${cat.name} Category`
-  const description = `${cat.name} Category - ${
-    process.env.NEXT_PUBLIC_SITE_NAME || "Storefront"
-  }`
+  const title = `${cat.name}`
+  const description = cat.description || `Browse ${cat.name} products and services from verified sustainable vendors on tese.io`
   const canonical = `${baseUrl}/${locale}/categories/${categoryHandle}`
 
   return {
@@ -67,42 +65,48 @@ export async function generateMetadata({
     },
     robots: { index: true, follow: true },
     openGraph: {
-      title: `${title} | ${process.env.NEXT_PUBLIC_SITE_NAME || "Storefront"}`,
+      title: `${title} | ${process.env.NEXT_PUBLIC_SITE_NAME || "tese.io Sustainability Marketplace"}`,
       description,
       url: canonical,
-      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "Storefront",
+      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "tese.io Sustainability Marketplace",
       type: "website",
     },
   }
 }
 
-const ALGOLIA_ID = process.env.NEXT_PUBLIC_ALGOLIA_ID
-const ALGOLIA_SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY
-
 async function Category({
   params,
+  searchParams,
 }: {
   params: Promise<{
     category: string
     locale: string
   }>
+  searchParams?: Promise<{ subcategory?: string; listing_type?: string }>
 }) {
   const { category: categoryHandle, locale } = await params
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const subcategory = typeof resolvedSearchParams?.subcategory === 'string'
+    ? resolvedSearchParams.subcategory
+    : undefined
 
   const category = await getCategoryByHandle(categoryHandle)
 
   if (!category) {
     return notFound()
   }
-  const currency_code = (await getRegion(locale))?.currency_code || "usd"
-  const ua = (await headers()).get("user-agent") || ""
-  const bot = isBot(ua)
+
+  // Get subcategories from category_children
+  const subcategories = category.category_children || []
+  const subcategoryOptions = subcategories.map((cat) => ({
+    value: cat.handle,
+    label: cat.name,
+  }))
 
   const breadcrumbsItems = [
-    {
-      path: categoryHandle,
-      label: category.name,
-    },
+    { path: '/', label: 'Home' },
+    { path: '/categories', label: 'Categories' },
+    { path: `/categories/${categoryHandle}`, label: category.name },
   ]
 
   // Small cached list for JSON-LD itemList
@@ -138,6 +142,18 @@ async function Category({
               {
                 "@type": "ListItem",
                 position: 1,
+                name: "Home",
+                item: `${baseUrl}/${locale}`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Categories",
+                item: `${baseUrl}/${locale}/categories`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
                 name: category.name,
                 item: `${baseUrl}/${locale}/categories/${categoryHandle}`,
               },
@@ -156,23 +172,45 @@ async function Category({
           }),
         }}
       />
-      <div className="hidden md:block mb-2">
+
+      <div className="hidden md:block mb-6">
         <Breadcrumbs items={breadcrumbsItems} />
       </div>
 
-      <h1 className="heading-xl uppercase">{category.name}</h1>
-
-      <Suspense fallback={<div data-testid="category-page-loading"><ProductListingSkeleton /></div>}>
-        {bot || !ALGOLIA_ID || !ALGOLIA_SEARCH_KEY ? (
-          <ProductListing category_id={category.id} showSidebar locale={locale} />
-        ) : (
-          <AlgoliaProductsListing
-            category_id={category.id}
-            locale={locale}
-            currency_code={currency_code}
-          />
+      <div className="mb-8">
+        <h1 className="heading-xl text-primary mb-2 uppercase">
+          {category.name}
+        </h1>
+        {category.description && (
+          <p className="text-lg text-secondary max-w-2xl">
+            {category.description}
+          </p>
         )}
-      </Suspense>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Sidebar with filters */}
+        {subcategoryOptions.length > 0 && (
+          <aside className="w-full lg:w-64 flex-shrink-0">
+            <ProductFilters
+              categories={subcategoryOptions}
+              activeCategory={subcategory}
+            />
+          </aside>
+        )}
+
+        {/* Main product listing */}
+        <div className="flex-1">
+          <Suspense fallback={<ProductListingSkeleton />}>
+            <ProductListing
+              category_id={category.id}
+              showSidebar={false}
+              locale={locale}
+              listing_type={undefined}
+            />
+          </Suspense>
+        </div>
+      </div>
     </main>
   )
 }

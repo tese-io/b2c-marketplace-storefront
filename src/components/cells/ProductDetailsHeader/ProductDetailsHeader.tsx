@@ -176,7 +176,9 @@ export const ProductDetailsHeader = ({
               </div>
             ) : !hasPriceRange ? (
               <span className="label-md text-secondary pt-2 pb-4" data-testid="product-price-unavailable">
-                Not available in your region
+                {isService && requestQuoteOnly
+                  ? 'Price on request – use "Request quote" below'
+                  : 'Not available in your region'}
               </span>
             ) : null}
           </div>
@@ -227,9 +229,8 @@ export const ProductDetailsHeader = ({
             : "OUT OF STOCK"}
         </Button>
       )}
-      {/* Seller message */}
-
-      {user && product.seller && (
+      {/* Write to seller – show whenever there is a seller (login required to open chat) */}
+      {product.seller && (
         <Chat
           user={user}
           seller={product.seller}

@@ -14,7 +14,7 @@ export const FirstStory: Story = {
   args: {
     heading: "Snag your style in a flash",
     paragraph: "Buy, sell, and discover pre-loved from the trendiest brands.",
-    image: "/images/hero/Image.jpg",
+    image: "/images/hero/hero-sustainability.png",
     buttons: [
       { label: "Buy now", path: "#" },
       { label: "Sell now", path: "3" },
