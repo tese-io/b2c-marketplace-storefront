@@ -113,131 +113,129 @@ const CartPaymentSection = ({
   const isEditEnabled = !isOpen && !!cart?.payment_collection?.payment_sessions?.length;
 
   return (
-    <div className="bg-ui-bg-interactive rounded-sm border p-4" data-testid="checkout-step-payment">
-      <div className="mb-6 flex flex-row items-center justify-between">
-        <Heading
-          level="h2"
-          className="text-3xl-regular flex flex-row items-center items-baseline gap-x-2"
-        >
-          {!isOpen && paymentReady && <CheckCircleSolid />}
+    <section
+      className={`tese-checkout-step ${isOpen ? 'tese-checkout-step--open' : 'tese-checkout-step--closed'}`}
+      data-testid="checkout-step-payment"
+    >
+      <div className="tese-checkout-step-head">
+        <Heading level="h2" className="tese-checkout-step-title">
+          {!isOpen && paymentReady && (
+            <CheckCircleSolid className="tese-checkout-step-check" />
+          )}
           Payment
         </Heading>
         {isEditEnabled && (
-          <Text>
-            <Button
-              data-testid="checkout-payment-edit-button"
-              onClick={handleEdit}
-              variant="tonal"
-            >
-              Edit
-            </Button>
-          </Text>
+          <Button
+            data-testid="checkout-payment-edit-button"
+            onClick={handleEdit}
+            variant="tonal"
+            className="tese-checkout-edit-btn"
+          >
+            Edit
+          </Button>
         )}
       </div>
       <div>
-        <div className={isOpen ? 'block' : 'hidden'}>
-          {!paidByGiftcard && availablePaymentMethods?.length && (
+        <div className={isOpen ? 'tese-checkout-step-body' : 'tese-checkout-step-summary'}>
+          {isOpen ? (
             <>
-              <RadioGroup
-                value={selectedPaymentMethod}
-                onChange={(value: string) => setPaymentMethod(value)}
-              >
-                {availablePaymentMethods.map(paymentMethod => (
-                  <div key={paymentMethod.id}>
-                    {isStripeFunc(paymentMethod.id) ? (
-                      <StripeCardContainer
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                        paymentInfoMap={paymentInfoMap}
-                        setCardBrand={setCardBrand}
-                        setError={setError}
-                        setCardComplete={setCardComplete}
-                      />
-                    ) : (
-                      <PaymentContainer
-                        paymentInfoMap={paymentInfoMap}
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                      />
-                    )}
-                  </div>
-                ))}
-              </RadioGroup>
-            </>
-          )}
-
-          {paidByGiftcard && (
-            <div className="flex w-1/3 flex-col">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">Payment method</Text>
-              <Text
-                className="txt-medium text-ui-fg-subtle"
-                data-testid="payment-method-summary"
-              >
-                Gift card
-              </Text>
-            </div>
-          )}
-
-          <ErrorMessage
-            error={error}
-            data-testid="payment-method-error-message"
-          />
-
-          <Button
-            onClick={handleSubmit}
-            variant="tonal"
-            loading={isLoading}
-            disabled={(isStripe && !cardComplete) || (!selectedPaymentMethod && !paidByGiftcard)}
-          >
-            {!activeSession && isStripeFunc(selectedPaymentMethod)
-              ? ' Enter card details'
-              : 'Continue to review'}
-          </Button>
-        </div>
-
-        <div className={isOpen ? 'hidden' : 'block'}>
-          {cart && paymentReady && activeSession ? (
-            <div className="flex w-full items-start gap-x-1">
-              <div className="flex w-1/3 flex-col">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">Payment method</Text>
-                <Text
-                  className="txt-medium text-ui-fg-subtle"
-                  data-testid="payment-method-summary"
+              {!paidByGiftcard && availablePaymentMethods?.length && (
+                <RadioGroup
+                  value={selectedPaymentMethod}
+                  onChange={(value: string) => setPaymentMethod(value)}
+                  className="tese-checkout-payment-options"
                 >
-                  {paymentInfoMap[activeSession?.provider_id]?.title || activeSession?.provider_id}
-                </Text>
-              </div>
-              <div className="flex w-1/3 flex-col">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">Payment details</Text>
-                <div
-                  className="txt-medium text-ui-fg-subtle flex items-center gap-2"
-                  data-testid="payment-details-summary"
-                >
-                  <Container className="bg-ui-button-neutral-hover flex h-7 w-fit items-center p-2"     data-testid="payment-details-summary">
-                    {paymentInfoMap[selectedPaymentMethod]?.icon || <CreditCard />}
-                  </Container>
-                  <Text>
-                    {isStripeFunc(selectedPaymentMethod) && cardBrand
-                      ? cardBrand
-                      : 'Another step will appear'}
+                  {availablePaymentMethods.map(paymentMethod => (
+                    <div key={paymentMethod.id}>
+                      {isStripeFunc(paymentMethod.id) ? (
+                        <StripeCardContainer
+                          paymentProviderId={paymentMethod.id}
+                          selectedPaymentOptionId={selectedPaymentMethod}
+                          paymentInfoMap={paymentInfoMap}
+                          setCardBrand={setCardBrand}
+                          setError={setError}
+                          setCardComplete={setCardComplete}
+                        />
+                      ) : (
+                        <PaymentContainer
+                          paymentInfoMap={paymentInfoMap}
+                          paymentProviderId={paymentMethod.id}
+                          selectedPaymentOptionId={selectedPaymentMethod}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </RadioGroup>
+              )}
+
+              {paidByGiftcard && (
+                <div className="tese-checkout-method-card">
+                  <Text className="tese-checkout-method-label">Payment method</Text>
+                  <Text className="tese-checkout-method-value" data-testid="payment-method-summary">
+                    Gift card
                   </Text>
                 </div>
+              )}
+
+              <ErrorMessage
+                error={error}
+                data-testid="payment-method-error-message"
+              />
+
+              <div className="tese-checkout-step-actions">
+                <Button
+                  onClick={handleSubmit}
+                  className="tese-cart-checkout-btn"
+                  variant="filled"
+                  loading={isLoading}
+                  disabled={(isStripe && !cardComplete) || (!selectedPaymentMethod && !paidByGiftcard)}
+                >
+                  {!activeSession && isStripeFunc(selectedPaymentMethod)
+                    ? 'Enter card details'
+                    : 'Continue to review'}
+                </Button>
               </div>
-            </div>
-          ) : paidByGiftcard ? (
-            <div className="flex w-1/3 flex-col">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">Payment method</Text>
-              <Text
-                className="txt-medium text-ui-fg-subtle"
-                data-testid="payment-method-summary"
-              >
-                Gift card
-              </Text>
-            </div>
-          ) : null}
+            </>
+          ) : (
+            <>
+              {cart && paymentReady && activeSession ? (
+                <div className="tese-checkout-payment-summary">
+                  <div>
+                    <Text className="tese-checkout-method-label">Payment method</Text>
+                    <Text className="tese-checkout-method-value" data-testid="payment-method-summary">
+                      {paymentInfoMap[activeSession?.provider_id]?.title || activeSession?.provider_id}
+                    </Text>
+                  </div>
+                  <div>
+                    <Text className="tese-checkout-method-label">Payment details</Text>
+                    <div
+                      className="tese-checkout-method-value flex items-center gap-2"
+                      data-testid="payment-details-summary"
+                    >
+                      <Container className="tese-checkout-payment-icon">
+                        {paymentInfoMap[selectedPaymentMethod]?.icon || <CreditCard />}
+                      </Container>
+                      <Text>
+                        {isStripeFunc(selectedPaymentMethod) && cardBrand
+                          ? cardBrand
+                          : 'Another step will appear'}
+                      </Text>
+                    </div>
+                  </div>
+                </div>
+              ) : paidByGiftcard ? (
+                <div className="tese-checkout-method-card">
+                  <Text className="tese-checkout-method-label">Payment method</Text>
+                  <Text className="tese-checkout-method-value" data-testid="payment-method-summary">
+                    Gift card
+                  </Text>
+                </div>
+              ) : null}
+            </>
+          )}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -8,6 +8,7 @@ import { CartAddressSection } from '@/components/sections/CartAddressSection/Car
 import CartPaymentSection from '@/components/sections/CartPaymentSection/CartPaymentSection';
 import CartReview from '@/components/sections/CartReview/CartReview';
 import CartShippingMethodsSection from '@/components/sections/CartShippingMethodsSection/CartShippingMethodsSection';
+import { CheckoutProgress } from '@/components/sections/CheckoutProgress/CheckoutProgress';
 import { retrieveCart } from '@/lib/data/cart';
 import { retrieveCustomer } from '@/lib/data/customer';
 import { listCartShippingMethods } from '@/lib/data/fulfillment';
@@ -21,7 +22,13 @@ export const metadata: Metadata = {
 export default async function CheckoutPage({}) {
   return (
     <Suspense
-      fallback={<div className="container flex items-center justify-center" data-testid="checkout-page-loading">Loading...</div>}
+      fallback={
+        <div className="tese-checkout-page">
+          <div className="tese-container tese-checkout-shell tese-checkout-loading" data-testid="checkout-page-loading">
+            Loading checkout…
+          </div>
+        </div>
+      }
     >
       <CheckoutPageContent />
     </Suspense>
@@ -41,25 +48,42 @@ async function CheckoutPageContent({}) {
 
   return (
     <PaymentWrapper cart={cart}>
-      <main className="container" data-testid="checkout-page">
-        <div className="grid gap-8 lg:grid-cols-11">
-          <div className="flex flex-col gap-4 lg:col-span-6" data-testid="checkout-steps-container">
-            <CartAddressSection
-              cart={cart}
-              customer={customer}
-            />
-            <CartShippingMethodsSection
-              cart={cart}
-              availableShippingMethods={shippingMethods as any}
-            />
-            <CartPaymentSection
-              cart={cart}
-              availablePaymentMethods={paymentMethods}
-            />
-          </div>
+      <main className="tese-checkout-page" data-testid="checkout-page">
+        <div className="tese-container tese-checkout-shell">
+          <header className="tese-checkout-head">
+            <div>
+              <p className="tese-checkout-eyebrow">Secure checkout</p>
+              <h1 className="tese-checkout-title">Complete your order</h1>
+            </div>
+          </header>
 
-          <div className="lg:col-span-5" data-testid="checkout-review-container">
-            <CartReview cart={cart} />
+          <div className="tese-checkout-layout">
+            <div className="tese-checkout-main" data-testid="checkout-steps-container">
+              <Suspense fallback={null}>
+                <CheckoutProgress />
+              </Suspense>
+              <div className="tese-checkout-steps">
+                <CartAddressSection
+                  cart={cart}
+                  customer={customer}
+                />
+                <CartShippingMethodsSection
+                  cart={cart}
+                  availableShippingMethods={shippingMethods as any}
+                />
+                <CartPaymentSection
+                  cart={cart}
+                  availablePaymentMethods={paymentMethods}
+                />
+              </div>
+            </div>
+
+            <aside className="tese-checkout-aside" data-testid="checkout-review-container">
+              <div className="tese-checkout-review-card">
+                <h2 className="tese-checkout-review-title">Order summary</h2>
+                <CartReview cart={cart} />
+              </div>
+            </aside>
           </div>
         </div>
       </main>

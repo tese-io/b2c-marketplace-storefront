@@ -5,6 +5,7 @@ import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { sdk } from '../config';
+import { decodeToken } from '../helpers/token';
 import {
   getAuthHeaders,
   getCacheOptions,
@@ -119,6 +120,58 @@ export async function login(formData: FormData) {
     return {
       success: false,
       message: (error as Error)?.message || 'Unable to log in. Please try again.'
+    };
+  }
+}
+
+/**
+ * Log in a customer using a one-time tese SSO key (handed off from the tese
+ * dashboard). The `tese-sso` Medusa auth provider validates the key against the
+ * tese backend and returns a token. For a first-time user the token has no
+ * linked customer yet, so we provision one via /store/customers/tese and then
+ * refresh the token into a full customer session.
+ */
+export async function loginWithTeseSSO(ssoKey: string) {
+  try {
+    const token = (await sdk.auth.login('customer', 'tese-sso', {
+      sso_key: ssoKey
+    })) as string;
+
+    if (typeof token !== 'string') {
+      return { success: false, message: 'Unexpected SSO response' };
+    }
+
+    let sessionToken = token;
+    const payload = decodeToken(token);
+
+    // No actor_id => claimable identity with no customer yet. Create + link it.
+    if (!payload?.actor_id) {
+      await sdk.client.fetch('/store/customers/tese', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}` }
+      });
+
+      const refreshed = await sdk.client.fetch<{ token: string }>(
+        '/auth/token/refresh',
+        {
+          method: 'POST',
+          headers: { authorization: `Bearer ${token}` }
+        }
+      );
+      sessionToken = refreshed?.token ?? token;
+    }
+
+    await setAuthToken(sessionToken);
+
+    const customerCacheTag = await getCacheTag('customers');
+    revalidateTag(customerCacheTag);
+
+    return { success: true };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      message:
+        (error as Error)?.message || 'SSO login failed. Please try again.'
     };
   }
 }

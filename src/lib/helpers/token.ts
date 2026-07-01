@@ -8,6 +8,9 @@ const decodeJwt = (token: string) => {
   }
 };
 
+/** Decode a JWT payload without verifying its signature. */
+export const decodeToken = decodeJwt;
+
 export const isTokenExpired = (token: string | null) => {
   if (!token) return true;
 

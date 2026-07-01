@@ -1,29 +1,30 @@
-import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
-import { getCategoryByHandle } from "@/lib/data/categories"
-import { Suspense } from "react"
-
-import type { Metadata } from "next"
-import { Breadcrumbs } from "@/components/atoms"
-import { AlgoliaProductsListing, ProductListing } from "@/components/sections"
-import { notFound } from "next/navigation"
-import isBot from "@/lib/helpers/isBot"
-import { headers } from "next/headers"
-import Script from "next/script"
-import { getRegion, listRegions } from "@/lib/data/regions"
-import { listProducts } from "@/lib/data/products"
-import { toHreflang } from "@/lib/helpers/hreflang"
+import { ProductListingSkeleton } from '@/components/organisms/ProductListingSkeleton/ProductListingSkeleton'
+import { CatalogPage } from '@/components/sections/CatalogPage/CatalogPage'
+import { getCategoryByHandle, listCategories } from '@/lib/data/categories'
+import { getSectorPreferencesFromCookies } from '@/lib/data/cookies'
+import { resolveSectorPreferences } from '@/lib/helpers/sector-preferences'
+import { toHreflang } from '@/lib/helpers/hreflang'
+import { listRegions } from '@/lib/data/regions'
+import type { Metadata } from 'next'
+import { headers } from 'next/headers'
+import { notFound } from 'next/navigation'
+import Script from 'next/script'
+import { Suspense } from 'react'
 
 export const revalidate = 60
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ category: string; locale: string }>
+  searchParams: Promise<{ sector?: string; industry?: string }>
 }): Promise<Metadata> {
   const { category: categoryHandle, locale } = await params
+  const sp = await searchParams
   const headersList = await headers()
-  const host = headersList.get("host")
-  const protocol = headersList.get("x-forwarded-proto") || "https"
+  const host = headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || 'https'
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`
 
   const cat = await getCategoryByHandle(categoryHandle)
@@ -49,11 +50,15 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${cat.name} Category`
-  const description = `${cat.name} Category - ${
-    process.env.NEXT_PUBLIC_SITE_NAME || "Storefront"
+  const title = `${cat.name}`
+  const description = `${cat.name} — sustainable listings on ${
+    process.env.NEXT_PUBLIC_SITE_NAME || 'tese.io'
   }`
-  const canonical = `${baseUrl}/${locale}/categories/${categoryHandle}`
+  const query = new URLSearchParams()
+  if (sp.sector) query.set('sector', sp.sector)
+  if (sp.industry) query.set('industry', sp.industry)
+  const qs = query.toString()
+  const canonical = `${baseUrl}/${locale}/categories/${categoryHandle}${qs ? `?${qs}` : ''}`
 
   return {
     title,
@@ -62,81 +67,61 @@ export async function generateMetadata({
       canonical,
       languages: {
         ...languages,
-        "x-default": `${baseUrl}/categories/${categoryHandle}`,
+        'x-default': `${baseUrl}/categories/${categoryHandle}`,
       },
     },
     robots: { index: true, follow: true },
     openGraph: {
-      title: `${title} | ${process.env.NEXT_PUBLIC_SITE_NAME || "Storefront"}`,
+      title: `${title} | ${process.env.NEXT_PUBLIC_SITE_NAME || 'tese.io'}`,
       description,
       url: canonical,
-      siteName: process.env.NEXT_PUBLIC_SITE_NAME || "Storefront",
-      type: "website",
+      siteName: process.env.NEXT_PUBLIC_SITE_NAME || 'tese.io',
+      type: 'website',
     },
   }
 }
 
-const ALGOLIA_ID = process.env.NEXT_PUBLIC_ALGOLIA_ID
-const ALGOLIA_SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY
-
 async function Category({
   params,
+  searchParams,
 }: {
-  params: Promise<{
-    category: string
-    locale: string
-  }>
+  params: Promise<{ category: string; locale: string }>
+  searchParams: Promise<{ sector?: string; industry?: string; listing?: string }>
 }) {
   const { category: categoryHandle, locale } = await params
+  const sp = await searchParams
+  const listingType = sp.listing === 'service' ? 'service' : undefined
 
   const category = await getCategoryByHandle(categoryHandle)
-
   if (!category) {
     return notFound()
   }
-  const currency_code = (await getRegion(locale))?.currency_code || "usd"
-  const ua = (await headers()).get("user-agent") || ""
-  const bot = isBot(ua)
 
-  const breadcrumbsItems = [
-    {
-      path: categoryHandle,
-      label: category.name,
-    },
-  ]
+  const cookiePrefs = await getSectorPreferencesFromCookies()
+  const { parentCategories } = await listCategories()
+  const { sector, sectorId, industryHandle } = resolveSectorPreferences(
+    sp,
+    cookiePrefs,
+    parentCategories
+  )
 
-  // Small cached list for JSON-LD itemList
   const headersList = await headers()
-  const host = headersList.get("host")
-  const protocol = headersList.get("x-forwarded-proto") || "https"
+  const host = headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || 'https'
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`
-  const {
-    response: { products: jsonLdProducts },
-  } = await listProducts({
-    countryCode: locale,
-    queryParams: { limit: 8, order: "created_at", fields: "id,title,handle" },
-    category_id: category.id,
-  })
-
-  const itemList = jsonLdProducts.slice(0, 8).map((p, idx) => ({
-    "@type": "ListItem",
-    position: idx + 1,
-    url: `${baseUrl}/${locale}/products/${p.handle}`,
-    name: p.title,
-  }))
 
   return (
-    <main className="container">
+    <main>
       <Script
         id="ld-breadcrumbs-category"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
             itemListElement: [
               {
-                "@type": "ListItem",
+                '@type': 'ListItem',
                 position: 1,
                 name: category.name,
                 item: `${baseUrl}/${locale}/categories/${categoryHandle}`,
@@ -145,33 +130,21 @@ async function Category({
           }),
         }}
       />
-      <Script
-        id="ld-itemlist-category"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            itemListElement: itemList,
-          }),
-        }}
-      />
-      <div className="hidden md:block mb-2">
-        <Breadcrumbs items={breadcrumbsItems} />
-      </div>
-
-      <h1 className="heading-xl uppercase">{category.name}</h1>
-
-      <Suspense fallback={<div data-testid="category-page-loading"><ProductListingSkeleton /></div>}>
-        {bot || !ALGOLIA_ID || !ALGOLIA_SEARCH_KEY ? (
-          <ProductListing category_id={category.id} showSidebar locale={locale} />
-        ) : (
-          <AlgoliaProductsListing
-            category_id={category.id}
-            locale={locale}
-            currency_code={currency_code}
-          />
-        )}
+      <Suspense
+        fallback={
+          <div data-testid="category-page-loading">
+            <ProductListingSkeleton />
+          </div>
+        }
+      >
+        <CatalogPage
+          locale={locale}
+          sector={sector}
+          sectorId={sectorId}
+          industryHandle={industryHandle}
+          category={category}
+          listingType={listingType}
+        />
       </Suspense>
     </main>
   )

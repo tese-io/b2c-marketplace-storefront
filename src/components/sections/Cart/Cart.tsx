@@ -7,19 +7,38 @@ import { useCartContext } from '@/components/providers';
 
 export const Cart = () => {
   const { cart } = useCartContext();
+  const itemCount = cart?.items?.reduce((sum, item) => sum + (item.quantity ?? 0), 0) ?? 0;
 
   if (!cart || !cart.items?.length) {
-    return <CartEmpty />;
+    return (
+      <div className="tese-cart-layout tese-cart-layout--empty">
+        <CartEmpty />
+      </div>
+    );
   }
 
   return (
-    <>
-      <div className="col-span-12 lg:col-span-6">
+    <div className="tese-cart-layout">
+      <header className="tese-cart-head col-span-full">
+        <div>
+          <p className="tese-cart-eyebrow">Checkout</p>
+          <h1 className="tese-cart-title">Your cart</h1>
+          <p className="tese-cart-sub">
+            {itemCount} {itemCount === 1 ? 'item' : 'items'} from verified marketplace suppliers
+          </p>
+        </div>
+        <LocalizedClientLink href="/categories" className="tese-cart-continue">
+          Continue shopping
+        </LocalizedClientLink>
+      </header>
+
+      <div className="tese-cart-main">
         <CartItems cart={cart} />
       </div>
-      <div className="lg:col-span-2"></div>
-      <div className="col-span-12 lg:col-span-4">
-        <div className="h-fit rounded-sm border p-4">
+
+      <aside className="tese-cart-aside">
+        <div className="tese-cart-summary-card">
+          <h2 className="tese-cart-summary-title">Order summary</h2>
           <CartSummary
             item_total={cart?.item_subtotal || 0}
             shipping_total={cart?.shipping_subtotal || 0}
@@ -28,11 +47,16 @@ export const Cart = () => {
             tax={cart?.tax_total || 0}
             discount_total={cart?.discount_subtotal || 0}
           />
-          <LocalizedClientLink href="/checkout?step=address">
-            <Button className="flex w-full items-center justify-center py-3">Go to checkout</Button>
+          <LocalizedClientLink href="/checkout?step=address" className="block w-full">
+            <Button className="tese-cart-checkout-btn flex w-full items-center justify-center py-3.5">
+              Go to checkout
+            </Button>
           </LocalizedClientLink>
+          <p className="tese-cart-summary-note">
+            Shipping and taxes may update at checkout based on your delivery address.
+          </p>
         </div>
-      </div>
-    </>
+      </aside>
+    </div>
   );
 };

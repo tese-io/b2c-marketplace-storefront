@@ -11,9 +11,11 @@ import { Product } from "@/types/product"
 export const ProductCard = ({
   product,
   className,
+  variant = "default",
 }: {
   product: HttpTypes.StoreProduct | Product,
   className?: string
+  variant?: "default" | "marketplace"
 }) => {
   if (!product) {
     return null
@@ -22,11 +24,16 @@ export const ProductCard = ({
   const { cheapestPrice } = getProductPrice({ product: product as HttpTypes.StoreProduct })
 
   const productName = String(product.title || "Product")
+  const meta = (product as HttpTypes.StoreProduct).metadata as Record<string, unknown> | undefined
+  const isMarketplace = variant === "marketplace"
 
   return (
     <div
       className={cn(
-        "relative group border rounded-sm flex flex-col justify-between p-1 w-full lg:w-[calc(25%-1rem)] min-w-[250px]",
+        "relative group flex flex-col justify-between w-full lg:w-[calc(25%-1rem)] min-w-[260px]",
+        isMarketplace
+          ? "tese-card p-0 overflow-hidden cursor-pointer"
+          : "border rounded-sm p-1",
         className
       )}
       data-testid="product-card"
@@ -71,8 +78,11 @@ export const ProductCard = ({
           aria-label={`See more about ${productName}`}
           title={`See more about ${productName}`}
         >
-          <Button className="absolute rounded-sm bg-action text-action-on-primary h-auto lg:h-[48px] lg:group-hover:block hidden w-full uppercase bottom-1 z-10" data-testid="product-card-see-more-button">
-            See More
+          <Button className={cn(
+            "absolute rounded-sm bg-action text-action-on-primary h-auto lg:h-[48px] lg:group-hover:block hidden w-full uppercase bottom-1 z-10",
+            isMarketplace && "rounded-b-xl rounded-t-none lg:rounded-xl mx-2 mb-2 w-[calc(100%-1rem)]"
+          )} data-testid="product-card-see-more-button">
+            {isMarketplace ? "View & quote" : "See More"}
           </Button>
         </LocalizedClientLink>
       </div>
@@ -81,11 +91,16 @@ export const ProductCard = ({
         aria-label={`Go to ${productName} page`}
         title={`Go to ${productName} page`}
       >
-        <div className="flex justify-between p-4" data-testid="product-card-info">
-          <div className="w-full">
-            <h3 className="heading-sm truncate" data-testid="product-card-title">{product.title}</h3>
+        <div className={cn("flex justify-between", isMarketplace ? "p-4 pt-3" : "p-4")} data-testid="product-card-info">
+          <div className="w-full min-w-0">
+            <h3 className={cn("truncate", isMarketplace ? "font-semibold text-[15px] text-primary" : "heading-sm")} data-testid="product-card-title">{product.title}</h3>
+            {isMarketplace && meta?.moq && (
+              <p className="text-[11px] text-secondary mt-1 truncate">
+                MOQ {String(meta.moq)}{meta.unit ? ` · ${String(meta.unit)}` : ""}
+              </p>
+            )}
             <div className="flex items-center gap-2 mt-2" data-testid="product-card-price">
-              <p className="font-medium" data-testid="product-card-current-price">{cheapestPrice?.calculated_price}</p>
+              <p className={cn("font-semibold", isMarketplace && "text-tese-ice")} data-testid="product-card-current-price">{cheapestPrice?.calculated_price}</p>
               {cheapestPrice?.calculated_price !==
                 cheapestPrice?.original_price && (
                 <p className="text-sm text-gray-500 line-through" data-testid="product-card-original-price">

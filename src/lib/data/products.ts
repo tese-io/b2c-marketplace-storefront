@@ -82,7 +82,7 @@ export const listProducts = async ({
         region_id: region?.id,
         fields:
           '*variants.calculated_price,+variants.inventory_quantity,*seller,*variants,*seller.products,' +
-          '*seller.reviews,*seller.reviews.customer,*seller.reviews.seller,*seller.products.variants,*attribute_values,*attribute_values.attribute',
+          '*seller.reviews,*seller.reviews.customer,*seller.reviews.seller,*seller.products.variants,*attribute_values,*attribute_values.attribute,*categories',
         ...queryParams
       },
       headers,
@@ -129,6 +129,25 @@ export const listProducts = async ({
         queryParams
       };
     });
+};
+
+export const listCatalogListings = async ({
+  countryCode,
+  catalogHandle,
+}: {
+  countryCode: string
+  catalogHandle: string
+}): Promise<(HttpTypes.StoreProduct & { seller?: SellerProps })[]> => {
+  const { filterCatalogListings } = await import(
+    '@/lib/helpers/catalog-product'
+  )
+
+  const { response } = await listProducts({
+    countryCode,
+    queryParams: { limit: 100, order: 'created_at' },
+  })
+
+  return filterCatalogListings(response.products, catalogHandle)
 };
 
 /**

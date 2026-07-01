@@ -43,7 +43,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       )
     default:
       return (
-        <Button disabled className="w-full">
+        <Button disabled className="tese-cart-checkout-btn w-full">
           Select a payment method
         </Button>
       )
@@ -155,7 +155,7 @@ const StripePaymentButton = ({
         disabled={disabled || notReady}
         onClick={handlePayment}
         loading={submitting}
-        className="w-full"
+        className="tese-cart-checkout-btn w-full"
       >
         Place order
       </Button>
@@ -197,7 +197,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
       <Button
         disabled={notReady}
         onClick={handlePayment}
-        className="w-full"
+        className="tese-cart-checkout-btn w-full"
         loading={submitting}
       >
         Place order

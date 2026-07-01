@@ -68,8 +68,6 @@ const CartShippingMethodsSection: FC<ShippingProps> = ({ cart, availableShipping
 
   const isOpen = searchParams.get('step') === 'delivery';
 
-  console.log(availableShippingMethods);
-
   const _shippingMethods = availableShippingMethods?.filter(
     sm => sm.rules?.find((rule: any) => rule.attribute === 'is_return')?.value !== 'true'
   );
@@ -171,42 +169,32 @@ const CartShippingMethodsSection: FC<ShippingProps> = ({ cart, availableShipping
   );
 
   return (
-    <div className="bg-ui-bg-interactive rounded-sm border p-4">
-      <div className="mb-6 flex flex-row items-center justify-between">
-        <Heading
-          level="h2"
-          className="text-3xl-regular flex flex-row items-baseline gap-x-2"
-        >
-          {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && <CheckCircleSolid />}
+    <section
+      className={`tese-checkout-step ${isOpen ? 'tese-checkout-step--open' : 'tese-checkout-step--closed'}`}
+    >
+      <div className="tese-checkout-step-head">
+        <Heading level="h2" className="tese-checkout-step-title">
+          {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && (
+            <CheckCircleSolid className="tese-checkout-step-check" />
+          )}
           Delivery
         </Heading>
         {isEditEnabled && (
-          <Text>
-            <Button
-              onClick={handleEdit}
-              variant="tonal"
-            >
-              Edit
-            </Button>
-          </Text>
+          <Button onClick={handleEdit} variant="tonal" className="tese-checkout-edit-btn">
+            Edit
+          </Button>
         )}
       </div>
       {isOpen ? (
         <>
-          <div className="grid">
+          <div className="tese-checkout-step-body">
             <div data-testid="delivery-options-container">
-              <div className="pb-8 pt-2 md:pt-0">
+              <div className="tese-checkout-delivery-options">
                 {filteredGroupedBySellerId.length === 0
-                  ? 'No shipping options available'
+                  ? <p className="tese-checkout-empty-note">No shipping options available</p>
                   : filteredGroupedBySellerId.map(key => (
-                      <div
-                        key={key}
-                        className="mb-4"
-                      >
-                        <Heading
-                          level="h3"
-                          className="mb-2"
-                        >
+                      <div key={key} className="tese-checkout-delivery-group">
+                        <Heading level="h3" className="tese-checkout-seller-label">
                           {groupedBySellerId[key][0].seller_name}
                         </Heading>
                         <Listbox
@@ -216,11 +204,7 @@ const CartShippingMethodsSection: FC<ShippingProps> = ({ cart, availableShipping
                           }}
                         >
                           <div className="relative">
-                            <Listbox.Button
-                              className={clsx(
-                                'text-base-regular relative flex h-12 w-full cursor-default items-center justify-between rounded-lg border bg-component-secondary px-4 text-left focus:outline-none focus-visible:border-gray-300 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-300'
-                              )}
-                            >
+                            <Listbox.Button className="tese-checkout-select">
                               {({ open }) => (
                                 <>
                                   <span className="block truncate">Choose delivery option</span>
@@ -239,12 +223,12 @@ const CartShippingMethodsSection: FC<ShippingProps> = ({ cart, availableShipping
                               leaveTo="opacity-0"
                             >
                               <Listbox.Options
-                                className="text-small-regular border-top-0 absolute z-20 max-h-60 w-full overflow-auto rounded-lg border bg-white focus:outline-none sm:text-sm"
+                                className="tese-checkout-select-menu"
                                 data-testid="shipping-address-options"
                               >
                                 {groupedBySellerId[key].map((option: any) => (
                                   <Listbox.Option
-                                    className="relative cursor-pointer select-none border-b py-4 pl-6 pr-10 hover:bg-gray-50"
+                                    className="tese-checkout-select-option"
                                     value={option.id}
                                     key={option.id}
                                   >
@@ -274,7 +258,7 @@ const CartShippingMethodsSection: FC<ShippingProps> = ({ cart, availableShipping
                       </div>
                     ))}
                 {!!cart?.shipping_methods?.length && (
-                  <div className="flex flex-col">
+                  <div className="flex flex-col gap-2">
                     {cart.shipping_methods?.map(method => (
                       <CartShippingMethodRow
                         key={method.id}
@@ -288,14 +272,15 @@ const CartShippingMethodsSection: FC<ShippingProps> = ({ cart, availableShipping
               </div>
             </div>
           </div>
-          <div>
+          <div className="tese-checkout-step-actions">
             <ErrorMessage
               error={error}
               data-testid="delivery-option-error-message"
             />
             <Button
               onClick={handleSubmit}
-              variant="tonal"
+              className="tese-cart-checkout-btn"
+              variant="filled"
               disabled={!cart.shipping_methods?.[0] || isPendingDeleteRow}
               loading={isLoadingPrices}
             >
@@ -304,31 +289,26 @@ const CartShippingMethodsSection: FC<ShippingProps> = ({ cart, availableShipping
           </div>
         </>
       ) : (
-        <div>
-          <div className="text-small-regular">
-            {cart && (cart.shipping_methods?.length ?? 0) > 0 && (
-              <div className="flex flex-col">
-                {cart.shipping_methods?.map(method => (
-                  <div
-                    key={method.id}
-                    className="mb-4 rounded-md border p-4"
-                  >
-                    <Text className="txt-medium-plus text-ui-fg-base mb-1">Method</Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {method.name}{' '}
-                      {convertToLocale({
-                        amount: method.amount!,
-                        currency_code: cart?.currency_code
-                      })}
-                    </Text>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="tese-checkout-step-summary">
+          {cart && (cart.shipping_methods?.length ?? 0) > 0 && (
+            <div className="flex flex-col gap-3">
+              {cart.shipping_methods?.map(method => (
+                <div key={method.id} className="tese-checkout-method-card">
+                  <Text className="tese-checkout-method-label">Method</Text>
+                  <Text className="tese-checkout-method-value">
+                    {method.name}{' '}
+                    {convertToLocale({
+                      amount: method.amount!,
+                      currency_code: cart?.currency_code
+                    })}
+                  </Text>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

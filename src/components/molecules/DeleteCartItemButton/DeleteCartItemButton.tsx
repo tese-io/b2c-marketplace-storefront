@@ -30,7 +30,7 @@ export const DeleteCartItemButton = ({
   return (
     <Button
       variant="text"
-      className="w-10 h-10 flex items-center justify-center p-0"
+      className="tese-cart-remove"
       onClick={() => handleDelete(id)}
       loading={isRemovingItem}
       disabled={isBtnDisabled}

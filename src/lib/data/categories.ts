@@ -49,14 +49,27 @@ export const listCategories = async ({ query }: Partial<CategoriesProps> = {}) =
 };
 
 export const getCategoryByHandle = async (categoryHandle: string) => {
+  const handle = decodeURIComponent(categoryHandle)
+
+  // Handles like metals-&-alloys break Medusa's ?handle= query when & is not encoded.
+  const { parentCategories } = await listCategories()
+  const match = parentCategories.find((cat) => cat.handle === handle)
+
+  if (match) return match
+
   return sdk.client
     .fetch<HttpTypes.StoreProductCategoryListResponse>(`/store/product-categories`, {
       query: {
-        fields: '*category_children',
-        handle: categoryHandle
+        fields: 'id,handle,name,description,metadata,*category_children',
+        handle,
       },
       cache: 'force-cache',
-      next: { revalidate: 300 }
+      next: { revalidate: 300 },
     })
-    .then(({ product_categories }) => product_categories[0]);
-};
+    .then(({ product_categories }) => product_categories[0])
+}
+
+/** Safe path segment for category handles containing &, spaces, etc. */
+export function categoryHref(handle: string, query = '') {
+  return `/categories/${encodeURIComponent(handle)}${query}`
+}

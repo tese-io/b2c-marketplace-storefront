@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "@/components/atoms"
-import { UserNavigation } from "@/components/molecules"
 import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
 import { ArrowLeftIcon } from "@/icons"
 import { ReturnItemsTab } from "./ReturnItemsTab"
@@ -79,10 +78,8 @@ export const OrderReturnSection = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 mt-6 gap-5 md:gap-8">
-      <UserNavigation />
-      <div className="md:col-span-3 mb-8 md:mb-0">
-        {tab === 0 ? (
+    <div className="tese-sourcing-account-body mb-8 md:mb-0">
+      {tab === 0 ? (
           <LocalizedClientLink href={`/user/orders/${order.order_set.id}`}>
             <Button
               variant="tonal"
@@ -141,7 +138,6 @@ export const OrderReturnSection = ({
             />
           </div>
         </div>
-      </div>
     </div>
   )
 }

@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
-import { Funnel_Display } from 'next/font/google';
+import type { Metadata } from "next"
+import { Poppins } from 'next/font/google';
 
 import './globals.css';
 
@@ -7,25 +7,31 @@ import { Toaster } from '@medusajs/ui';
 import Head from 'next/head';
 
 import { HtmlLangSetter } from '@/components/atoms/HtmlLangSetter/HtmlLangSetter';
+import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/constants/brand';
 import { retrieveCart } from '@/lib/data/cart';
 
 import { Providers } from './providers';
 
-const funnelDisplay = Funnel_Display({
-  variable: '--font-funnel-sans',
+const poppins = Poppins({
+  variable: '--font-poppins',
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600']
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap'
 });
 
 export const metadata: Metadata = {
   title: {
-    template: `%s | ${
-      process.env.NEXT_PUBLIC_SITE_NAME || 'Mercur B2C Demo - Marketplace Storefront'
-    }`,
-    default: process.env.NEXT_PUBLIC_SITE_NAME || 'Mercur B2C Demo - Marketplace Storefront'
+    template: `%s | ${SITE_NAME}`,
+    default: SITE_NAME,
   },
-  description:
-    process.env.NEXT_PUBLIC_SITE_DESCRIPTION || 'Mercur B2C Demo - Marketplace Storefront',
+  description: SITE_DESCRIPTION,
+  icons: {
+    icon: [
+      { url: '/logo-icon.png', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '32x32' },
+    ],
+    apple: '/apple-icon.png',
+  },
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   alternates: {
     languages: {
@@ -48,7 +54,7 @@ export default async function RootLayout({
   return (
     <html
       lang={htmlLang}
-      className=""
+      className={poppins.variable}
     >
       <Head>
         <link
@@ -138,7 +144,7 @@ export default async function RootLayout({
           href="https://api.mercurjs.com"
         />
       </Head>
-      <body className={`${funnelDisplay.className} relative bg-primary text-secondary antialiased`}>
+      <body className={`${poppins.className} relative bg-primary text-secondary antialiased`}>
         <HtmlLangSetter />
         <Providers cart={cart}>{children}</Providers>
         <Toaster position="top-right" />

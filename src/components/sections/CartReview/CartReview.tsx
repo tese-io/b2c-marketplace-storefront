@@ -15,16 +15,16 @@ const Review = ({ cart }: { cart: any }) => {
     (cart.payment_collection || paidByGiftcard);
 
   return (
-    <div>
-      <div className="mb-6 w-full">
+    <div className="tese-checkout-review">
+      <div className="tese-checkout-review-items">
         <CartItems cart={cart} />
       </div>
 
-      <div className={'mb-6'}>
+      <div className="tese-checkout-promo">
         <PromoCode cart={cart} />
       </div>
 
-      <div className="mb-6 w-full rounded-sm border p-4">
+      <div className="tese-checkout-review-totals">
         <CartSummary
           item_total={cart?.item_subtotal || 0}
           shipping_total={cart?.shipping_subtotal || 0}
@@ -36,10 +36,12 @@ const Review = ({ cart }: { cart: any }) => {
       </div>
 
       {previousStepsCompleted && (
-        <PaymentButton
-          cart={cart}
-          data-testid="submit-order-button"
-        />
+        <div className="tese-checkout-place-order">
+          <PaymentButton
+            cart={cart}
+            data-testid="submit-order-button"
+          />
+        </div>
       )}
     </div>
   );

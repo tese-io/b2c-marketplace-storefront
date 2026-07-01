@@ -69,11 +69,33 @@ export default {
           },
         },
       },
+      fontFamily: {
+        sans: [
+          "var(--font-poppins)",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "sans-serif",
+        ],
+      },
       colors: {
         primary: "rgba(var(--content-primary))",
         secondary: "rgba(var(--content-secondary))",
         tertiary: "rgba(var(--content-tertiary))",
         disabled: "rgba(var(--content-disabled))",
+        tese: {
+          lime: "rgba(var(--tese-lime))",
+          "lime-soft": "rgba(var(--tese-lime-soft))",
+          ink: "rgba(var(--tese-ink))",
+          "ink-soft": "rgba(var(--tese-ink-soft))",
+          ice: "rgba(var(--tese-ice))",
+          "ice-soft": "rgba(var(--tese-ice-soft))",
+          surface: "rgba(var(--tese-surface))",
+        },
+        price: {
+          up: "rgba(var(--price-up))",
+          down: "rgba(var(--price-down))",
+        },
         action: {
           DEFAULT: "rgba(var(--content-action-primary))",
           hover: "rgba(var(--content-action-primary-hover))",
@@ -129,7 +151,15 @@ export default {
         xs: "4px",
         sm: "8px",
         md: "16px",
+        lg: "20px",
+        xl: "24px",
+        "2xl": "28px",
         full: "1000px",
+      },
+      boxShadow: {
+        card: "0 1px 2px rgba(0,20,5,0.04), 0 8px 24px rgba(0,20,5,0.06)",
+        "card-hover": "0 4px 12px rgba(0,20,5,0.08), 0 16px 40px rgba(0,20,5,0.10)",
+        pill: "0 6px 24px rgba(0,20,5,0.10)",
       },
       fill: {
         primary: "rgba(var(--content-action-on-primary))",

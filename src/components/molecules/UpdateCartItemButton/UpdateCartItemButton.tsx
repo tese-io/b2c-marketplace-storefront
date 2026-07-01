@@ -64,29 +64,31 @@ export const UpdateCartItemButton = ({
   const isIncreaseDisabled = isUpdatingItem || !lineItemId;
 
   return (
-    <div className="mt-2 flex items-center gap-4">
+    <div className="tese-cart-qty" role="group" aria-label="Quantity">
       <Button
         variant="tonal"
-        className="flex h-8 w-8 items-center justify-center"
+        className="tese-cart-qty-btn"
         disabled={isDecreaseDisabled}
         onClick={() => handleQuantityChange(pendingQuantity - 1)}
+        aria-label="Decrease quantity"
       >
-        -
+        −
       </Button>
       <span
-        className={`font-medium transition-all duration-300 ${
-          isDecreaseDisabled || isIncreaseDisabled
-            ? 'scale-95 text-secondary opacity-70'
-            : 'scale-100 text-primary opacity-100'
+        className={`tese-cart-qty-value ${
+          isDecreaseDisabled || isIncreaseDisabled ? 'is-muted' : ''
         }`}
+        aria-live="polite"
+        aria-atomic="true"
       >
         {pendingQuantity}
       </span>
       <Button
         variant="tonal"
-        className="flex h-8 w-8 items-center justify-center"
+        className="tese-cart-qty-btn"
         disabled={isIncreaseDisabled}
         onClick={() => handleQuantityChange(pendingQuantity + 1)}
+        aria-label="Increase quantity"
       >
         +
       </Button>

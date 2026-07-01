@@ -85,3 +85,14 @@ export const removeCartId = async () => {
     maxAge: -1,
   });
 };
+
+export async function getSectorPreferencesFromCookies(): Promise<{
+  sector?: string;
+  industry?: string;
+}> {
+  const cookies = await nextCookies();
+  return {
+    sector: cookies.get('teseio_sector')?.value,
+    industry: cookies.get('teseio_industry')?.value,
+  };
+}

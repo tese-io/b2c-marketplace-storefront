@@ -17,12 +17,14 @@ interface CategoryNavbarProps {
   categories: HttpTypes.StoreProductCategory[]
   parentCategories?: HttpTypes.StoreProductCategory[]
   onClose?: (state: boolean) => void
+  variant?: "default" | "strip"
 }
 
 export const CategoryNavbar = ({
   categories,
   parentCategories = [],
   onClose,
+  variant = "default",
 }: CategoryNavbarProps) => {
   const { category } = useParams<{ category?: string }>()
 
@@ -85,10 +87,17 @@ export const CategoryNavbar = ({
   const handleDropdownMouseLeave = () => {
     setHoveredCategoryId(null)
   }
+  const isStrip = variant === "strip"
+
   return (
     <>
       <nav
-        className="flex md:items-center flex-col md:flex-row md:overflow-x-auto md:scrollbar-hide md:max-w-full gap-2"
+        className={cn(
+          "flex items-center gap-1.5",
+          isStrip
+            ? "overflow-x-auto scrollbar-hide max-w-full pb-0.5"
+            : "md:items-center flex-col md:flex-row md:overflow-x-auto md:scrollbar-hide md:max-w-full gap-2"
+        )}
         aria-label="Category navigation"
         data-testid="category-navbar"
       >
@@ -96,11 +105,13 @@ export const CategoryNavbar = ({
           href="/categories"
           onClick={handleClose}
           className={cn(
-            "label-md uppercase px-2 my-1 md:my-0 flex items-center justify-between md:flex-shrink-0 text-primary"
+            isStrip
+              ? "tese-nav-pill shrink-0"
+              : "label-md uppercase px-2 my-1 md:my-0 flex items-center justify-between md:flex-shrink-0 text-primary"
           )}
           data-testid="category-link-all-products"
         >
-          All Products
+          All products
         </LocalizedClientLink>
 
         {filteredCategories.map(({ id, handle, name, category_children }) => {
@@ -112,7 +123,7 @@ export const CategoryNavbar = ({
           return (
             <div
               key={id}
-              className="md:flex-shrink-0"
+              className="shrink-0"
               onMouseEnter={() => handleCategoryMouseEnter(id)}
               onMouseLeave={handleCategoryMouseLeave}
             >
@@ -120,13 +131,17 @@ export const CategoryNavbar = ({
                 href={categoryUrl}
                 onClick={handleClose}
                 className={cn(
-                  "label-md uppercase px-2 py-1 my-3 md:my-0 flex items-center justify-between md:whitespace-nowrap text-primary relative z-10",
-                  isActive && "md:border-b md:border-primary"
+                  isStrip
+                    ? cn("tese-nav-pill inline-flex items-center gap-1", isActive && "tese-nav-pill-active")
+                    : cn(
+                        "label-md uppercase px-2 py-1 my-3 md:my-0 flex items-center justify-between md:whitespace-nowrap text-primary relative z-10",
+                        isActive && "md:border-b md:border-primary"
+                      )
                 )}
                 data-testid={`category-link-${handle}`}
               >
                 {name}
-                {hasChildren && (
+                {hasChildren && !isStrip && (
                   <CollapseIcon size={18} className="-rotate-90 md:hidden" />
                 )}
               </LocalizedClientLink>
