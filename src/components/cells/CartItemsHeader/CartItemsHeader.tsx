@@ -1,31 +1,38 @@
-import { Divider } from "@/components/atoms"
-import { SingleProductSeller } from "@/types/product"
-import { format } from "date-fns"
-import { SellerAvatar } from "../SellerAvatar/SellerAvatar"
-import { Link } from "@/i18n/routing"
+import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink';
+import { SingleProductSeller } from '@/types/product';
+import { format } from 'date-fns';
+
+import { SellerAvatar } from '../SellerAvatar/SellerAvatar';
 
 export const CartItemsHeader = ({
   seller,
 }: {
-  seller: SingleProductSeller
+  seller: SingleProductSeller;
 }) => {
-  return (
-    <Link href={`/sellers/${seller.handle}`}>
-      <div className="border rounded-sm p-4 flex gap-4 items-center">
-        <SellerAvatar photo={seller.photo} size={32} alt={seller.name} />
+  const joined =
+    seller.id !== 'marketplace' && seller.created_at
+      ? format(seller.created_at, 'MMM yyyy')
+      : null;
 
-        <div className="lg:flex gap-2">
-          <p className="uppercase heading-xs">{seller.name}</p>
-          {seller.id !== "fleek" && (
-            <div className="flex items-center gap-2">
-              <Divider square />
-              <p className="label-md text-secondary">
-                Joined: {format(seller.created_at || "", "yyyy-MM-dd")}
-              </p>
-            </div>
-          )}
-        </div>
+  const inner = (
+    <div className="tese-cart-seller-head">
+      <SellerAvatar photo={seller.photo} size={36} alt={seller.name} />
+      <div className="min-w-0">
+        <p className="tese-cart-seller-name">{seller.name}</p>
+        {joined && (
+          <p className="tese-cart-seller-meta">Supplier since {joined}</p>
+        )}
       </div>
-    </Link>
-  )
-}
+    </div>
+  );
+
+  if (seller.handle) {
+    return (
+      <LocalizedClientLink href={`/sellers/${seller.handle}`} className="block">
+        {inner}
+      </LocalizedClientLink>
+    );
+  }
+
+  return inner;
+};

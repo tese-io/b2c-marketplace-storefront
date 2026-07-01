@@ -20,8 +20,10 @@ export default async function OrderConfirmedPage(props: Props) {
   }
 
   return (
-    <main className="container">
-      <OrderConfirmedSection order={order} />
+    <main className="tese-order-page">
+      <div className="tese-container tese-order-shell">
+        <OrderConfirmedSection order={order} />
+      </div>
     </main>
   )
 }

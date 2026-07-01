@@ -1,60 +1,150 @@
-import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
-import { getCategoryByHandle } from "@/lib/data/categories"
-import { Suspense } from "react"
+import { ProductListingSkeleton } from '@/components/organisms/ProductListingSkeleton/ProductListingSkeleton'
+import { CatalogPage } from '@/components/sections/CatalogPage/CatalogPage'
+import { getCategoryByHandle, listCategories } from '@/lib/data/categories'
+import { getSectorPreferencesFromCookies } from '@/lib/data/cookies'
+import { resolveSectorPreferences } from '@/lib/helpers/sector-preferences'
+import { toHreflang } from '@/lib/helpers/hreflang'
+import { listRegions } from '@/lib/data/regions'
+import type { Metadata } from 'next'
+import { headers } from 'next/headers'
+import { notFound } from 'next/navigation'
+import Script from 'next/script'
+import { Suspense } from 'react'
 
-import type { Metadata } from "next"
-import { generateCategoryMetadata } from "@/lib/helpers/seo"
-import { Breadcrumbs } from "@/components/atoms"
-import { AlgoliaProductsListing, ProductListing } from "@/components/sections"
-
-const ALGOLIA_ID = process.env.NEXT_PUBLIC_ALGOLIA_ID
-const ALGOLIA_SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY
+export const revalidate = 60
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
-  params: Promise<{ category: string }>
+  params: Promise<{ category: string; locale: string }>
+  searchParams: Promise<{ sector?: string; industry?: string }>
 }): Promise<Metadata> {
-  const { category } = await params
+  const { category: categoryHandle, locale } = await params
+  const sp = await searchParams
+  const headersList = await headers()
+  const host = headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || 'https'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`
 
-  const cat = await getCategoryByHandle([category])
+  const cat = await getCategoryByHandle(categoryHandle)
+  if (!cat) {
+    return {}
+  }
 
-  return generateCategoryMetadata(cat)
+  let languages: Record<string, string> = {}
+  try {
+    const regions = await listRegions()
+    const locales = Array.from(
+      new Set(
+        (regions || []).flatMap((r) => r.countries?.map((c) => c.iso_2) || [])
+      )
+    ) as string[]
+    languages = locales.reduce<Record<string, string>>((acc, code) => {
+      acc[toHreflang(code)] = `${baseUrl}/${code}/categories/${categoryHandle}`
+      return acc
+    }, {})
+  } catch {
+    languages = {
+      [toHreflang(locale)]: `${baseUrl}/${locale}/categories/${categoryHandle}`,
+    }
+  }
+
+  const title = `${cat.name}`
+  const description = `${cat.name} — sustainable listings on ${
+    process.env.NEXT_PUBLIC_SITE_NAME || 'tese.io'
+  }`
+  const query = new URLSearchParams()
+  if (sp.sector) query.set('sector', sp.sector)
+  if (sp.industry) query.set('industry', sp.industry)
+  const qs = query.toString()
+  const canonical = `${baseUrl}/${locale}/categories/${categoryHandle}${qs ? `?${qs}` : ''}`
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical,
+      languages: {
+        ...languages,
+        'x-default': `${baseUrl}/categories/${categoryHandle}`,
+      },
+    },
+    robots: { index: true, follow: true },
+    openGraph: {
+      title: `${title} | ${process.env.NEXT_PUBLIC_SITE_NAME || 'tese.io'}`,
+      description,
+      url: canonical,
+      siteName: process.env.NEXT_PUBLIC_SITE_NAME || 'tese.io',
+      type: 'website',
+    },
+  }
 }
 
 async function Category({
   params,
+  searchParams,
 }: {
-  params: Promise<{
-    category: string
-    locale: string
-  }>
+  params: Promise<{ category: string; locale: string }>
+  searchParams: Promise<{ sector?: string; industry?: string; listing?: string }>
 }) {
-  const { category: handle, locale } = await params
+  const { category: categoryHandle, locale } = await params
+  const sp = await searchParams
+  const listingType = sp.listing === 'service' ? 'service' : undefined
 
-  const category = await getCategoryByHandle([handle])
+  const category = await getCategoryByHandle(categoryHandle)
+  if (!category) {
+    return notFound()
+  }
 
-  const breadcrumbsItems = [
-    {
-      path: category.handle,
-      label: category.name,
-    },
-  ]
+  const cookiePrefs = await getSectorPreferencesFromCookies()
+  const { parentCategories } = await listCategories()
+  const { sector, sectorId, industryHandle } = resolveSectorPreferences(
+    sp,
+    cookiePrefs,
+    parentCategories
+  )
+
+  const headersList = await headers()
+  const host = headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || 'https'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`
 
   return (
-    <main className="container">
-      <div className="hidden md:block mb-2">
-        <Breadcrumbs items={breadcrumbsItems} />
-      </div>
-
-      <h1 className="heading-xl uppercase">{category.name}</h1>
-
-      <Suspense fallback={<ProductListingSkeleton />}>
-        {!ALGOLIA_ID || !ALGOLIA_SEARCH_KEY ? (
-          <ProductListing category_id={category.id} showSidebar />
-        ) : (
-          <AlgoliaProductsListing category_id={category.id} locale={locale} />
-        )}
+    <main>
+      <Script
+        id="ld-breadcrumbs-category"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: category.name,
+                item: `${baseUrl}/${locale}/categories/${categoryHandle}`,
+              },
+            ],
+          }),
+        }}
+      />
+      <Suspense
+        fallback={
+          <div data-testid="category-page-loading">
+            <ProductListingSkeleton />
+          </div>
+        }
+      >
+        <CatalogPage
+          locale={locale}
+          sector={sector}
+          sectorId={sectorId}
+          industryHandle={industryHandle}
+          category={category}
+          listingType={listingType}
+        />
       </Suspense>
     </main>
   )

@@ -23,23 +23,30 @@ export const ProductCarousel = ({
   })
 
   return (
-    <div className="embla relative">
+    <div className="embla relative" data-testid="product-carousel">
       <div
         className="embla__viewport overflow-hidden rounded-xs"
         ref={emblaRef}
+        data-testid="product-carousel-viewport"
       >
-        <div className="embla__container h-[350px] lg:h-fit max-h-[700px] flex lg:block">
-          {(slides || []).map((slide) => (
+        <div className="embla__container h-[350px] lg:h-fit max-h-[698px] flex lg:block" data-testid="product-carousel-container">
+          {(slides || []).map((slide, idx) => (
             <div
               key={slide.id}
               className="embla__slide min-w-0 h-[350px] lg:h-fit"
+              data-testid={`product-carousel-slide-${idx}`}
             >
               <Image
+                priority={idx === 0}
+                fetchPriority={idx === 0 ? "high" : "auto"}
                 src={decodeURIComponent(slide.url)}
                 alt="Product image"
                 width={700}
                 height={700}
-                className="w-full h-auto aspect-square object-cover object-center object-center"
+                quality={idx === 0 ? 85 : 70}
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="max-h-[700px] w-full h-auto aspect-square object-cover object-center object-center"
+                data-testid={`product-carousel-image-${idx}`}
               />
             </div>
           ))}

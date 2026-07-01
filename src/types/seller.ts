@@ -18,4 +18,5 @@ export type SellerProps = SellerAddress & {
   reviews?: any[]
   products?: Product[]
   email?: string
+  store_status?: "ACTIVE" | "SUSPENDED" | "INACTIVE"
 }

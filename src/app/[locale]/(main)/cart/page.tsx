@@ -9,10 +9,12 @@ export const metadata: Metadata = {
 
 export default function CartPage({}) {
   return (
-    <main className='container grid grid-cols-12'>
-      <Suspense fallback={<>Loading...</>}>
-        <Cart />
-      </Suspense>
+    <main className="tese-cart-page">
+      <div className="tese-container tese-cart-shell">
+        <Suspense fallback={<div className="tese-cart-loading">Loading cart…</div>}>
+          <Cart />
+        </Suspense>
+      </div>
     </main>
   );
 }

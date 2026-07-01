@@ -10,12 +10,12 @@ export const CartDropdownItem = ({
   currency_code: string
 }) => {
   const original_total = convertToLocale({
-    amount: item.original_total,
+    amount: (item.compare_at_unit_price || 0) * item.quantity,
     currency_code,
   })
 
   const total = convertToLocale({
-    amount: item.total,
+    amount: item.subtotal ?? 0,
     currency_code,
   })
 
@@ -54,12 +54,7 @@ export const CartDropdownItem = ({
             Quantity: <span className="text-primary">{item.quantity}</span>
           </p>
         </div>
-        <div className="pt-2 flex lg:block items-center gap-2 mt-4 lg:mt-0">
-          {total !== original_total && (
-            <p className="line-through text-secondary label-md">
-              {original_total}
-            </p>
-          )}
+        <div className="pt-2 flex items-center gap-2 mt-4 lg:mt-0">
           <p className="label-lg">{total}</p>
         </div>
       </div>

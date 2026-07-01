@@ -52,7 +52,7 @@ export const setAuthToken = async (token: string) => {
   cookies.set('_medusa_jwt', token, {
     maxAge: 60 * 60 * 24 * 7,
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
   });
 };
@@ -85,3 +85,14 @@ export const removeCartId = async () => {
     maxAge: -1,
   });
 };
+
+export async function getSectorPreferencesFromCookies(): Promise<{
+  sector?: string;
+  industry?: string;
+}> {
+  const cookies = await nextCookies();
+  return {
+    sector: cookies.get('teseio_sector')?.value,
+    industry: cookies.get('teseio_industry')?.value,
+  };
+}

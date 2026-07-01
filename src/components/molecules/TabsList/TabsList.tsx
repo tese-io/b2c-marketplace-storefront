@@ -1,24 +1,24 @@
-import { TabsTrigger } from '@/components/atoms';
-import { Link } from '@/i18n/routing';
+import { TabsTrigger } from "@/components/atoms"
+import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
 
 export const TabsList = ({
   list,
   activeTab,
+  "data-testid": dataTestId,
 }: {
-  list: { label: string; link: string }[];
-  activeTab: string;
+  list: { label: string; link: string }[]
+  activeTab: string
+  "data-testid"?: string
 }) => {
   return (
-    <div className='flex gap-4 w-full'>
+    <div className="flex gap-4 w-full" data-testid={dataTestId ?? 'tabs-list'}>
       {list.map(({ label, link }) => (
-        <Link key={label} href={link}>
-          <TabsTrigger
-            isActive={activeTab === label.toLowerCase()}
-          >
+        <LocalizedClientLink key={label} href={link}>
+          <TabsTrigger isActive={activeTab === label.toLowerCase()}>
             {label}
           </TabsTrigger>
-        </Link>
+        </LocalizedClientLink>
       ))}
     </div>
-  );
-};
+  )
+}

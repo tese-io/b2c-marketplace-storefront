@@ -1,5 +1,5 @@
 import Image from "next/image"
-import Link from "next/link"
+import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
 import { BlogPost } from "@/types/blog"
 import { ArrowRightIcon } from "@/icons"
 import tailwindConfig from "../../../../tailwind.config"
@@ -12,7 +12,7 @@ interface BlogCardProps {
 
 export function BlogCard({ post, index }: BlogCardProps) {
   return (
-    <Link
+    <LocalizedClientLink
       href={post.href}
       className={cn(
         "group block border border-secondary p-1 rounded-sm relative",
@@ -21,12 +21,13 @@ export function BlogCard({ post, index }: BlogCardProps) {
     >
       <div className="relative overflow-hidden rounded-xs h-full">
         <Image
+          loading="lazy"
+          sizes="(min-width: 1024px) 33vw, 100vw"
           src={decodeURIComponent(post.image)}
           alt={post.title}
           width={467}
           height={472}
           className="object-cover max-h-[472px] h-full w-full"
-          priority
         />
       </div>
       <div className="p-4 bg-tertiary text-tertiary absolute bottom-0 left-1 lg:opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-b-xs w-[calc(100%-8px)]">
@@ -40,6 +41,6 @@ export function BlogCard({ post, index }: BlogCardProps) {
           />
         </div>
       </div>
-    </Link>
+    </LocalizedClientLink>
   )
 }

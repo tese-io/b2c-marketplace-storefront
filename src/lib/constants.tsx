@@ -1,11 +1,15 @@
 import React from "react"
-import { CreditCard } from "@medusajs/icons"
+import { Cash, CreditCard } from "@medusajs/icons"
 
 /* Map of payment provider_id to their title and icon. Add in any payment providers you want to use. */
 export const paymentInfoMap: Record<
   string,
   { title: string; icon: React.JSX.Element }
 > = {
+  "pp_card_stripe-connect": {
+    title: "Credit card",
+    icon: <CreditCard />,
+  },
   pp_stripe_stripe: {
     title: "Credit card",
     icon: <CreditCard />,
@@ -24,7 +28,7 @@ export const paymentInfoMap: Record<
   },
   pp_system_default: {
     title: "Manual Payment",
-    icon: <CreditCard />,
+    icon: <Cash />,
   },
   // Add more payment providers here
 }
@@ -62,3 +66,5 @@ export const noDivisionCurrencies = [
   "xdr",
   "xau",
 ]
+
+export const PROTECTED_ROUTES = ['/user', '/user/wishlist', '/user/orders', '/user/settings', '/user/addresses', '/user/messages', '/user/reviews', '/user/returns']

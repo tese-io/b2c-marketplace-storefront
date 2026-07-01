@@ -2,20 +2,23 @@
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { CollapseIcon, TickThinIcon } from "@/icons"
+import clsx from "clsx"
 
 export const SelectField = ({
   options,
   className = "",
   selected,
   selectOption,
+  placeholder = "",
 }: {
   options: {
-    value: string
-    label: string
+    value?: string
+    label?: string
     hidden?: boolean
   }[]
+  placeholder?: string
   className?: string
-  selected?: string
+  selected?: string | number | readonly string[]
   selectOption?: (value: string) => void
 }) => {
   const [selectedOption, setSelectedOption] = useState(
@@ -33,9 +36,9 @@ export const SelectField = ({
     return window.removeEventListener("click", () => null)
   }, [])
 
-  const selectOptionHandler = (label: string, value: string) => {
+  const selectOptionHandler = (label?: string, value?: string) => {
     setSelectedOption(label)
-    if (selectOption) selectOption(value)
+    if (selectOption && value) selectOption(value)
     setOpen(false)
   }
 
@@ -44,17 +47,22 @@ export const SelectField = ({
       <div
         ref={selectRef}
         className={cn(
-          "relative rounded-sm border px-3 py-2 bg-component-secondary label-md cursor-pointer h-10",
+          "relative rounded-sm border px-3 py-2 bg-component-secondary label-md cursor-pointer h-12 flex items-center",
           open && "border-primary",
           className
         )}
         onClick={() => setOpen(!open)}
       >
-        {selectedOption}
-        <CollapseIcon className="absolute right-3" size={20} />
+        {selectedOption || placeholder}
+        <CollapseIcon
+          className={clsx("absolute right-3 transition", {
+            "rotate-180": open,
+          })}
+          size={20}
+        />
       </div>
       {open && (
-        <ul className="absolute border border-primary bg-component-secondary rounded-sm w-full top-[39px] z-10">
+        <ul className="absolute border border-primary bg-component-secondary rounded-sm w-full top-[47px] z-10">
           {options.map(
             ({ label, value, hidden }, index) =>
               !hidden && (

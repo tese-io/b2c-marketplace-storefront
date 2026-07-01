@@ -2,9 +2,10 @@ import { HttpTypes } from "@medusajs/types"
 import { Container } from "@medusajs/ui"
 import { mapKeys } from "lodash"
 import React, { useEffect, useMemo, useState } from "react"
-import { Checkbox, Input } from "@/components/atoms"
+import { Input } from "@/components/atoms"
 import AddressSelect from "@/components/cells/AddressSelect/AddressSelect"
 import CountrySelect from "@/components/cells/CountrySelect/CountrySelect"
+import { usePathname } from "next/navigation"
 
 const ShippingAddress = ({
   customer,
@@ -17,6 +18,9 @@ const ShippingAddress = ({
   checked: boolean
   onChange: () => void
 }) => {
+  const pathname = usePathname()
+
+  const locale = pathname.split("/")[1]
   const [formData, setFormData] = useState<Record<string, any>>({
     "shipping_address.first_name": cart?.shipping_address?.first_name || "",
     "shipping_address.last_name": cart?.shipping_address?.last_name || "",
@@ -24,24 +28,42 @@ const ShippingAddress = ({
     "shipping_address.company": cart?.shipping_address?.company || "",
     "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
     "shipping_address.city": cart?.shipping_address?.city || "",
-    "shipping_address.country_code": cart?.shipping_address?.country_code || "",
+    "shipping_address.country_code":
+      cart?.shipping_address?.country_code || locale,
     "shipping_address.province": cart?.shipping_address?.province || "",
     "shipping_address.phone": cart?.shipping_address?.phone || "",
     email: cart?.email || "",
   })
 
-  const countriesInRegion = useMemo(
-    () => cart?.region?.countries?.map((c) => c.iso_2),
-    [cart?.region]
-  )
-
   // check if customer has saved addresses that are in the current region
   const addressesInRegion = useMemo(
     () =>
       customer?.addresses.filter(
-        (a) => a.country_code && countriesInRegion?.includes(a.country_code)
+        (a) => a.country_code && a.country_code === locale
       ),
-    [customer?.addresses, countriesInRegion]
+    [customer?.addresses]
+  )
+
+  // Create a stable reference that only changes when address data actually changes
+  const addressSnapshot = useMemo(
+    () =>
+      JSON.stringify({
+        shipping_address: cart?.shipping_address,
+        email: cart?.email || customer?.email,
+      }),
+    [
+      cart?.shipping_address?.first_name,
+      cart?.shipping_address?.last_name,
+      cart?.shipping_address?.address_1,
+      cart?.shipping_address?.company,
+      cart?.shipping_address?.postal_code,
+      cart?.shipping_address?.city,
+      cart?.shipping_address?.country_code,
+      cart?.shipping_address?.province,
+      cart?.shipping_address?.phone,
+      cart?.email,
+      customer?.email,
+    ]
   )
 
   const setFormAddress = (
@@ -57,7 +79,7 @@ const ShippingAddress = ({
         "shipping_address.company": address?.company || "",
         "shipping_address.postal_code": address?.postal_code || "",
         "shipping_address.city": address?.city || "",
-        "shipping_address.country_code": address?.country_code || "",
+        "shipping_address.country_code": address?.country_code || locale,
         "shipping_address.province": address?.province || "",
         "shipping_address.phone": address?.phone || "",
       }))
@@ -70,15 +92,14 @@ const ShippingAddress = ({
   }
 
   useEffect(() => {
-    // Ensure cart is not null and has a shipping_address before setting form data
-    if (cart && cart.shipping_address) {
-      setFormAddress(cart?.shipping_address, cart?.email)
+    if (cart?.shipping_address) {
+      setFormAddress(cart.shipping_address, cart.email)
     }
 
     if (cart && !cart.email && customer?.email) {
       setFormAddress(undefined, customer.email)
     }
-  }, [cart]) // Add cart as a dependency
+  }, [addressSnapshot])
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -100,7 +121,7 @@ const ShippingAddress = ({
           </p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4">
             <AddressSelect
-              addresses={customer.addresses}
+              addresses={addressesInRegion || []}
               addressInput={
                 mapKeys(formData, (_, key) =>
                   key.replace("shipping_address.", "")
@@ -111,7 +132,7 @@ const ShippingAddress = ({
           </div>
         </Container>
       )}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 tese-checkout-form">
         <Input
           label="First name"
           name="shipping_address.first_name"
@@ -183,7 +204,7 @@ const ShippingAddress = ({
           data-testid="shipping-province-input"
         />
       </div>
-      <div className="grid grid-cols-2 gap-4 my-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 tese-checkout-form">
         <Input
           label="Email"
           name="email"

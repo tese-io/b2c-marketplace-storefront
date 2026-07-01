@@ -5,9 +5,10 @@ import { isManual, isStripe } from "../../../lib/constants"
 import { placeOrder } from "@/lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Button } from "@/components/atoms"
-import { useRouter } from "next/navigation"
+import { orderErrorFormatter } from "@/lib/helpers/order-error-formatter"
+import { toast } from "@/lib/helpers/toast"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -42,7 +43,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       )
     default:
       return (
-        <Button disabled className="w-full">
+        <Button disabled className="tese-cart-checkout-btn w-full">
           Select a payment method
         </Button>
       )
@@ -60,15 +61,23 @@ const StripePaymentButton = ({
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [disabled, setDisabled] = useState(true)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
-      .catch((err) => {
-        setErrorMessage(err.message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    try {
+      const res = await placeOrder()
+      if (!res.ok) {
+        setErrorMessage(res.error?.message)
+      }
+    } catch (error: any) {
+      if (error?.message !== "NEXT_REDIRECT") {
+        setErrorMessage(
+          error?.message?.replace("Error setting up the request: ", "")
+        )
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const stripe = useStripe()
@@ -79,7 +88,10 @@ const StripePaymentButton = ({
     (s) => s.status === "pending"
   )
 
-  const disabled = !stripe || !elements ? true : false
+  useEffect(() => {
+    //@ts-ignore
+    setDisabled(!card?._complete)
+  }, [card, stripe, elements, cart])
 
   const handlePayment = async () => {
     setSubmitting(true)
@@ -143,7 +155,7 @@ const StripePaymentButton = ({
         disabled={disabled || notReady}
         onClick={handlePayment}
         loading={submitting}
-        className="w-full"
+        className="tese-cart-checkout-btn w-full"
       >
         Place order
       </Button>
@@ -156,12 +168,24 @@ const StripePaymentButton = ({
 }
 
 const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
+  const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const onPaymentCompleted = async () => {
-    await placeOrder().catch((err) => {
-      setErrorMessage(err.message !== "NEXT_REDIRECT" ? err.message : null)
-    })
+    try {
+      const res = await placeOrder()
+      if (!res.ok) {
+        setErrorMessage(res.error?.message)
+      }
+    } catch (error: any) {
+      if (error?.message !== "NEXT_REDIRECT") {
+        setErrorMessage(
+          error?.message?.replace("Error setting up the request: ", "")
+        )
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handlePayment = () => {
@@ -170,7 +194,12 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
 
   return (
     <>
-      <Button disabled={notReady} onClick={handlePayment} className="w-full">
+      <Button
+        disabled={notReady}
+        onClick={handlePayment}
+        className="tese-cart-checkout-btn w-full"
+        loading={submitting}
+      >
         Place order
       </Button>
       <ErrorMessage

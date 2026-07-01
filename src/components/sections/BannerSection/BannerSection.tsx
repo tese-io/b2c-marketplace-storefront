@@ -1,5 +1,5 @@
 import { Button } from "@/components/atoms"
-import { Link } from "@/i18n/routing"
+import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
 import Image from "next/image"
 
 export const BannerSection = () => {
@@ -11,28 +11,30 @@ export const BannerSection = () => {
             <span className="text-sm inline-block px-4 py-1 border border-secondary rounded-sm">
               #COLLECTION
             </span>
-            <h1 className="display-sm">
+            <h2 className="display-sm">
               BOHO VIBES: WHERE COMFORT MEETS CREATIVITY
-            </h1>
+            </h2>
             <p className="text-lg text-tertiary max-w-lg">
               Discover boho styles that inspire adventure and embrace the beauty
               of the unconventional.
             </p>
           </div>
-          <Link href="/collections/boho">
+          <LocalizedClientLink href="/collections/boho">
             <Button size="large" className="w-fit bg-secondary/10">
               EXPLORE
             </Button>
-          </Link>
+          </LocalizedClientLink>
         </div>
         <div className="relative aspect-[4/3] lg:aspect-auto lg:h-full flex justify-end rounded-sm">
           <Image
+            loading="lazy"
+            fetchPriority="high"
             src="/images/banner-section/Image.jpg"
             alt="Boho fashion collection - Model wearing a floral dress with yellow boots"
             width={700}
             height={600}
             className="object-cover object-top rounded-sm"
-            priority
+            sizes="(min-width: 1024px) 50vw, 100vw"
           />
         </div>
       </div>

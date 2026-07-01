@@ -1,78 +1,103 @@
-"use server"
-import { Wishlist } from "@/types/wishlist"
-import { sdk } from "../config"
-import { getAuthHeaders } from "./cookies"
-import { revalidatePath } from "next/cache"
+'use server';
 
-export const getUserWishlists = async () => {
+import { revalidatePath } from 'next/cache';
+
+import { Wishlist } from '@/types/wishlist';
+
+import { fetchQuery, sdk } from '../config';
+import { getAuthHeaders } from './cookies';
+import { getRegion } from "@/lib/data/regions"
+
+export const getUserWishlists = async ({regionId, countryCode} : {regionId?: string, countryCode?: string}) => {
   const headers = {
     ...(await getAuthHeaders()),
-    "Content-Type": "application/json",
-    "x-publishable-api-key": process.env
-      .NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY as string,
+    'Content-Type': 'application/json',
+    'x-publishable-api-key': process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY as string
+  };
+
+  const query: Record<string, string> = {
+    fields: '+variants.calculated_price.*,+variants.currency_code'
+  };
+
+  let finalRegionId = regionId;
+
+  if (!finalRegionId && countryCode) {
+    const region = await getRegion(countryCode);
+    if (region) {
+      finalRegionId = region.id;
+    }
+  }
+
+  if (finalRegionId) {
+    query.region_id = finalRegionId;
+  }
+  if (countryCode) {
+    query.country_code = countryCode;
   }
 
   return sdk.client
-    .fetch<{ wishlists: Wishlist[]; count: number }>(`/store/wishlist`, {
-      cache: "no-cache",
+    .fetch<Wishlist>(`/store/wishlist`, {
+      cache: 'no-cache',
       headers,
-      method: "GET",
+      method: 'GET',
+      query
     })
-    .then((res) => {
-      return res
+    .then(res => {
+      return res;
     })
-}
+    .catch(() => {
+      return { products: [] };
+    });
+};
 
 export const addWishlistItem = async ({
   reference_id,
-  reference,
+  reference
 }: {
-  reference_id: string
-  reference: "product"
+  reference_id: string;
+  reference: 'product';
 }) => {
   const headers = {
-    ...(await getAuthHeaders()),
-    "Content-Type": "application/json",
-    "x-publishable-api-key": process.env
-      .NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY as string,
+    ...(await getAuthHeaders())
+  };
+
+  const response = await fetchQuery('/store/wishlist', {
+    headers,
+    method: 'POST',
+    body: {
+      reference,
+      reference_id
+    }
+  })
+
+  revalidatePath('/wishlist');
+
+  if (!response.ok) {
+    throw new Error(response.error?.message || 'An error occured');
   }
 
-  const response = await fetch(
-    `${process.env.MEDUSA_BACKEND_URL}/store/wishlist`,
-    {
-      headers,
-      method: "POST",
-      body: JSON.stringify({
-        reference,
-        reference_id,
-      }),
-    }
-  ).then(() => {
-    revalidatePath("/wishlist")
-  })
-}
+  return response;
+};
 
 export const removeWishlistItem = async ({
-  wishlist_id,
-  product_id,
+  product_id
 }: {
-  wishlist_id: string
-  product_id: string
+  product_id: string;
 }) => {
   const headers = {
-    ...(await getAuthHeaders()),
-    "Content-Type": "application/json",
-    "x-publishable-api-key": process.env
-      .NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY as string,
+    ...(await getAuthHeaders())
+  };
+
+  const response = await fetchQuery(`/store/wishlist/product/${product_id}`, {
+    headers,
+    method: 'DELETE'
+  })
+
+  revalidatePath('/wishlist');
+
+  if (!response.ok) {
+    throw new Error(response.error?.message || 'An error occured');
   }
 
-  const response = await fetch(
-    `${process.env.MEDUSA_BACKEND_URL}/store/wishlist/${wishlist_id}/product/${product_id}`,
-    {
-      headers,
-      method: "DELETE",
-    }
-  ).then(() => {
-    revalidatePath("/wishlist")
-  })
-}
+  return response;
+};

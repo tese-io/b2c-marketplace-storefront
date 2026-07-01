@@ -1,40 +1,48 @@
 "use client"
 
+import { HttpTypes } from "@medusajs/types"
 import {
   AlgoliaProductSidebar,
-  ProductCard,
   ProductListingActiveFilters,
   ProductsPagination,
 } from "@/components/organisms"
-import { client } from "@/lib/client"
-import { Configure, useHits } from "react-instantsearch"
-import { InstantSearchNext } from "react-instantsearch-nextjs"
+import {
+  ProductListingLoadingView,
+  ProductListingNoResultsView,
+  ProductListingProductsView,
+} from "@/components/molecules"
 import { useSearchParams } from "next/navigation"
 import { getFacedFilters } from "@/lib/helpers/get-faced-filters"
-import useUpdateSearchParams from "@/hooks/useUpdateSearchParams"
 import { PRODUCT_LIMIT } from "@/const"
 import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
+import { useEffect, useMemo, useState } from "react"
+import { searchProducts } from "@/lib/data/products"
+import { FacetModel } from "@/components/organisms/ProductSidebar/AlgoliaProductSidebar"
 
 export const AlgoliaProductsListing = ({
   category_id,
   collection_id,
   seller_handle,
   locale = process.env.NEXT_PUBLIC_DEFAULT_REGION,
+  currency_code,
 }: {
   category_id?: string
   collection_id?: string
   locale?: string
   seller_handle?: string
+  currency_code: string
 }) => {
-  const searchParamas = useSearchParams()
+  const searchParams = useSearchParams()
 
-  const facetFilters: string = getFacedFilters(searchParamas)
-  const page: number = +(searchParamas.get("page") || 1)
-  const query: string = searchParamas.get("query") || ""
+  const facetFilters: string = getFacedFilters(searchParams)
+  const query: string = searchParams.get("query") || ""
+  const page: number = +(searchParams.get("page") || 1)
 
   const filters = `${
-    seller_handle ? `seller.handle:${seller_handle} AND` : ""
-  }supported_countries:${locale}${
+    seller_handle
+      ? `NOT seller:null AND seller.handle:${seller_handle} AND `
+      : "NOT seller:null AND "
+  }NOT seller.store_status:SUSPENDED AND supported_countries:${locale} AND variants.prices.currency_code:${currency_code} AND variants.prices.amount > 0${
     category_id
       ? ` AND categories.id:${category_id}${
           collection_id !== undefined
@@ -44,83 +52,100 @@ export const AlgoliaProductsListing = ({
       : ` ${facetFilters}`
   }`
 
-  const sandboxfilters = `${
-    category_id
-      ? `categories.id:${category_id}${
-          collection_id !== undefined
-            ? ` AND collections.id:${collection_id}`
-            : ""
-        } ${facetFilters}`
-      : `${facetFilters.replace("AND", "")}`
-  }`
-
   return (
-    <InstantSearchNext searchClient={client} indexName="products">
-      <Configure
+      <ProductsListing
+        locale={locale}
+        currency_code={currency_code}
+        filters={filters}
         query={query}
-        hitsPerPage={PRODUCT_LIMIT}
-        filters={sandboxfilters}
-        page={page - 1}
+        page={page}
       />
-      <ProductsListing />
-    </InstantSearchNext>
   )
 }
 
-const ProductsListing = () => {
-  const {
-    items,
-    results,
-    // sendEvent,
-  } = useHits()
-  const updateSearchParams = useUpdateSearchParams()
+const ProductsListing = ({
+  locale,
+  currency_code,
+  filters,
+  query,
+  page,
+}: {
+  locale?: string
+  currency_code: string
+  filters: string
+  query: string
+  page: number
+}) => {
+  const [products, setProducts] = useState<
+    (HttpTypes.StoreProduct & { seller?: any })[]
+  >([])
+  const [facets, setFacets] = useState<Record<string, FacetModel[]>>({})
+  const [isLoading, setIsLoading] = useState(true)
+  const [count, setCount] = useState(0)
+  const [pages, setPages] = useState(1)
 
-  const selectOptionHandler = (value: string) => {
-    updateSearchParams("sortBy", value)
-  }
+  const searchParams = useSearchParams()
 
-  if (!results?.processingTimeMS) return <ProductListingSkeleton />
+  useEffect(() => {
+    async function fetchProducts() {
+      if (!locale) return
+
+      try {
+        setIsLoading(true)
+        const result = await searchProducts({
+          query: query || undefined,
+          page: page - 1,
+          hitsPerPage: PRODUCT_LIMIT,
+          filters,
+          currency_code,
+          countryCode: locale,
+        })
+
+        setProducts(result.products)
+        setFacets(result.facets)
+        setCount(result.nbHits)
+        setPages(result.nbPages)
+      } catch (error) {
+        setProducts([])
+        setFacets({})
+        setCount(0)
+        setPages(0)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [locale, filters, query, page, currency_code])
+
+  if (isLoading && products.length === 0) return <ProductListingSkeleton />
 
   return (
-    <>
+    <div className="min-h-[70vh]">
       <div className="flex justify-between w-full items-center">
-        <div className="my-4 label-md">{`${results?.nbHits} listings`}</div>
-        {/* <div className="hidden md:flex gap-2 items-center">
-          Sort by:{" "}
-          <SelectField
-            className="min-w-[200px]"
-            options={selectOptions}
-            selectOption={selectOptionHandler}
-          />
-        </div> TODO: Fix sorting with Algolia */}
+        <div className="my-4 label-md">{`${count} listings`}</div>
       </div>
       <div className="hidden md:block">
         <ProductListingActiveFilters />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 mt-6">
-        <div>
-          <AlgoliaProductSidebar />
+      <div className="md:flex gap-4">
+        <div className="w-[280px] flex-shrink-0 hidden md:block">
+          <AlgoliaProductSidebar facets={facets} />
         </div>
-        <div className="w-full col-span-3">
-          {!items.length ? (
-            <div className="text-center w-full my-10">
-              <h2 className="uppercase text-primary heading-lg">no results</h2>
-              <p className="mt-4 text-lg">
-                Sorry, we can&apos;t find any results for your criteria
-              </p>
-            </div>
-          ) : (
-            <div className="w-full">
-              <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-                {items.map((hit) => (
-                  <ProductCard key={hit.objectID} product={hit} />
-                ))}
-              </ul>
-            </div>
+        <div className="w-full flex flex-col">
+          {isLoading && <ProductListingLoadingView />}
+
+          {!isLoading && !products.length && <ProductListingNoResultsView />}
+
+          {!isLoading && products.length > 0 && (
+            <ProductListingProductsView products={products} />
           )}
+
+          <div className="mt-auto">
+            <ProductsPagination pages={pages} />
+          </div>
         </div>
       </div>
-      <ProductsPagination pages={results?.nbPages || 1} />
-    </>
+    </div>
   )
 }
