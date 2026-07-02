@@ -1,9 +1,12 @@
+import { getSellerTrustStage } from '@/lib/helpers/trust-labels'
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
 import { SellerProps } from '@/types/seller'
 import Image from 'next/image'
 
 export function B2BProductSellerBar({ seller }: { seller?: SellerProps }) {
   if (!seller) return null
+
+  const trust = getSellerTrustStage(seller)
 
   return (
     <div className="tese-pdp-seller">
@@ -24,7 +27,9 @@ export function B2BProductSellerBar({ seller }: { seller?: SellerProps }) {
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="tese-pdp-seller-label">Verified supplier</p>
+          <p className="tese-pdp-seller-label" title={trust.description}>
+            {trust.shortLabel}
+          </p>
           <p className="tese-pdp-seller-name">{seller.name}</p>
           {seller.description && (
             <p className="tese-pdp-seller-desc">{seller.description}</p>

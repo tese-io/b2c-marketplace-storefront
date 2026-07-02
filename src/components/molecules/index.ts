@@ -17,6 +17,8 @@ import { ProductCarouselIndicator } from './ProductCarouselIndicator/ProductCaro
 import ProductListingLoadingView from './ProductListingLoadingView/ProductListingLoadingView';
 import ProductListingNoResultsView from './ProductListingNoResultsView/ProductListingNoResultsView';
 import ProductListingProductsView from './ProductListingProductsView/ProductListingProductsView';
+import { ConnectOnOrbitButton } from './ConnectOnOrbitButton/ConnectOnOrbitButton';
+import { SellerProductsEmpty } from './SellerProductsEmpty/SellerProductsEmpty';
 import { ProductPageAccordion } from './ProductPageAccordion/ProductPageAccordion';
 import { ProductPostedDate } from './ProductPostedDate/ProductPostedDate';
 import { ProductReportButton } from './ProductReportButton/ProductReportButton';
@@ -77,5 +79,7 @@ export {
   ProfileDetails,
   ProductListingLoadingView,
   ProductListingNoResultsView,
-  ProductListingProductsView
+  ProductListingProductsView,
+  ConnectOnOrbitButton,
+  SellerProductsEmpty
 };

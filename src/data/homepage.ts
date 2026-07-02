@@ -4,7 +4,58 @@ export type HomeService = {
   description: string
   href: string
   icon: 'marketplace' | 'sourcing' | 'verification' | 'logistics' | 'finance'
+  outcome?: string
 }
+
+export type HomeServiceWithOutcome = HomeService & { outcome: string }
+
+export const HOME_SERVICES: HomeServiceWithOutcome[] = [
+  {
+    id: 'marketplace',
+    title: 'Marketplace',
+    outcome: 'Compare suppliers side by side',
+    description:
+      'Browse vetted sustainable listings with MOQ, origin, certifications, and embodied carbon data — filter by sector and quote in one workflow.',
+    href: '/categories',
+    icon: 'marketplace',
+  },
+  {
+    id: 'sourcing',
+    title: 'AI Sourcing',
+    outcome: 'Reduce sourcing time',
+    description:
+      'Describe what you need in plain language. tese.io matches certified suppliers, checks credentials, and scans the web for alternatives.',
+    href: '/sourcing',
+    icon: 'sourcing',
+  },
+  {
+    id: 'verification',
+    title: 'Verification & chain of custody',
+    outcome: 'De-risk procurement decisions',
+    description:
+      'Mill certificates, GRS/ASI traceability, and chain-of-custody verification services — evidence you can attach to RFQs and audits.',
+    href: '/categories?listing=service',
+    icon: 'verification',
+  },
+  {
+    id: 'logistics',
+    title: 'Logistics & fulfilment',
+    outcome: 'Consolidate multi-supplier delivery',
+    description:
+      'Worldwide seller fulfilment zones, shipping quotes, and consolidated delivery options for multi-supplier orders.',
+    href: '/categories?listing=service',
+    icon: 'logistics',
+  },
+  {
+    id: 'finance',
+    title: 'Finance matchmaking',
+    outcome: 'Match capital to procurement',
+    description:
+      'Connect procurement to impact and sustainable finance — green loans, transition credit, and ESG-linked funding matched to your products and services.',
+    href: '/sourcing?intent=finance',
+    icon: 'finance',
+  },
+]
 
 export type HomePartnerStat = {
   value: string
@@ -44,51 +95,8 @@ export type HomeSecondaryCta = {
   secondaryHref: string
 }
 
-export const HOME_SERVICES: HomeService[] = [
-  {
-    id: 'marketplace',
-    title: 'Marketplace',
-    description:
-      'Browse vetted sustainable listings with MOQ, origin, certifications, and embodied carbon data — compare suppliers side by side.',
-    href: '/categories',
-    icon: 'marketplace',
-  },
-  {
-    id: 'sourcing',
-    title: 'AI Sourcing',
-    description:
-      'Describe what you need in plain language. tese.io matches certified suppliers, checks credentials, and scans the web for alternatives.',
-    href: '/sourcing',
-    icon: 'sourcing',
-  },
-  {
-    id: 'verification',
-    title: 'Verification & chain of custody',
-    description:
-      'Mill certificates, GRS/ASI traceability, and chain-of-custody verification services to de-risk procurement decisions.',
-    href: '/categories?listing=service',
-    icon: 'verification',
-  },
-  {
-    id: 'logistics',
-    title: 'Logistics & fulfilment',
-    description:
-      'Worldwide seller fulfilment zones, shipping quotes, and consolidated delivery options for multi-supplier orders.',
-    href: '/categories?listing=service',
-    icon: 'logistics',
-  },
-  {
-    id: 'finance',
-    title: 'Finance matchmaking',
-    description:
-      'tese.io connects your procurement to the right impact and sustainable finance — green loans, transition credit, and ESG-linked funding matched to your products and services.',
-    href: '/sourcing?intent=finance',
-    icon: 'finance',
-  },
-]
-
 export const HOME_PARTNER_STATS: HomePartnerStat[] = [
-  { value: '50+', label: 'Verified suppliers' },
+  { value: '50+', label: 'Listed suppliers' },
   { value: '8', label: 'Sustainable categories' },
   { value: 'Worldwide', label: 'Fulfilment coverage' },
 ]
@@ -130,7 +138,7 @@ export const HOME_INSIGHTS: HomeInsight[] = [
     excerpt:
       'A practical guide to mill certificates, ASI chain-of-custody, and what to ask suppliers before signing.',
     category: 'Procurement guide',
-    href: '#',
+    href: '/categories?sector=industrial-materials&industry=metals-%26-alloys',
     accent: '#475569',
   },
   {
@@ -139,7 +147,7 @@ export const HOME_INSIGHTS: HomeInsight[] = [
     excerpt:
       'Compare EPD-backed data across cement alternatives, recycled steel, and low-carbon aggregates.',
     category: 'Sustainability',
-    href: '#',
+    href: '/categories?sector=construction&industry=construction-materials',
     accent: '#059669',
   },
   {
@@ -148,7 +156,7 @@ export const HOME_INSIGHTS: HomeInsight[] = [
     excerpt:
       'How to evaluate inverters, panels, and storage from multiple certified sellers on one platform.',
     category: 'Energy',
-    href: '#',
+    href: '/categories?sector=energy&industry=renewable-energy',
     accent: '#0891B2',
   },
   {
@@ -157,7 +165,7 @@ export const HOME_INSIGHTS: HomeInsight[] = [
     excerpt:
       'What certification evidence to expect when sourcing recycled yarns and fibres for apparel supply chains.',
     category: 'Textiles',
-    href: '#',
+    href: '/categories?sector=textiles&industry=textiles-%26-fibres',
     accent: '#E11D48',
   },
 ]

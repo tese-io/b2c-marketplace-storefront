@@ -5,6 +5,12 @@ import { useState } from "react"
 
 import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
 import { getCategoryVisual } from "@/components/organisms/CategoryCardB2B/category-visuals"
+import {
+  getCategoryDescription,
+  MEGA_MENU_INDUSTRIES,
+  MEGA_MENU_PRODUCTS,
+  MEGA_MENU_SERVICES,
+} from "@/data/explorer-copy"
 import { HOME_SERVICES } from "@/data/homepage"
 import { SECTORS, type SectorId } from "@/data/sectors"
 import { getSectorVisual } from "@/data/sector-visuals"
@@ -117,21 +123,26 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
         </button>
         {openMenu === "products" && (
           <MegaMenuPanel
-            eyebrow="Sustainable catalogue"
-            title="Browse by material category"
+            eyebrow={MEGA_MENU_PRODUCTS.eyebrow}
+            title={MEGA_MENU_PRODUCTS.title}
             footerHref={`/categories${catalogQuery}`}
-            footerLabel="View all products"
+            footerLabel={MEGA_MENU_PRODUCTS.footerLabel}
             onClose={() => setOpenMenu(null)}
           >
+            <p className="tese-mega-menu-intro">{MEGA_MENU_PRODUCTS.subtitle}</p>
             <div className="tese-mega-menu-grid">
               {parentCategories.map((cat) => {
                 const visual = getCategoryVisual(cat.handle || '')
+                const description = getCategoryDescription(
+                  cat.handle || '',
+                  cat.description
+                )
                 return (
                   <MegaMenuLinkItem
                     key={cat.id}
                     href={categoryHref(cat.handle || '', catalogQuery)}
                     title={cat.name || ''}
-                    description={cat.description || undefined}
+                    description={description || undefined}
                     accent={visual.accent}
                     accentSoft={visual.accentSoft}
                     icon={visual.icon}
@@ -161,21 +172,25 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
         </button>
         {openMenu === "services" && (
           <MegaMenuPanel
-            eyebrow="Platform capabilities"
-            title="Procurement services on tese.io"
+            eyebrow={MEGA_MENU_SERVICES.eyebrow}
+            title={MEGA_MENU_SERVICES.title}
             footerHref={`/categories${servicesQuery}`}
-            footerLabel="View all services"
+            footerLabel={MEGA_MENU_SERVICES.footerLabel}
             onClose={() => setOpenMenu(null)}
           >
+            <p className="tese-mega-menu-intro">{MEGA_MENU_SERVICES.subtitle}</p>
             <div className="tese-mega-menu-grid">
               {HOME_SERVICES.map((service) => {
                 const colors = SERVICE_ACCENTS[service.id]
+                const description = service.outcome
+                  ? `${service.description} Outcome: ${service.outcome}.`
+                  : service.description
                 return (
                   <MegaMenuLinkItem
                     key={service.id}
                     href={service.href}
                     title={service.title}
-                    description={service.description}
+                    description={description}
                     accent={colors?.accent}
                     accentSoft={colors?.soft}
                     icon={<ServiceNavIcon id={service.icon} />}
@@ -205,13 +220,14 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
         </button>
         {openMenu === "industries" && (
           <MegaMenuPanel
-            eyebrow="Sectors"
-            title="Industries we serve"
+            eyebrow={MEGA_MENU_INDUSTRIES.eyebrow}
+            title={MEGA_MENU_INDUSTRIES.title}
             footerHref={`/categories${catalogQuery}`}
-            footerLabel="Browse all sectors"
+            footerLabel={MEGA_MENU_INDUSTRIES.footerLabel}
             onClose={() => setOpenMenu(null)}
             wide={false}
           >
+            <p className="tese-mega-menu-intro">{MEGA_MENU_INDUSTRIES.subtitle}</p>
             <div className="tese-mega-menu-list">
               {SECTORS.map((sector) => {
                 if (sector.id === 'all') {
@@ -220,7 +236,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
                       key={sector.id}
                       href={`/categories${catalogQuery}`}
                       title={sector.label}
-                      description="All products and services across every sector"
+                      description={sector.explorerIntro}
                       icon={
                         <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
                           <path fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6z" />
@@ -237,7 +253,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
                     key={sector.id}
                     href={`/categories${buildCatalogQuery(sector.id)}`}
                     title={sector.label}
-                    description={`${sector.categoryHandles.length} categories · ${sector.shortLabel}`}
+                    description={sector.explorerIntro}
                     accent={visual.accent}
                     accentSoft={visual.accentSoft}
                     icon={visual.icon}

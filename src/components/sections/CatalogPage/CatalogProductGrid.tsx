@@ -6,6 +6,7 @@ import {
   buildCategoriesById,
   getProductSectorLabels,
 } from '@/lib/helpers/sector-preferences'
+import type { WishlistState } from '@/lib/helpers/wishlist-state'
 import { SellerProps } from '@/types/seller'
 
 type CatalogProduct = HttpTypes.StoreProduct & { seller?: SellerProps }
@@ -14,10 +15,12 @@ export function CatalogProductGrid({
   products,
   categories,
   emptyMessage,
+  wishlistState,
 }: {
   products: CatalogProduct[]
   categories: HttpTypes.StoreProductCategory[]
   emptyMessage?: string
+  wishlistState?: WishlistState
 }) {
   if (!products.length) {
     return (
@@ -43,6 +46,8 @@ export function CatalogProductGrid({
           sectorLabels={getProductSectorLabels(product, categoriesById)}
           vendorCount={vendorCount}
           displayTitle={displayTitle}
+          isLoggedIn={wishlistState?.isLoggedIn}
+          initiallyWishlisted={wishlistState?.wishlistedIds.has(product.id)}
         />
       ))}
     </div>

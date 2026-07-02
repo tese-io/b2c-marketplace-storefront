@@ -6,11 +6,10 @@ import {
   buildCategoriesById,
   getProductSectorLabels,
 } from '@/lib/helpers/sector-preferences'
+import { getWishlistState } from '@/lib/helpers/wishlist-state'
 import { SellerProps } from '@/types/seller'
 import { Product } from '@/types/product'
 import { HttpTypes } from '@medusajs/types'
-
-import { ProductCard } from '../ProductCard/ProductCard'
 
 export const HomeProductsCarousel = async ({
   locale,
@@ -43,8 +42,10 @@ export const HomeProductsCarousel = async ({
 
   if (!products.length) return null
 
+  const wishlistState = await getWishlistState(locale)
+  const categoriesById = buildCategoriesById(parentCategories)
+
   if (b2b) {
-    const categoriesById = buildCategoriesById(parentCategories)
     const gridItems = dedupeCatalogGridProducts(
       products as (HttpTypes.StoreProduct & { seller?: SellerProps })[]
     )
@@ -63,6 +64,8 @@ export const HomeProductsCarousel = async ({
             }
             vendorCount={vendorCount}
             displayTitle={displayTitle}
+            isLoggedIn={wishlistState.isLoggedIn}
+            initiallyWishlisted={wishlistState.wishlistedIds.has(product.id)}
           />
         ))}
       </div>
@@ -73,8 +76,19 @@ export const HomeProductsCarousel = async ({
     <div className="flex justify-center w-full">
       <Carousel
         align="start"
-        items={products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        items={products.map((product, index) => (
+          <div key={product.id} className="w-[280px] shrink-0">
+            <FeaturedListingCard
+              product={product as HttpTypes.StoreProduct & { seller?: SellerProps }}
+              index={index}
+              sectorLabels={getProductSectorLabels(
+                product as HttpTypes.StoreProduct,
+                categoriesById
+              )}
+              isLoggedIn={wishlistState.isLoggedIn}
+              initiallyWishlisted={wishlistState.wishlistedIds.has(product.id)}
+            />
+          </div>
         ))}
       />
     </div>

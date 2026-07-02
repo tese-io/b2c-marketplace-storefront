@@ -270,7 +270,7 @@ export const searchProducts = async (params: {
   let facets = params.facets;
 
   if(!facets) {
-    facets = ["variants.condition", "variants.color", "variants.size"];
+    facets = ["certifications", "origin", "sectors", "is_circular", "co2_kg_per_unit", "seller.is_verified", "categories.handle"];
   }
 
   const { countryCode, ...bodyParams } = params;

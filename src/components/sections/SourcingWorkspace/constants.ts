@@ -53,3 +53,9 @@ export const AI_MODELS: AiModel[] = [
 ]
 
 export const DEFAULT_AI_MODEL: AiModelId = 'tesera'
+
+export const SOURCING_LEGAL_LINKS = [
+  { id: 'terms', label: 'Terms & Conditions', href: '/terms' },
+  { id: 'privacy', label: 'Privacy Policy', href: '/privacy' },
+  { id: 'resources', label: 'Resources', href: '/resources' },
+] as const

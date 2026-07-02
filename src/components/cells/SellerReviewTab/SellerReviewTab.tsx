@@ -20,12 +20,12 @@ export const SellerReviewTab = async ({
       : 0
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 mt-8">
-      <div className="border rounded-sm p-4">
+    <div className="tese-seller-reviews">
+      <div className="tese-seller-reviews-score">
         <SellerScore rate={rating} reviewCount={reviewCount} />
       </div>
-      <div className="col-span-3 border rounded-sm p-4">
-        <h3 className="heading-sm uppercase border-b pb-4">Seller reviews</h3>
+      <div className="tese-seller-reviews-list">
+        <h3 className="tese-seller-reviews-heading">Seller reviews</h3>
         <SellerReviewList reviews={seller.reviews} />
       </div>
     </div>

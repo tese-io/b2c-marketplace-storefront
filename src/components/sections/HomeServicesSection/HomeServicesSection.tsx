@@ -80,6 +80,9 @@ export function HomeServicesSection() {
               <ServiceIcon icon={service.icon} />
             </div>
             <h3 className="tese-service-card-title">{service.title}</h3>
+            {service.outcome && (
+              <p className="tese-service-card-outcome">{service.outcome}</p>
+            )}
             <p className="tese-service-card-desc">{service.description}</p>
             <span className="tese-service-card-link">
               Learn more →

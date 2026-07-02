@@ -1,10 +1,12 @@
 "use client"
 import { Chip } from "@/components/atoms"
+import { humanizeCategoryHandle } from "@/lib/helpers/catalog-search"
 import useFilters from "@/hooks/useFilters"
 import { CloseIcon } from "@/icons"
 
 const filtersLabels = {
   category: "Category",
+  categories: "Category",
   brand: "Brand",
   min_price: "Min Price",
   max_price: "Max Price",
@@ -13,12 +15,26 @@ const filtersLabels = {
   query: "Search",
   condition: "Condition",
   rating: "Rating",
+  certifications: "Certifications",
+  origin: "Origin",
+  circular: "Circular",
+  verified: "Verified",
+  co2_min: "Min CO₂",
+  co2_max: "Max CO₂",
+  sectors: "Sector",
 }
+
+const TOGGLE_KEYS = new Set(["circular", "verified", "sale"])
 
 export const ActiveFilterElement = ({ filter }: { filter: string[] }) => {
   const { updateFilters } = useFilters(filter[0])
 
   const activeFilters = filter[1].split(",")
+  const displayValue = (value: string) => {
+    if (TOGGLE_KEYS.has(filter[0]) && value === "true") return "Yes"
+    if (filter[0] === "categories") return humanizeCategoryHandle(value)
+    return value
+  }
 
   const removeFilterHandler = (filter: string) => {
     updateFilters(filter)
@@ -33,7 +49,7 @@ export const ActiveFilterElement = ({ filter }: { filter: string[] }) => {
         const Element = () => {
           return (
             <span className="flex gap-2 items-center cursor-default whitespace-nowrap">
-              {element}{" "}
+              {displayValue(element)}{" "}
               <span onClick={() => removeFilterHandler(element)}>
                 <CloseIcon size={16} className="cursor-pointer" />
               </span>

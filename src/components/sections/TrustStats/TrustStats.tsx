@@ -1,60 +1,139 @@
-const STATS = [
-  {
-    value: "ISO / EN",
-    label: "Mill certificates on structural metals",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-  {
-    value: "GRS / ASI",
-    label: "Recycled & low-carbon materials",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
-      </svg>
-    ),
-  },
-  {
-    value: "Worldwide",
-    label: "Seller fulfilment & shipping zones",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582" />
-      </svg>
-    ),
-  },
-  {
-    value: "AI + Web",
-    label: "Dual-source supplier discovery",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-      </svg>
-    ),
-  },
-]
+import { TRUST_STATS_COPY } from '@/data/explorer-copy'
 
-export function TrustStats() {
+const TRUST_STAT_ICONS = {
+  certifications: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M8 3h8l4 4v14H4V3h4z"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M16 3v4h4M8 13l2.5 2.5L14 11"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle
+        cx="17"
+        cy="17"
+        r="3.25"
+        stroke="currentColor"
+        strokeWidth="1.75"
+      />
+      <path
+        d="M16.2 17l.75.75 1.55-1.55"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  circularity: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M12 4.5c-3.5 0-6.5 2.4-7.3 5.7M4.7 10.2l2.1 1.2M12 19.5c3.5 0 6.5-2.4 7.3-5.7M19.3 13.8l-2.1-1.2M12 8v4l2.5 1.5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7.5 7.8L5.8 5.5M16.5 7.8l1.7-2.3M7.5 16.2l-1.7 2.3M16.5 16.2l1.7 2.3"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  fulfilment: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle
+        cx="12"
+        cy="12"
+        r="8.25"
+        stroke="currentColor"
+        strokeWidth="1.75"
+      />
+      <path
+        d="M3.75 12h16.5M12 3.75c2.2 2.5 3.4 5.2 3.4 8.25S14.2 17.75 12 20.25M12 3.75C9.8 6.25 8.6 9 8.6 12.25s1.2 5.25 3.4 7.75"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16.5 9.5l2-1.5M16.5 14.5l2 1.5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  discovery: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="6" cy="8" r="2.25" stroke="currentColor" strokeWidth="1.75" />
+      <circle cx="18" cy="8" r="2.25" stroke="currentColor" strokeWidth="1.75" />
+      <circle cx="12" cy="17" r="2.25" stroke="currentColor" strokeWidth="1.75" />
+      <path
+        d="M7.8 9.4L10.4 14.8M16.2 9.4l-2.6 5.4M8.25 8h7.5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12 4.5v1.5M12 4.5l1.2.7M12 4.5l-1.2.7"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+} as const
+
+export function TrustStats () {
   return (
-    <section className="w-full bg-tese-surface/80 border-b border-black/[0.06]">
-      <div className="tese-container py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {STATS.map((s) => (
-          <div
-            key={s.label}
-            className="tese-card flex gap-4 p-5 items-start"
-          >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-tese-ink text-tese-lime">
-              {s.icon}
-            </div>
-            <div>
-              <p className="text-lg font-semibold text-tese-ink">{s.value}</p>
-              <p className="text-sm text-secondary mt-0.5 leading-snug">{s.label}</p>
-            </div>
+    <section
+      className="tese-trust-stats"
+      aria-labelledby="trust-stats-heading"
+    >
+      <div className="tese-container tese-trust-stats-inner">
+        <header className="tese-trust-stats-header">
+          <p className="tese-trust-stats-eyebrow">
+            <span className="tese-trust-stats-eyebrow-dot" aria-hidden />
+            {TRUST_STATS_COPY.eyebrow}
+          </p>
+          <h2 id="trust-stats-heading" className="tese-trust-stats-heading">
+            {TRUST_STATS_COPY.heading}
+          </h2>
+        </header>
+
+        <div className="tese-trust-stats-panel tese-grain">
+          <div className="tese-trust-stats-grid">
+            {TRUST_STATS_COPY.items.map((stat, index) => (
+              <article
+                key={stat.id}
+                className="tese-trust-stat"
+                style={{ animationDelay: `${index * 70}ms` }}
+              >
+                <span className="tese-trust-stat-index" aria-hidden>
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div className="tese-trust-stat-icon" aria-hidden>
+                  {TRUST_STAT_ICONS[stat.id]}
+                </div>
+                <div className="tese-trust-stat-copy">
+                  <h3 className="tese-trust-stat-value">{stat.value}</h3>
+                  <p className="tese-trust-stat-label">{stat.label}</p>
+                </div>
+              </article>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </section>
   )

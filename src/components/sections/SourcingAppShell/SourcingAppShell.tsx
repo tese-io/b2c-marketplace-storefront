@@ -30,6 +30,7 @@ import {
   SOURCING_HISTORY_EVENT,
   type SourcingThread,
 } from '@/lib/sourcing-history'
+import { SourcingPageFooter } from '@/components/sections/SourcingWorkspace/SourcingPageFooter'
 
 type NavItem = {
   id: string
@@ -352,6 +353,8 @@ export function SourcingAppShell ({
         <main className="tese-sourcing-content" id="sourcing-main">
           {children}
         </main>
+
+        <SourcingPageFooter />
       </div>
     </div>
   )

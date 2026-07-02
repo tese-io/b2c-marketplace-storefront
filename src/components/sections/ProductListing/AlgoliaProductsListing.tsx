@@ -1,23 +1,20 @@
 "use client"
 
 import { HttpTypes } from "@medusajs/types"
-import {
-  AlgoliaProductSidebar,
-  ProductListingActiveFilters,
-  ProductsPagination,
-} from "@/components/organisms"
+import { ProductsPagination } from "@/components/organisms"
 import {
   ProductListingLoadingView,
-  ProductListingNoResultsView,
   ProductListingProductsView,
 } from "@/components/molecules"
+import { ListingSearchToolbar } from "@/components/molecules/ListingSearchToolbar/ListingSearchToolbar"
+import { SellerProductsEmpty } from "@/components/molecules/SellerProductsEmpty/SellerProductsEmpty"
 import { useSearchParams } from "next/navigation"
 import { getFacedFilters } from "@/lib/helpers/get-faced-filters"
 import { PRODUCT_LIMIT } from "@/const"
 import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { searchProducts } from "@/lib/data/products"
-import { FacetModel } from "@/components/organisms/ProductSidebar/AlgoliaProductSidebar"
+import { FacetCounts } from "@/components/organisms/ProductSidebar/AlgoliaProductSidebar"
 
 export const AlgoliaProductsListing = ({
   category_id,
@@ -25,12 +22,20 @@ export const AlgoliaProductsListing = ({
   seller_handle,
   locale = process.env.NEXT_PUBLIC_DEFAULT_REGION,
   currency_code,
+  orbitUrl,
+  sellerName,
+  isLoggedIn,
+  wishlistedIds,
 }: {
   category_id?: string
   collection_id?: string
   locale?: string
   seller_handle?: string
   currency_code: string
+  orbitUrl?: string | null
+  sellerName?: string
+  isLoggedIn?: boolean
+  wishlistedIds?: string[]
 }) => {
   const searchParams = useSearchParams()
 
@@ -40,13 +45,13 @@ export const AlgoliaProductsListing = ({
 
   const filters = `${
     seller_handle
-      ? `NOT seller:null AND seller.handle:${seller_handle} AND `
-      : "NOT seller:null AND "
+      ? `has_seller:true AND seller.handle:${seller_handle} AND `
+      : "has_seller:true AND "
   }NOT seller.store_status:SUSPENDED AND supported_countries:${locale} AND variants.prices.currency_code:${currency_code} AND variants.prices.amount > 0${
     category_id
       ? ` AND categories.id:${category_id}${
           collection_id !== undefined
-            ? ` AND collections.id:${collection_id}`
+            ? ` AND collection.id:${collection_id}`
             : ""
         } ${facetFilters}`
       : ` ${facetFilters}`
@@ -59,6 +64,11 @@ export const AlgoliaProductsListing = ({
         filters={filters}
         query={query}
         page={page}
+        seller_handle={seller_handle}
+        orbitUrl={orbitUrl}
+        sellerName={sellerName}
+        isLoggedIn={isLoggedIn}
+        wishlistedIds={wishlistedIds}
       />
   )
 }
@@ -69,22 +79,30 @@ const ProductsListing = ({
   filters,
   query,
   page,
+  seller_handle,
+  orbitUrl,
+  sellerName,
+  isLoggedIn,
+  wishlistedIds,
 }: {
   locale?: string
   currency_code: string
   filters: string
   query: string
   page: number
+  seller_handle?: string
+  orbitUrl?: string | null
+  sellerName?: string
+  isLoggedIn?: boolean
+  wishlistedIds?: string[]
 }) => {
   const [products, setProducts] = useState<
     (HttpTypes.StoreProduct & { seller?: any })[]
   >([])
-  const [facets, setFacets] = useState<Record<string, FacetModel[]>>({})
+  const [facets, setFacets] = useState<Record<string, FacetCounts>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [count, setCount] = useState(0)
   const [pages, setPages] = useState(1)
-
-  const searchParams = useSearchParams()
 
   useEffect(() => {
     async function fetchProducts() {
@@ -120,30 +138,45 @@ const ProductsListing = ({
 
   if (isLoading && products.length === 0) return <ProductListingSkeleton />
 
+  const searchPlaceholder = seller_handle
+    ? `Search ${sellerName || 'this supplier'}'s listings…`
+    : 'Search listings…'
+
   return (
-    <div className="min-h-[70vh]">
-      <div className="flex justify-between w-full items-center">
-        <div className="my-4 label-md">{`${count} listings`}</div>
-      </div>
-      <div className="hidden md:block">
-        <ProductListingActiveFilters />
-      </div>
-      <div className="md:flex gap-4">
-        <div className="w-[280px] flex-shrink-0 hidden md:block">
-          <AlgoliaProductSidebar facets={facets} />
-        </div>
-        <div className="w-full flex flex-col">
-          {isLoading && <ProductListingLoadingView />}
+    <div className="tese-seller-listing min-h-[50vh]">
+      <ListingSearchToolbar
+        count={count}
+        facets={facets}
+        showSectors={!seller_handle}
+        searchPlaceholder={searchPlaceholder}
+      />
+      <div className="tese-seller-grid-wrap">
+        {isLoading && <ProductListingLoadingView />}
 
-          {!isLoading && !products.length && <ProductListingNoResultsView />}
+        {!isLoading && !products.length && seller_handle && (
+          <SellerProductsEmpty sellerName={sellerName} orbitUrl={orbitUrl} />
+        )}
 
-          {!isLoading && products.length > 0 && (
-            <ProductListingProductsView products={products} />
-          )}
-
-          <div className="mt-auto">
-            <ProductsPagination pages={pages} />
+        {!isLoading && !products.length && !seller_handle && (
+          <div className="tese-seller-empty">
+            <h2 className="tese-seller-empty-title">No results</h2>
+            <p className="tese-seller-empty-hint">
+              Sorry, we couldn&apos;t find any results for your criteria.
+            </p>
           </div>
+        )}
+
+        {!isLoading && products.length > 0 && (
+          <ProductListingProductsView
+            products={products}
+            isLoggedIn={isLoggedIn}
+            wishlistedIds={wishlistedIds}
+            wideLayout
+          />
+        )}
+
+        <div className="mt-auto">
+          <ProductsPagination pages={pages} />
         </div>
       </div>
     </div>

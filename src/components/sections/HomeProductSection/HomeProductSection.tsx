@@ -1,6 +1,7 @@
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
 
 import { HomeProductsCarousel } from '@/components/organisms'
+import { FEATURED_SECTION_EYEBROW } from '@/data/explorer-copy'
 import type { SectorDefinition, SectorId } from '@/data/sectors'
 import { HttpTypes } from '@medusajs/types'
 import { listProducts } from '@/lib/data/products'
@@ -75,7 +76,7 @@ export const HomeProductSection = async ({
         <div className="tese-featured-section-intro">
           <p className="tese-featured-eyebrow">
             <span className="tese-featured-eyebrow-dot" aria-hidden />
-            Verified inventory
+            {FEATURED_SECTION_EYEBROW}
           </p>
           <h2
             id="featured-listings-heading"

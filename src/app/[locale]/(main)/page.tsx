@@ -12,6 +12,7 @@ import {
   SourcingCTA,
   TrustStats,
 } from "@/components/sections"
+import { FEATURED_SECTION_SUBTITLE } from '@/data/explorer-copy'
 
 import type { Metadata } from "next"
 import { headers } from "next/headers"
@@ -187,7 +188,7 @@ export default async function Home({
         <div className="tese-container">
           <HomeProductSection
             heading={featuredHeading}
-            subtitle="Vetted suppliers with MOQ, origin, certifications, and embodied carbon data."
+            subtitle={FEATURED_SECTION_SUBTITLE}
             locale={locale}
             home
             sector={sector}

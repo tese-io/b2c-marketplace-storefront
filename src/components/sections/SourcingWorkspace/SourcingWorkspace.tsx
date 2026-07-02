@@ -16,8 +16,11 @@ import {
 
 import { SendInquiryButton } from "@/components/sections/SourcingInquiries/SendInquiryButton"
 
+import { AI_SOURCING_HOOK, AI_SOURCING_PROMO, AI_SOURCING_TAGLINE } from '@/data/explorer-copy'
+
 import { QUICK_PROMPTS, STAGES } from "./constants"
 import { SourcingInput } from "./SourcingInput"
+import { SourcingLegalNotice } from "./SourcingLegalNotice"
 
 type Citation = { title?: string; url?: string }
 
@@ -608,9 +611,8 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
               <TeseLogoMark size={56} className="tese-sourcing-home-mark" />
             </LocalizedClientLink>
             <h1 className="tese-sourcing-home-title">AI Sourcing</h1>
-            <p className="tese-sourcing-home-tagline">
-              All requirements in one ask — match the catalogue and search the web with AI.
-            </p>
+            <p className="tese-sourcing-home-tagline">{AI_SOURCING_TAGLINE}</p>
+            <p className="tese-sourcing-home-hook">{AI_SOURCING_HOOK}</p>
           </div>
 
           <SourcingInput
@@ -636,9 +638,11 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
             ))}
           </div>
 
+          <SourcingLegalNotice />
+
           <div className="tese-sourcing-promo">
             <p className="tese-sourcing-promo-text">
-              <strong>Inquiries &amp; orders</strong> — send RFQs to multiple suppliers and track responses from this workspace.
+              <strong>Inquiries &amp; orders</strong> — {AI_SOURCING_PROMO}
             </p>
             <span className="tese-sourcing-promo-arrow" aria-hidden>→</span>
           </div>

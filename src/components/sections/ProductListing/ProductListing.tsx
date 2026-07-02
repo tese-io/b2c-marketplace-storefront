@@ -5,6 +5,7 @@ import {
   ProductsList,
   ProductsPagination,
 } from "@/components/organisms"
+import { SellerProductsEmpty } from "@/components/molecules/SellerProductsEmpty/SellerProductsEmpty"
 import { PRODUCT_LIMIT } from "@/const"
 import { listProductsWithSort } from "@/lib/data/products"
 
@@ -14,12 +15,16 @@ export const ProductListing = async ({
   seller_id,
   showSidebar = false,
   locale = process.env.NEXT_PUBLIC_DEFAULT_REGION || "pl",
+  orbitUrl,
+  sellerName,
 }: {
   category_id?: string
   collection_id?: string
   seller_id?: string
   showSidebar?: boolean
   locale?: string
+  orbitUrl?: string | null
+  sellerName?: string
 }) => {
   const { response } = await listProductsWithSort({
     seller_id,
@@ -37,6 +42,14 @@ export const ProductListing = async ({
   const count = products.length
 
   const pages = Math.ceil(count / PRODUCT_LIMIT) || 1
+
+  if (seller_id && count === 0) {
+    return (
+      <div className="tese-seller-listing" data-testid="product-listing-container">
+        <SellerProductsEmpty sellerName={sellerName} orbitUrl={orbitUrl} />
+      </div>
+    )
+  }
 
   return (
     <div className="py-4" data-testid="product-listing-container">

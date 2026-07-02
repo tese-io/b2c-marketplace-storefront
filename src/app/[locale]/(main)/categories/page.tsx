@@ -76,7 +76,13 @@ async function AllCategories({
   searchParams,
 }: {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ sector?: string; industry?: string; listing?: string }>
+  searchParams: Promise<{
+    sector?: string
+    industry?: string
+    listing?: string
+    query?: string
+    page?: string
+  }>
 }) {
   const { locale } = await params
   const sp = await searchParams
@@ -127,6 +133,9 @@ async function AllCategories({
           sectorId={sectorId}
           industryHandle={industryHandle}
           listingType={listingType}
+          query={sp.query}
+          page={sp.page ? Number(sp.page) : undefined}
+          facetParams={sp}
         />
       </Suspense>
     </main>

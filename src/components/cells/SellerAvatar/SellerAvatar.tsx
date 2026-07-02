@@ -1,31 +1,51 @@
-import Image from "next/image"
+import Image from 'next/image'
+import clsx from 'clsx'
 
 export const SellerAvatar = ({
-  photo = "",
+  photo = '',
   size = 32,
-  alt = "",
+  alt = '',
+  variant = 'default',
+  className,
 }: {
   photo?: string
   size?: number
   alt?: string
+  variant?: 'default' | 'hero'
+  className?: string
 }) => {
-  return photo ? (
-    <Image
-      src={decodeURIComponent(photo)}
-      alt={alt}
-      width={size}
-      height={size}
-      className="shrink-0"
-      style={{ maxWidth: size, maxHeight: size }}
-    />
-  ) : (
-    <Image
-      src="/images/placeholder.svg"
-      alt={alt}
-      className="opacity-30 w-8 h-8 shrink-0"
-      width={32}
-      height={32}
-      style={{ maxWidth: 32, maxHeight: 32 }}
-    />
+  const isHero = variant === 'hero'
+
+  if (photo) {
+    return (
+      <Image
+        src={decodeURIComponent(photo)}
+        alt={alt}
+        width={size}
+        height={size}
+        className={clsx(
+          'shrink-0 object-cover',
+          isHero ? 'tese-seller-avatar-img' : '',
+          className
+        )}
+        style={{ width: size, height: size, maxWidth: size, maxHeight: size }}
+      />
+    )
+  }
+
+  return (
+    <div
+      className={clsx(
+        'tese-seller-avatar-fallback',
+        isHero && 'tese-seller-avatar-fallback-hero',
+        className
+      )}
+      style={isHero ? { width: size, height: size } : undefined}
+      aria-hidden={!alt}
+    >
+      <span className="tese-seller-avatar-initial">
+        {(alt || 'S').charAt(0).toUpperCase()}
+      </span>
+    </div>
   )
 }

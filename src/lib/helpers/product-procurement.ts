@@ -144,8 +144,8 @@ export function getProductAdvantages(product: HttpTypes.StoreProduct): ProductAd
 
   if (items.length === 0) {
     items.push({
-      title: 'Vetted on tese.io',
-      body: 'Supplier-verified listing with quote-ready specs and sustainability metadata.',
+      title: 'Listed on tese.io',
+      body: 'Supplier listing with quote-ready specs and sustainability metadata where disclosed.',
     })
   }
 

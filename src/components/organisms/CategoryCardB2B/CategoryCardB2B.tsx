@@ -1,4 +1,5 @@
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
+import { getCategoryDescription } from '@/data/explorer-copy'
 import { categoryHref } from '@/lib/data/categories'
 
 import { getCategoryVisual } from './category-visuals'
@@ -11,6 +12,7 @@ export function CategoryCardB2B({
   index?: number
 }) {
   const visual = getCategoryVisual(category.handle)
+  const description = getCategoryDescription(category.handle, category.description)
 
   return (
     <LocalizedClientLink
@@ -33,8 +35,8 @@ export function CategoryCardB2B({
 
         <div className="tese-category-card-copy">
           <h3 className="tese-category-card-title">{category.name}</h3>
-          {category.description && (
-            <p className="tese-category-card-desc">{category.description}</p>
+          {description && (
+            <p className="tese-category-card-desc">{description}</p>
           )}
         </div>
 

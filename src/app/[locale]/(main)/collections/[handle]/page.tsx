@@ -5,6 +5,7 @@ import { AlgoliaProductsListing, ProductListing } from "@/components/sections"
 import { getCollectionByHandle } from "@/lib/data/collections"
 import { getRegion } from "@/lib/data/regions"
 import isBot from "@/lib/helpers/isBot"
+import { getWishlistState } from "@/lib/helpers/wishlist-state"
 import { Suspense } from "react"
 
 const ALGOLIA_ID = process.env.NEXT_PUBLIC_ALGOLIA_ID
@@ -23,6 +24,7 @@ const SingleCollectionsPage = async ({
   if (!collection) return <NotFound />
 
   const currency_code = (await getRegion(locale))?.currency_code || "usd"
+  const wishlistState = await getWishlistState(locale)
 
   const breadcrumbsItems = [
     {
@@ -47,6 +49,8 @@ const SingleCollectionsPage = async ({
             collection_id={collection.id}
             locale={locale}
             currency_code={currency_code}
+            isLoggedIn={wishlistState.isLoggedIn}
+            wishlistedIds={Array.from(wishlistState.wishlistedIds)}
           />
         )}
       </Suspense>

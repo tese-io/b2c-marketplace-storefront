@@ -60,7 +60,7 @@ export function HomeIndustriesSection() {
               <div className="tese-industry-card-body">
                 <h3 className="tese-industry-card-title">{sector.label}</h3>
                 <p className="tese-industry-card-desc">
-                  {truncate(sector.subheadline, 120)}
+                  {truncate(sector.explorerIntro, 140)}
                 </p>
                 <span className="tese-industry-card-link">Browse sector →</span>
               </div>
