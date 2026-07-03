@@ -94,20 +94,23 @@ export const listProducts = async ({
 
       const nextPage = count > offset + limit ? pageParam + 1 : null;
 
-      const response = products.filter(prod => {
+      const response = products.map(prod => {
         // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
-        const reviews = prod.seller?.reviews.filter(item => !!item) ?? [];
-        return (
-          // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
-          prod?.seller && {
-            ...prod,
-            seller: {
-              // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
-              ...prod.seller,
-              reviews
-            }
+        if (!prod.seller) {
+          // Products without a seller (e.g. migrated from Mongo) are still
+          // valid listings — keep them rather than dropping them.
+          return prod;
+        }
+        // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
+        const reviews = prod.seller?.reviews?.filter(item => !!item) ?? [];
+        return {
+          ...prod,
+          seller: {
+            // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
+            ...prod.seller,
+            reviews
           }
-        );
+        };
       });
 
       return {
