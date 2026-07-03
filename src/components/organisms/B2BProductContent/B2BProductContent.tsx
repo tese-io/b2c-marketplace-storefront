@@ -14,6 +14,7 @@ import {
   PDP_EMPTY,
 } from '@/lib/helpers/pdp-content'
 import { PDP_SECTIONS } from '@/data/explorer-copy'
+import { looksLikeHtml, sanitizeProductHtml } from '@/lib/helpers/html'
 import { HttpTypes } from '@medusajs/types'
 
 export function B2BProductContent({
@@ -192,6 +193,11 @@ export function B2BProductContent({
 }
 
 function formatDescription(text: string) {
+  // Rich-text descriptions (e.g. migrated from Shopify) are already HTML —
+  // sanitize and render them. Plain text is escaped and split into paragraphs.
+  if (looksLikeHtml(text)) {
+    return sanitizeProductHtml(text)
+  }
   const paragraphs = text.split(/\n\n+/).filter(Boolean)
   if (paragraphs.length > 1) {
     return paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join('')

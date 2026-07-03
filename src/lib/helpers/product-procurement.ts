@@ -158,7 +158,16 @@ export function getProductApplications(product: HttpTypes.StoreProduct): string[
     return CATEGORY_APPLICATIONS[handle]
   }
 
-  const desc = product.description || ''
+  // Flatten any HTML (migrated descriptions) to text before deriving
+  // sentences, otherwise tag fragments leak into the list. Output is rendered
+  // as plain text (React escapes it), so a lightweight strip is sufficient
+  // here — no need to pull a sanitizer into this client-imported module.
+  const desc = (product.description || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
   const sentences = desc
     .split(/[.!?]/)
     .map((s) => s.trim())
