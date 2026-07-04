@@ -3,47 +3,13 @@
 import { useEffect, useState } from 'react'
 
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
+import {
+  enquiryStatusLabel,
+  type Enquiry,
+  type EnquiryListPayload as ListPayload,
+} from '@/types/enquiry'
 
-type EnquiryTarget = {
-  _id?: string
-  sellerId?: string | null
-  sellerName?: string
-  productHandle?: string | null
-  productTitle?: string
-  status?: string
-  quotedAmount?: number | null
-  quotedCurrency?: string
-}
-
-type Enquiry = {
-  enquiryId: string
-  title: string
-  requirement: string
-  status: string
-  createdAt: string
-  targets?: EnquiryTarget[]
-}
-
-type ListPayload = {
-  status: boolean
-  data?: {
-    items: Enquiry[]
-    pagination?: { total: number }
-  }
-  msg?: string
-}
-
-function statusLabel(status: string) {
-  const map: Record<string, string> = {
-    draft: 'Draft',
-    open: 'Open',
-    quoted: 'Quoted',
-    accepted: 'Accepted',
-    closed: 'Closed',
-    cancelled: 'Cancelled',
-  }
-  return map[status] || status
-}
+const statusLabel = enquiryStatusLabel
 
 export function SourcingInquiriesList() {
   const [items, setItems] = useState<Enquiry[]>([])

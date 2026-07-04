@@ -3,20 +3,15 @@
 import { useState } from 'react'
 
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
-
-type EnquiryTarget = {
-  productHandle?: string | null
-  productId?: string | null
-  productTitle?: string
-  sellerId?: string | null
-  sellerName?: string
-  sellerEmail?: string
-}
+import type { EnquiryTarget } from '@/types/enquiry'
 
 type SendInquiryButtonProps = {
   requirement: string
   title?: string
-  target?: EnquiryTarget
+  target?: Pick<
+    EnquiryTarget,
+    'productHandle' | 'productId' | 'productTitle' | 'sellerId' | 'sellerName' | 'sellerEmail'
+  >
   sourcingThreadId?: string | null
   className?: string
   label?: string

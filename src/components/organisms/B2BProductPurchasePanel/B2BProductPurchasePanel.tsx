@@ -5,6 +5,7 @@ import { ProductVariants } from '@/components/molecules'
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
 import { WishlistButton } from '@/components/cells/WishlistButton/WishlistButton'
 import { Chat } from '@/components/organisms/Chat/Chat'
+import { RequestQuoteButton } from '@/components/organisms/B2BProductPurchasePanel/RequestQuoteButton'
 import { useCartContext } from '@/components/providers'
 import useGetAllSearchParams from '@/hooks/useGetAllSearchParams'
 import { getProductPrice } from '@/lib/helpers/get-product-price'
@@ -174,12 +175,15 @@ export function B2BProductPurchasePanel({
       )}
 
       <div className="tese-pdp-actions">
-        <LocalizedClientLink
-          href={`/sourcing?q=${quoteQuery}`}
-          className="tese-pdp-btn-primary"
-        >
-          Get quote
-        </LocalizedClientLink>
+        <RequestQuoteButton
+          productTitle={catalogTitle || product.title || 'this product'}
+          productHandle={product.handle}
+          productId={product.id}
+          sellerId={product.seller?.id}
+          sellerName={product.seller?.name}
+          sellerEmail={product.seller?.email}
+          isLoggedIn={Boolean(user)}
+        />
         <Button
           onClick={handleAddToCart}
           disabled={isAddToCartDisabled}
@@ -196,6 +200,16 @@ export function B2BProductPurchasePanel({
               : 'Out of stock'}
         </Button>
       </div>
+
+      <LocalizedClientLink
+        href={`/sourcing?q=${quoteQuery}`}
+        className="tese-pdp-explore-link"
+      >
+        Or explore alternatives with AI sourcing
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+          <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </LocalizedClientLink>
 
       {category?.handle && (
         <LocalizedClientLink

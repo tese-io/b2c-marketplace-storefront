@@ -2,22 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-type PortalPayload = {
-  status: boolean
-  data?: {
-    enquiryId: string
-    title: string
-    requirement: string
-    buyerName?: string
-    productTitle?: string
-    sellerName?: string
-    alreadySubmitted?: boolean
-    quotedAmount?: number | null
-    quotedCurrency?: string
-    quoteNotes?: string
-  }
-  msg?: string
-}
+import type { QuotePortalPayload as PortalPayload } from '@/types/enquiry'
 
 export function SourcingQuotePortal({ token }: { token: string }) {
   const [loading, setLoading] = useState(true)

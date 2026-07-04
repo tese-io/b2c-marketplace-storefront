@@ -1860,6 +1860,54 @@ button:disabled svg path {
   margin-top: 1rem;
 }
 
+/* PDP "Request a quote" inline form */
+.tese-pdp-quote-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid rgba(var(--tese-ink), 0.12);
+  border-radius: 0.75rem;
+  background: rgb(var(--tese-surface));
+}
+.tese-pdp-quote-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(var(--tese-ink-soft));
+}
+.tese-pdp-quote-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(var(--tese-ink), 0.16);
+  border-radius: 0.5rem;
+  background: white;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgb(var(--tese-ink));
+}
+.tese-pdp-quote-input:focus-visible {
+  outline: 2px solid rgb(var(--tese-lime));
+  outline-offset: 1px;
+}
+.tese-pdp-quote-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.tese-pdp-quote-actions .tese-pdp-btn-secondary {
+  min-height: 44px !important;
+  border: 1px solid rgba(var(--tese-ink), 0.16);
+  background: white;
+  color: rgb(var(--tese-ink));
+}
+.tese-pdp-quote-error {
+  font-size: 12px;
+  color: #dc2626;
+}
+
 .tese-pdp-content-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -4101,7 +4149,9 @@ button:disabled svg path {
 
 .tese-sourcing-app {
   display: flex;
-  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
   background: #f4f5f3;
   color: rgb(var(--tese-ink));
 }
@@ -4296,7 +4346,8 @@ button.tese-sourcing-sidebar-logout {
   flex-direction: column;
   flex: 1;
   min-width: 0;
-  min-height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .tese-sourcing-topbar {
@@ -5004,7 +5055,9 @@ button.tese-sourcing-sidebar-logout {
 }
 .tese-sourcing-chat-scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1.5rem 1rem 1rem;
 }
 .tese-sourcing-chat-inner {
