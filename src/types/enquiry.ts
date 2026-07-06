@@ -87,6 +87,12 @@ export type EnquiryListPayload = {
   msg?: string
 }
 
+export type EnquiryDetailPayload = {
+  status: boolean
+  data?: Enquiry
+  msg?: string
+}
+
 export type QuotePortalPayload = {
   status: boolean
   data?: {
