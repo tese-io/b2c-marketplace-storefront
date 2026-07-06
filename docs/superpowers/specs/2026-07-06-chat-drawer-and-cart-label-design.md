@@ -101,6 +101,18 @@ Structure:
 4. Second entry point (seller page hero "Write to seller") opens the same drawer.
 5. Console clean; no regression to the buy-now cart.
 
+## Addendum (2026-07-06): thin-shell pivot
+
+A concurrent messages-inbox redesign gave `MatrixChat` its **own** header
+(counterpart avatar + name + "Re: {product}") and an `onBack` close hook,
+plus a `tese-messages-*` design system. To avoid a double header and keep the
+look consistent, the drawer becomes a **thin shell**: overlay + backdrop +
+right-docked panel wrapping the (now self-headered) `MatrixChat`. It adds no
+seller header of its own; `onClose` is forwarded through `ChatBox` to
+`MatrixChat`'s `onBack`, so the in-panel back control closes the drawer.
+`ChatDrawer` no longer needs the `seller` object — only `seller_id`,
+`context_id`, `subject`, `open`, `onClose`.
+
 ## Non-goals
 
 Multi-item quote basket, changing the RFQ/quotation flow, mobile inbox redesign, and any

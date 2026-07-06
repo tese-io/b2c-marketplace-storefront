@@ -2,87 +2,44 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Rename the mislabeled "Add to quote cart" button to "Add to cart", and replace the header-clipped centered chat Modal with a right-side chat drawer that shows the seller's identity.
+**Goal:** Rename the mislabeled "Add to quote cart" button to "Add to cart", and replace the header-clipped centered chat Modal with a right-side chat drawer.
 
-**Architecture:** Pure storefront (Next.js App Router) UI change. A new `ChatDrawer` client component provides a full-height right-docked overlay (`z-50`, above the `z-40` sticky header) with a seller header; the existing `Chat` entry component renders it instead of the generic `Modal`, and `ChatBox` fills the drawer height. No backend, no data-flow, no dependency changes.
+**Architecture:** Pure storefront (Next.js App Router) UI change. A new `ChatDrawer` client component is a thin full-height right-docked overlay (`z-50`, above the `z-40` sticky header) wrapping the existing `ChatBox` → `MatrixChat`. Per the 2026-07-06 thin-shell addendum, a concurrent inbox redesign already gave `MatrixChat` its own header (counterpart avatar + name + "Re: {product}") and an `onBack` close hook, so the drawer adds NO header of its own — it forwards `onClose` through `ChatBox` to `MatrixChat`'s `onBack`.
 
 **Tech Stack:** Next.js 14 App Router, React client components, Tailwind (project design tokens), `matrix-js-sdk` (unchanged, inside `MatrixChat`).
 
 ## Global Constraints
 
-- No new npm dependencies. Reuse existing primitives: `Avatar` (`@/components/atoms`), `LocalizedClientLink` (`@/components/molecules/LocalizedLink/LocalizedLink`), `CloseIcon` (`@/icons`), `cn` (`@/lib/utils`).
+- No new npm dependencies.
 - The drawer overlay MUST be `z-50` (the sticky header is `z-40` in `src/components/organisms/Header/Header.tsx:36`; anything ≤ z-40 gets clipped).
 - Do NOT modify `src/components/molecules/Modal/Modal.tsx` — other features still use it.
-- Do NOT modify `MatrixChat.tsx` or the `/user/messages` inbox.
-- The repo has no React-component (RTL/jsdom) test harness — only pure-logic vitest `.test.ts`. Do NOT add an RTL harness. Verify UI tasks in the browser with the Playwright MCP tools against the running staging stack.
-- Staging test login (customer): `matrix-test@tese.io` / `secret123`. Storefront: `http://localhost:3000`. A known product with a seller: `/pl/products/polypropylene-woven-bags` (seller: EuroMaterials Trading).
+- Do NOT modify `MatrixChat.tsx`, `MatrixInbox.tsx`, `MessageCards.tsx`, `UserMessagesSection.tsx`, or the `/user/messages` page — these are being changed by a concurrent (owner-approved) inbox redesign. Keep every commit scoped to ONLY this task's files; never `git add -A` or sweep the redesign's uncommitted files into a commit.
+- The redesigned `MatrixChat` signature is `{ roomId: string; className?: string; onBack?: () => void }`. Its header already shows the counterpart identity and a product subtitle; passing `onBack` renders an in-header back control.
+- The repo has no React-component (RTL/jsdom) test harness — only pure-logic vitest `.test.ts`. Do NOT add an RTL harness. Verify UI in the browser with the Playwright MCP tools against the running staging stack. (In this session the controller performs browser verification; implementers do the edit + typecheck + scoped commit.)
+- Staging test login (customer): `matrix-test@tese.io` / `secret123`. Storefront: `http://localhost:3000`. Product with a seller: `/pl/products/polypropylene-woven-bags` (seller: EuroMaterials Trading).
 - Commit after each task.
 
 ---
 
-### Task 1: Rename "Add to quote cart" → "Add to cart"
+### Task 1: Rename "Add to quote cart" → "Add to cart"  ✅ DONE (commit a2032d2)
 
 **Files:**
-- Modify: `src/components/organisms/B2BProductPurchasePanel/B2BProductPurchasePanel.tsx` (the button label ternary, ~line 196-200)
+- Modify: `src/components/organisms/B2BProductPurchasePanel/B2BProductPurchasePanel.tsx`
 
-**Interfaces:**
-- Consumes: nothing new.
-- Produces: nothing consumed by later tasks.
-
-- [ ] **Step 1: Change the label**
-
-In `src/components/organisms/B2BProductPurchasePanel/B2BProductPurchasePanel.tsx`, find the button label ternary inside the `Button` with `data-testid="product-add-to-cart-button"`:
-
-```tsx
-          {!hasAnyPrice
-            ? 'Not available in region'
-            : variantStock && variantHasPrice
-              ? 'Add to quote cart'
-              : 'Out of stock'}
-```
-
-Change the middle branch string only:
-
-```tsx
-          {!hasAnyPrice
-            ? 'Not available in region'
-            : variantStock && variantHasPrice
-              ? 'Add to cart'
-              : 'Out of stock'}
-```
-
-Do not touch `handleAddToCart` or any other line.
-
-- [ ] **Step 2: Verify in the browser**
-
-Ensure the storefront is running (`pm2 restart tese-storefront` if needed; it hot-reloads on save). Then with the Playwright MCP tools:
-- Navigate to `http://localhost:3000/pl/products/polypropylene-woven-bags`.
-- Evaluate: read `document.querySelector('[data-testid="product-add-to-cart-button"]').textContent.trim()`.
-- Expected: `Add to cart` (for a priced+in-stock variant). If the product is unpriced in the region it may read "Not available in region" — that's fine; pick a priced product/variant to confirm the renamed branch.
-
-- [ ] **Step 3: Commit**
-
-```bash
-cd /home/ubuntu/tese/b2c-marketplace-storefront
-git add src/components/organisms/B2BProductPurchasePanel/B2BProductPurchasePanel.tsx
-git commit -m "Rename misleading 'Add to quote cart' button to 'Add to cart'
-
-The button's handler adds to the normal Medusa cart; there is no quote
-basket. Make the label match the behavior."
-```
+Changed the button label branch from `'Add to quote cart'` to `'Add to cart'`. No behavior change. Committed as `a2032d2`.
 
 ---
 
-### Task 2: Chat drawer replaces the centered Modal
+### Task 2: Thin chat drawer replaces the centered Modal
 
 **Files:**
 - Create: `src/components/organisms/Chat/ChatDrawer.tsx`
-- Modify: `src/components/organisms/Chat/Chat.tsx` (swap `Modal` for `ChatDrawer`)
-- Modify: `src/components/cells/ChatBox/ChatBox.tsx` (fill height: `h-[500px]` → `h-full`)
+- Modify: `src/components/cells/ChatBox/ChatBox.tsx` (add `onClose`, forward as `onBack`; fill height)
+- Modify: `src/components/organisms/Chat/Chat.tsx` (swap `Modal` → `ChatDrawer`)
 
 **Interfaces:**
-- Consumes: `ChatBox` from `@/components/cells/ChatBox/ChatBox` (props `{ seller_id: string; context_id?: string; subject?: string | null }`); `Avatar` from `@/components/atoms` (props `{ src?, initials?, size?, alt?, className? }`); `LocalizedClientLink` (default export); `CloseIcon` from `@/icons` (prop `size`); `SellerProps` from `@/types/seller` (has `id`, `name`, `photo`, `handle`).
-- Produces: `ChatDrawer` — `export function ChatDrawer(props: { open: boolean; onClose: () => void; seller: SellerProps; seller_id: string; context_id?: string; subject?: string | null }): JSX.Element | null`.
+- Consumes: `ChatBox` from `@/components/cells/ChatBox/ChatBox` (props after this task: `{ seller_id: string; context_id?: string; subject?: string | null; onClose?: () => void }`). `MatrixChat` (unchanged file) prop `onBack?: () => void`.
+- Produces: `ChatDrawer` — `export function ChatDrawer(props: { open: boolean; onClose: () => void; seller_id: string; context_id?: string; subject?: string | null }): JSX.Element | null`.
 
 - [ ] **Step 1: Create `ChatDrawer.tsx`**
 
@@ -93,36 +50,24 @@ Create `src/components/organisms/Chat/ChatDrawer.tsx` with exactly:
 
 import { useEffect } from 'react';
 
-import { Avatar } from '@/components/atoms';
 import { ChatBox } from '@/components/cells/ChatBox/ChatBox';
-import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink';
-import { CloseIcon } from '@/icons';
-import { SellerProps } from '@/types/seller';
-
-const initialsOf = (name?: string) =>
-  (name || '?')
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]!.toUpperCase())
-    .join('') || '?';
 
 /**
  * Right-side "Write to seller" chat drawer. Overlays at z-50 (above the
- * sticky z-40 header, so nothing clips), full height, docked right. Owns the
- * seller-identity header; the conversation itself is the shared ChatBox.
+ * sticky z-40 header, so nothing clips), full height, docked right. It is a
+ * thin shell: the embedded MatrixChat already renders the seller header and
+ * an in-header back control, so `onClose` is forwarded through ChatBox to
+ * MatrixChat's `onBack` — no drawer-owned header.
  */
 export function ChatDrawer({
   open,
   onClose,
-  seller,
   seller_id,
   context_id,
   subject,
 }: {
   open: boolean;
   onClose: () => void;
-  seller: SellerProps;
   seller_id: string;
   context_id?: string;
   subject?: string | null;
@@ -156,134 +101,79 @@ export function ChatDrawer({
         onClick={onClose}
         data-testid="chat-drawer-backdrop"
       />
-
       <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-primary shadow-2xl">
-        <div className="flex items-start gap-3 border-b p-4">
-          <Avatar
-            src={seller.photo || undefined}
-            initials={initialsOf(seller.name)}
-            size="large"
-            alt={seller.name}
-          />
-          <div className="min-w-0 flex-1">
-            <p className="label-lg truncate text-primary">{seller.name}</p>
-            <p className="label-sm text-secondary">Verified supplier</p>
-            {subject && (
-              <p className="label-sm mt-0.5 truncate text-secondary">
-                Re: {subject}
-              </p>
-            )}
-            {seller.handle && (
-              <LocalizedClientLink
-                href={`/sellers/${seller.handle}`}
-                className="label-sm mt-1 inline-block text-tese-ice hover:underline"
-              >
-                View supplier
-              </LocalizedClientLink>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close chat"
-            className="shrink-0 text-secondary hover:text-primary"
-            data-testid="chat-drawer-close"
-          >
-            <CloseIcon size={20} />
-          </button>
-        </div>
-
-        <div className="min-h-0 flex-1 px-4 pb-4 pt-2">
-          <ChatBox
-            seller_id={seller_id}
-            context_id={context_id}
-            subject={subject}
-          />
-        </div>
+        <ChatBox
+          seller_id={seller_id}
+          context_id={context_id}
+          subject={subject}
+          onClose={onClose}
+        />
       </div>
     </div>
   );
 }
 ```
 
-- [ ] **Step 2: Make `ChatBox` fill the drawer height**
+- [ ] **Step 2: `ChatBox` accepts `onClose`, forwards it, and fills height**
 
-In `src/components/cells/ChatBox/ChatBox.tsx`, replace every `h-[500px]` with `h-full` (three occurrences: the `failed` state wrapper, the loading state wrapper, and the final mounted wrapper). For example the final return changes from:
+In `src/components/cells/ChatBox/ChatBox.tsx`:
+
+Add `onClose` to the props type:
 
 ```tsx
-  return (
-    <div className="h-[500px] w-full">
-      <MatrixChat roomId={roomId} className="h-full" />
-    </div>
-  );
+type ChatBoxProps = {
+  seller_id: string;
+  /** Product or order id the chat is about (drives the deterministic room). */
+  context_id?: string;
+  subject?: string | null;
+  /** Closes the surrounding drawer; wired to MatrixChat's in-header back. */
+  onClose?: () => void;
+};
 ```
 
-to:
+Destructure it:
+
+```tsx
+export function ChatBox({ seller_id, context_id, subject, onClose }: ChatBoxProps) {
+```
+
+Replace every `h-[500px]` with `h-full` (the `failed` wrapper, the loading wrapper, and the mounted wrapper), and pass `onBack={onClose}` to `MatrixChat`. The final return becomes:
 
 ```tsx
   return (
     <div className="h-full w-full">
-      <MatrixChat roomId={roomId} className="h-full" />
+      <MatrixChat roomId={roomId} className="h-full" onBack={onClose} />
     </div>
   );
 ```
-
-Apply the same `h-[500px]` → `h-full` change to the two centered `failed` / loading wrappers above it. Nothing else changes.
 
 - [ ] **Step 3: Wire `ChatDrawer` into `Chat.tsx`**
 
 In `src/components/organisms/Chat/Chat.tsx`:
 
-Remove the Modal import:
+Remove these two imports:
 
 ```tsx
+import { ChatBox } from '@/components/cells/ChatBox/ChatBox';
 import { Modal } from '@/components/molecules';
 ```
 
-Add the drawer import (with the other local imports):
+Add:
 
 ```tsx
 import { ChatDrawer } from './ChatDrawer';
 ```
 
-Replace the entire `{modal && ( ... )}` block:
-
-```tsx
-      {modal && (
-        <Modal
-          heading="Chat"
-          onClose={() => setModal(false)}
-        >
-          <div className="px-4">
-            <ChatBox
-              seller_id={seller.id}
-              context_id={product?.id || order_id}
-              subject={subject || product?.title || null}
-            />
-          </div>
-        </Modal>
-      )}
-```
-
-with:
+Replace the entire `{modal && ( <Modal …> … </Modal> )}` block with:
 
 ```tsx
       <ChatDrawer
         open={modal}
         onClose={() => setModal(false)}
-        seller={seller}
         seller_id={seller.id}
         context_id={product?.id || order_id}
         subject={subject || product?.title || null}
       />
-```
-
-The `ChatBox` import stays (still referenced by `ChatDrawer`, but `Chat.tsx` no longer uses it directly — remove the now-unused `ChatBox` import from `Chat.tsx` to avoid a lint error):
-
-Remove from `Chat.tsx`:
-
-```tsx
-import { ChatBox } from '@/components/cells/ChatBox/ChatBox';
 ```
 
 - [ ] **Step 4: Typecheck the changed files**
@@ -292,28 +182,9 @@ import { ChatBox } from '@/components/cells/ChatBox/ChatBox';
 cd /home/ubuntu/tese/b2c-marketplace-storefront
 npx tsc --noEmit 2>&1 | grep -E "Chat/ChatDrawer|Chat/Chat.tsx|ChatBox" | head
 ```
-Expected: no output (the repo has pre-existing unrelated `@medusajs/types` resolution errors elsewhere; only lines matching these three files indicate a real problem).
+Expected: no output (pre-existing unrelated `@medusajs/types` errors elsewhere don't match these paths).
 
-- [ ] **Step 5: Verify the drawer in the browser**
-
-Restart if needed (`pm2 restart tese-storefront`; hot-reload otherwise). With the Playwright MCP tools:
-1. Log in as the customer: navigate `http://localhost:3000/pl/login`, fill `login-email-input` = `matrix-test@tese.io`, `login-password-input` = `secret123`, click `login-submit-button`; expect to land on `/pl/user`.
-2. Navigate `http://localhost:3000/pl/products/polypropylene-woven-bags`.
-3. Click the "Write to seller" button (the `Chat` button; text "Write to seller").
-4. Assert via evaluate:
-   - `document.querySelector('[data-testid="chat-drawer"]')` exists.
-   - Panel `getBoundingClientRect().top` is `0` (full height, not clipped under the header) and `right` equals `window.innerWidth`.
-   - Header shows the seller name (`EuroMaterials Trading`) and "Verified supplier".
-   - `document.body.style.overflow === 'hidden'` while open.
-5. Type a message in the composer and Send; confirm it appears in the thread (the drawer body is the existing `MatrixChat`).
-6. Close via the X (`chat-drawer-close`); assert `[data-testid="chat-drawer"]` is gone and `document.body.style.overflow` is restored. Re-open and close via backdrop click (`chat-drawer-backdrop`) and via Escape key; both close.
-7. Take a screenshot for a visual check (seller header present, full-height panel, product visible behind the dim backdrop).
-
-- [ ] **Step 6: Verify a second entry point**
-
-Navigate to the seller page (`View supplier` link target, e.g. `http://localhost:3000/pl/sellers/<handle>`) and trigger its "Write to seller" action; confirm the same drawer opens. (All four `Chat` callers share this component, so one more spot-check is sufficient.)
-
-- [ ] **Step 7: Commit**
+- [ ] **Step 5: Commit (scoped)**
 
 ```bash
 cd /home/ubuntu/tese/b2c-marketplace-storefront
@@ -322,29 +193,38 @@ git add src/components/organisms/Chat/ChatDrawer.tsx \
         src/components/cells/ChatBox/ChatBox.tsx
 git commit -m "Replace header-clipped chat Modal with a right-side ChatDrawer
 
-The 'Write to seller' chat used the generic Modal (z-30), which the
-sticky z-40 header rendered over, clipping its title bar. New ChatDrawer
-is a full-height right-docked overlay at z-50 with a proper seller header
-(avatar, name, 'Verified supplier', 'Re: <product>', View supplier) and
-close via X / backdrop / Esc, with background scroll locked. ChatBox
-fills the drawer height. All four Chat entry points inherit it."
+The 'Write to seller' chat used the generic Modal (z-30), which the sticky
+z-40 header rendered over, clipping its title bar. New ChatDrawer is a
+full-height right-docked overlay at z-50; it wraps the (self-headered)
+MatrixChat and forwards close to its in-header back control. Closes via
+backdrop / Esc, with background scroll locked. All four Chat entry points
+inherit it."
 ```
+
+Do NOT stage any other file (a concurrent inbox redesign has unrelated files modified in the working tree).
+
+**Controller browser verification (not the implementer):**
+1. Log in as `matrix-test@tese.io` / `secret123`; navigate `/pl/products/polypropylene-woven-bags`.
+2. Click "Write to seller". Assert `[data-testid="chat-drawer"]` exists; panel `getBoundingClientRect().top === 0` (full height, not clipped); `document.body.style.overflow === 'hidden'`.
+3. Assert the MatrixChat header inside shows the counterpart name (no duplicate/second header).
+4. Send a message; confirm it appears.
+5. Close via the in-header back control, via backdrop click, and via Esc; each closes and restores `body.overflow`.
+6. Screenshot for visual confirmation. Spot-check a second entry point (seller page "Write to seller").
 
 ---
 
 ## Self-Review
 
-**Spec coverage:**
-- Cart rename → Task 1. ✓
-- Drawer overlay z-50 above header → Task 2 Step 1 (`fixed inset-0 z-50`). ✓
-- Full-height right panel, no clipping → Task 2 Step 1 (`absolute right-0 top-0 h-full`), verified Step 5. ✓
-- Seller header (avatar, name, verified, Re:, View supplier, close) → Task 2 Step 1. ✓
+**Spec coverage (incl. thin-shell addendum):**
+- Cart rename → Task 1 (done, a2032d2). ✓
+- Drawer overlay z-50 above header, full-height right panel → Task 2 Step 1. ✓
+- Thin shell, no drawer-owned header; identity comes from MatrixChat → Task 2 Step 1 (wraps ChatBox only). ✓
+- `onClose` forwarded to MatrixChat `onBack` via ChatBox → Task 2 Steps 1-2. ✓
 - ChatBox fills height → Task 2 Step 2. ✓
 - Chat.tsx swaps Modal → Task 2 Step 3. ✓
-- Modal.tsx / MatrixChat / inbox untouched → not modified; called out in Global Constraints. ✓
-- Esc + backdrop + scroll-lock → Task 2 Step 1, verified Step 5. ✓
-- Verify rename + second entry point → Task 1 Step 2, Task 2 Step 6. ✓
+- Modal / MatrixChat / inbox files untouched; commits scoped → Global Constraints + Step 5. ✓
+- Esc + backdrop + scroll-lock → Task 2 Step 1. ✓
 
-**Placeholder scan:** none — full code and exact commands throughout.
+**Placeholder scan:** none — full code and exact commands.
 
-**Type consistency:** `ChatDrawer` prop names/types in Step 1 match the invocation in Step 3 (`open`, `onClose`, `seller`, `seller_id`, `context_id`, `subject`). `ChatBox` props (`seller_id`, `context_id`, `subject`) match its definition. `Avatar` props (`src`, `initials`, `size`, `alt`) match the atom. `SellerProps` fields used (`id`, `name`, `photo`, `handle`) exist.
+**Type consistency:** `ChatDrawer` props (`open`, `onClose`, `seller_id`, `context_id`, `subject`) match its invocation in Step 3. `ChatBox` gains `onClose?: () => void`, forwarded as `MatrixChat`'s `onBack?: () => void` (matches the redesigned signature). No `seller`/`Avatar`/`CloseIcon` deps remain.
