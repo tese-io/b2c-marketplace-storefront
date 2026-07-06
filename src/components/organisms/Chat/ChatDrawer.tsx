@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import { ChatBox } from '@/components/cells/ChatBox/ChatBox';
+import { CloseIcon } from '@/icons';
 
 /**
  * Right-side "Write to seller" chat drawer. Overlays at z-50 (above the
@@ -54,6 +55,15 @@ export function ChatDrawer({
         data-testid="chat-drawer-backdrop"
       />
       <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-primary shadow-2xl">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close chat"
+          data-testid="chat-drawer-close"
+          className="absolute right-3 top-3 z-10 hidden h-8 w-8 items-center justify-center rounded-full text-secondary hover:bg-black/5 hover:text-primary md:inline-flex"
+        >
+          <CloseIcon size={18} />
+        </button>
         <ChatBox
           seller_id={seller_id}
           context_id={context_id}
