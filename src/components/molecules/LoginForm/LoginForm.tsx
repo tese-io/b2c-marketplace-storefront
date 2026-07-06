@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { FieldError, FieldValues, FormProvider, useForm, useFormContext } from 'react-hook-form';
 
 import { Button } from '@/components/atoms';
@@ -40,8 +40,21 @@ const Form = () => {
   } = useFormContext();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
   const isSessionExpired = searchParams.get('sessionExpired') === 'true';
   const isSessionRequired = searchParams.get('sessionRequired') === 'true';
+
+  // tese SSO entry: bounce to the dashboard, which (re)uses the tese session,
+  // mints a one-time SSO key and returns the user here via /sso-callback —
+  // already authenticated. The marketplace path to land on defaults to /user.
+  const locale = (params?.locale as string) || 'pl';
+  const dashboardUrl = (
+    process.env.NEXT_PUBLIC_TESE_DASHBOARD_URL || 'http://148.113.8.184:4200'
+  ).replace(/\/$/, '');
+  const marketplacePath = searchParams.get('redirect') || '/user';
+  const continueWithTeseHref = `${dashboardUrl}/marketplace/enter?path=${encodeURIComponent(
+    marketplacePath
+  )}&locale=${encodeURIComponent(locale)}`;
 
   const submit = async (data: FieldValues) => {
     const formData = new FormData();
@@ -144,6 +157,23 @@ const Form = () => {
               Log in
             </Button>
           </form>
+
+          <div className="my-6 flex items-center gap-4">
+            <span className="h-px flex-1 bg-black/[0.08]" />
+            <span className="label-sm uppercase text-secondary">or</span>
+            <span className="h-px flex-1 bg-black/[0.08]" />
+          </div>
+
+          <a
+            href={continueWithTeseHref}
+            data-testid="login-continue-with-tese"
+            className="flex w-full items-center justify-center gap-2 rounded-sm bg-action px-4 py-3 label-md uppercase text-action-on-primary transition-opacity hover:opacity-90"
+          >
+            Continue with tese
+          </a>
+          <p className="mt-3 text-center label-sm text-secondary">
+            Use your tese account — no separate marketplace password needed.
+          </p>
         </div>
 
         <div className="rounded-sm border p-4">
