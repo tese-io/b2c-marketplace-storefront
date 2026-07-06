@@ -215,13 +215,21 @@ export function SourcingInquiriesList() {
               </ul>
             )}
 
-            <time className="block mt-3 text-[11px] text-secondary" dateTime={item.createdAt}>
-              {new Date(item.createdAt).toLocaleDateString(undefined, {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </time>
+            <div className="mt-3 flex items-center justify-between gap-2">
+              <time className="text-[11px] text-secondary" dateTime={item.createdAt}>
+                {new Date(item.createdAt).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </time>
+              <LocalizedClientLink
+                href={`/sourcing/inquiries/${item.enquiryId}`}
+                className="text-[12px] font-medium text-tese-ink hover:underline"
+              >
+                View details →
+              </LocalizedClientLink>
+            </div>
           </li>
         ))}
       </ul>
