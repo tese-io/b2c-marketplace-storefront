@@ -5,10 +5,10 @@ import { useState } from 'react';
 import { HttpTypes } from '@medusajs/types';
 
 import { Button } from '@/components/atoms';
-import { ChatBox } from '@/components/cells/ChatBox/ChatBox';
-import { Modal } from '@/components/molecules';
 import { MessageIcon } from '@/icons';
 import { SellerProps } from '@/types/seller';
+
+import { ChatDrawer } from './ChatDrawer';
 
 export const Chat = ({
   user,
@@ -47,20 +47,13 @@ export const Chat = ({
       >
         {icon ? <MessageIcon size={20} /> : 'Write to seller'}
       </Button>
-      {modal && (
-        <Modal
-          heading="Chat"
-          onClose={() => setModal(false)}
-        >
-          <div className="px-4">
-            <ChatBox
-              seller_id={seller.id}
-              context_id={product?.id || order_id}
-              subject={subject || product?.title || null}
-            />
-          </div>
-        </Modal>
-      )}
+      <ChatDrawer
+        open={modal}
+        onClose={() => setModal(false)}
+        seller_id={seller.id}
+        context_id={product?.id || order_id}
+        subject={subject || product?.title || null}
+      />
     </>
   );
 };
