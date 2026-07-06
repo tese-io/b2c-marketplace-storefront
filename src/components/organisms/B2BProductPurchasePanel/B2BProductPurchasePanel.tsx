@@ -196,7 +196,7 @@ export function B2BProductPurchasePanel({
           {!hasAnyPrice
             ? 'Not available in region'
             : variantStock && variantHasPrice
-              ? 'Add to quote cart'
+              ? 'Add to cart'
               : 'Out of stock'}
         </Button>
       </div>
