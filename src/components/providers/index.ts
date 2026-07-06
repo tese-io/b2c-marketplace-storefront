@@ -1,5 +1,5 @@
 import { CartProvider } from './Cart/CartProvider';
 import { useCartContext } from './Cart/context';
-import { TalkJsProvider } from './TalkJs/TalkJsProvider';
+import { MatrixProvider } from './Matrix/MatrixProvider';
 
-export { CartProvider, useCartContext, TalkJsProvider };
+export { CartProvider, useCartContext, MatrixProvider };

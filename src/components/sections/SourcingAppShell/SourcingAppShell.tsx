@@ -1,7 +1,7 @@
 'use client'
 
 import { HttpTypes } from '@medusajs/types'
-import { useUnreads } from '@talkjs/react'
+import { useMatrixUnreads } from '@/components/providers/Matrix/MatrixProvider'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -172,7 +172,7 @@ export function SourcingAppShell ({
 }: Omit<SourcingAppShellProps, 'locale'>) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const unreads = useUnreads()
+  const unreads = useMatrixUnreads()
   const activeThreadId = searchParams.get('thread')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [threads, setThreads] = useState<SourcingThread[]>([])
@@ -193,7 +193,7 @@ export function SourcingAppShell ({
     ? [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Account'
     : 'Sign in'
 
-  const unreadCount = unreads?.length ?? 0
+  const unreadCount = unreads
 
   return (
     <div className="tese-sourcing-app">

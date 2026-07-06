@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 
-import { TalkJsProvider } from '@/components/providers'
+import { MatrixProvider } from '@/components/providers'
 import { SourcingAppShell } from '@/components/sections/SourcingAppShell/SourcingAppShell'
 import { retrieveCustomer } from '@/lib/data/customer'
 import { checkRegion } from '@/lib/helpers/check-region'
@@ -21,7 +21,6 @@ export default async function WorkspaceLayout({
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }>) {
-  const APP_ID = process.env.NEXT_PUBLIC_TALKJS_APP_ID
   const { locale } = await params
 
   const user = await retrieveCustomer()
@@ -39,21 +38,9 @@ export default async function WorkspaceLayout({
     </Suspense>
   )
 
-  if (!APP_ID || !user?.id || !user.email) {
+  if (!user?.id) {
     return shell
   }
 
-  const userName =
-    [user.first_name, user.last_name].filter(Boolean).join(' ') || 'User'
-
-  return (
-    <TalkJsProvider
-      appId={APP_ID}
-      userId={user.id}
-      userName={userName}
-      userEmail={user.email}
-    >
-      {shell}
-    </TalkJsProvider>
-  )
+  return <MatrixProvider>{shell}</MatrixProvider>
 }

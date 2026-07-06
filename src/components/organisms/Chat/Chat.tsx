@@ -10,8 +10,6 @@ import { Modal } from '@/components/molecules';
 import { MessageIcon } from '@/icons';
 import { SellerProps } from '@/types/seller';
 
-const TALKJS_APP_ID = process.env.NEXT_PUBLIC_TALKJS_APP_ID || '';
-
 export const Chat = ({
   user,
   seller,
@@ -35,16 +33,9 @@ export const Chat = ({
 }) => {
   const [modal, setModal] = useState(false);
 
-  if (!TALKJS_APP_ID) {
+  if (!user?.id || !seller?.id) {
     return null;
   }
-
-  if (!user?.id || !user?.email || !seller?.id || !seller?.email) {
-    return null;
-  }
-
-  const userName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Customer';
-  const sellerName = seller.name || 'Seller';
 
   return (
     <>
@@ -63,23 +54,9 @@ export const Chat = ({
         >
           <div className="px-4">
             <ChatBox
-              order_id={order_id}
-              product_id={product?.id}
+              seller_id={seller.id}
+              context_id={product?.id || order_id}
               subject={subject || product?.title || null}
-              currentUser={{
-                id: user.id,
-                name: userName,
-                email: user.email,
-                photoUrl: '/talkjs-placeholder.jpg',
-                role: 'customer'
-              }}
-              supportUser={{
-                id: seller.id,
-                name: sellerName,
-                email: seller.email,
-                photoUrl: seller.photo || '/talkjs-placeholder.jpg',
-                role: 'seller'
-              }}
             />
           </div>
         </Modal>

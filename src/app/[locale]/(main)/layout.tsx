@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import { Footer, Header } from '@/components/organisms';
-import { TalkJsProvider } from '@/components/providers';
+import { MatrixProvider } from '@/components/providers';
 import { retrieveCustomer } from '@/lib/data/customer';
 import { checkRegion } from '@/lib/helpers/check-region';
 
@@ -12,7 +12,6 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }>) {
-  const APP_ID = process.env.NEXT_PUBLIC_TALKJS_APP_ID;
   const { locale } = await params;
 
   const user = await retrieveCustomer();
@@ -22,7 +21,7 @@ export default async function RootLayout({
     return redirect('/');
   }
 
-  if (!APP_ID || !user || !user.id || !user.email)
+  if (!user?.id)
     return (
       <>
         <Header locale={locale} />
@@ -31,18 +30,11 @@ export default async function RootLayout({
       </>
     );
 
-  const userName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'User';
-
   return (
-    <TalkJsProvider
-      appId={APP_ID}
-      userId={user.id}
-      userName={userName}
-      userEmail={user.email}
-    >
+    <MatrixProvider>
       <Header locale={locale} />
       {children}
       <Footer />
-    </TalkJsProvider>
+    </MatrixProvider>
   );
 }
