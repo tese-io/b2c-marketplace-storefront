@@ -1803,6 +1803,7 @@ button:disabled svg path {
 @media (min-width: 480px) {
   .tese-pdp-actions {
     flex-direction: row;
+    flex-wrap: wrap;
   }
 }
 
@@ -1866,6 +1867,9 @@ button:disabled svg path {
   flex-direction: column;
   gap: 0.75rem;
   width: 100%;
+  /* Claim a full row so the sibling "Add to quote cart" button wraps below
+     it (full width) instead of being squeezed into a narrow column. */
+  flex: 1 1 100%;
   padding: 1rem;
   border: 1px solid rgba(var(--tese-ink), 0.12);
   border-radius: 0.75rem;
