@@ -6,7 +6,11 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 120
 
 export async function POST(req: NextRequest) {
-  let body: { query?: string; chat_history?: { role: string; content: string }[] } = {}
+  let body: {
+    query?: string
+    chat_history?: { role: string; content: string }[]
+    thread_id?: string
+  } = {}
   try {
     body = await req.json()
   } catch {
@@ -22,6 +26,7 @@ export async function POST(req: NextRequest) {
     const data = await proxySourcingSearch({
       query,
       chat_history: body.chat_history,
+      thread_id: body.thread_id,
     })
     return NextResponse.json(data)
   } catch {
