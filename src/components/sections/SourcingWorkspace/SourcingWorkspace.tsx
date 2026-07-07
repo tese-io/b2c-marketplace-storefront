@@ -45,6 +45,7 @@ type CatalogPick = {
   metadata?: Record<string, unknown>
   price?: number | null
   currency?: string | null
+  match_reasons?: string[]
 }
 
 type SourcingResult = {
@@ -54,6 +55,8 @@ type SourcingResult = {
   catalog_picks: CatalogPick[]
   follow_ups: string[]
   meta?: Record<string, unknown>
+  thread_id?: string
+  personalization?: { company_name: string; sector: string; applied: string[] }
 }
 
 type Message =
@@ -464,17 +467,59 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
   const [threadId, setThreadId] = useState<string | null>(threadParam)
   const [threadTitle, setThreadTitle] = useState("")
   const [threadCreatedAt, setThreadCreatedAt] = useState<number | undefined>()
-  const endRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const bootedRef = useRef(false)
 
   const hasConversation = messages.length > 0
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" })
+    const container = scrollContainerRef.current
+    if (!container) return
+    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" })
   }, [messages])
 
   useEffect(() => {
-    if (threadParam) {
+    if (!threadParam) {
+      setThreadId(null)
+      setThreadTitle("")
+      setThreadCreatedAt(undefined)
+      setMessages([])
+      setInput("")
+      bootedRef.current = false
+      return
+    }
+
+    let cancelled = false
+
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/sourcing/threads/${encodeURIComponent(threadParam)}`, {
+          cache: "no-store",
+        })
+        if (res.ok) {
+          const { thread } = await res.json()
+          if (!cancelled && thread) {
+            setThreadId(thread.id)
+            setThreadTitle(thread.title || "")
+            setThreadCreatedAt(undefined)
+            setMessages(
+              (thread.messages || []).map(
+                (m: { role: "user" | "assistant"; content: string; result?: Record<string, unknown> }) =>
+                  m.role === "assistant"
+                    ? { role: "assistant", content: m.content || "", result: m.result as SourcingResult | undefined }
+                    : { role: "user", content: m.content || "" }
+              )
+            )
+            setInput("")
+            bootedRef.current = true
+            return
+          }
+        }
+      } catch {
+        // fall through to the localStorage-backed thread lookup
+      }
+
+      if (cancelled) return
       const thread = getSourcingThread(threadParam)
       if (thread) {
         setThreadId(thread.id)
@@ -483,17 +528,11 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
         setMessages(thread.messages as Message[])
         setInput("")
         bootedRef.current = true
-        return
       }
-    }
+    })()
 
-    if (!threadParam) {
-      setThreadId(null)
-      setThreadTitle("")
-      setThreadCreatedAt(undefined)
-      setMessages([])
-      setInput("")
-      bootedRef.current = false
+    return () => {
+      cancelled = true
     }
   }, [threadParam])
 
@@ -529,6 +568,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
     setLoading(true)
     setInput("")
     const priorHistory = history
+    let serverThreadId: string | undefined
 
     setMessages((prev) => [
       ...prev,
@@ -540,9 +580,17 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
       const res = await fetch("/api/sourcing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q, chat_history: priorHistory }),
+        body: JSON.stringify({ query: q, chat_history: priorHistory, thread_id: threadId ?? undefined }),
       })
       const data: SourcingResult = await res.json()
+      serverThreadId = data.thread_id
+      if (serverThreadId && serverThreadId !== threadId) {
+        setThreadId(serverThreadId)
+        // reflect it in the URL without a navigation
+        const url = new URL(window.location.href)
+        url.searchParams.set("thread", serverThreadId)
+        window.history.replaceState(null, "", url.toString())
+      }
       setMessages((prev) => {
         const base = prev.filter((m) => !("pending" in m && m.pending))
         const completed: Message[] = [
@@ -553,7 +601,9 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
             result: data,
           },
         ]
-        persistConversation(activeThreadId!, activeTitle, completed, activeCreatedAt)
+        if (!serverThreadId) {
+          persistConversation(activeThreadId!, activeTitle, completed, activeCreatedAt)
+        }
         return completed
       })
     } catch {
@@ -567,7 +617,9 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
             error: true,
           },
         ]
-        persistConversation(activeThreadId!, activeTitle, failed, activeCreatedAt)
+        if (!serverThreadId) {
+          persistConversation(activeThreadId!, activeTitle, failed, activeCreatedAt)
+        }
         return failed
       })
     } finally {
@@ -653,7 +705,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
 
   return (
     <div className="tese-sourcing-chat">
-      <div className="tese-sourcing-chat-scroll">
+      <div ref={scrollContainerRef} className="tese-sourcing-chat-scroll">
         <div className="tese-sourcing-chat-inner">
           {messages.map((m, i) =>
             m.role === "user" ? (
@@ -671,7 +723,6 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
               />
             )
           )}
-          <div ref={endRef} />
         </div>
       </div>
 
