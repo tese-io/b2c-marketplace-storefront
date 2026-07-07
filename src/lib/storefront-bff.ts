@@ -45,6 +45,7 @@ export async function storefrontBffFetch<T>(
 export async function proxySourcingSearch(body: {
   query?: string
   chat_history?: { role: string; content: string }[]
+  thread_id?: string
 }) {
   const { ok, json } = await storefrontBffFetch<Record<string, unknown>>(
     '/sourcing/search',
@@ -66,4 +67,16 @@ export async function proxySourcingSearch(body: {
   }
 
   return json
+}
+
+export async function proxyListSourcingThreads() {
+  return storefrontBffFetch('/sourcing/threads', { method: 'GET' })
+}
+
+export async function proxyGetSourcingThread(id: string) {
+  return storefrontBffFetch(`/sourcing/threads/${encodeURIComponent(id)}`, { method: 'GET' })
+}
+
+export async function proxyDeleteSourcingThread(id: string) {
+  return storefrontBffFetch(`/sourcing/threads/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
