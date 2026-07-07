@@ -1,4 +1,6 @@
-export const QUICK_PROMPTS = [
+export type QuickPrompt = { label: string; query: string }
+
+export const QUICK_PROMPTS: QuickPrompt[] = [
   {
     label: 'Global material search',
     query: 'Recycled aluminium ingots, 99.7% purity, low-carbon, EU suppliers, ~10 t/month',
@@ -59,3 +61,24 @@ export const SOURCING_LEGAL_LINKS = [
   { id: 'privacy', label: 'Privacy Policy', href: '/privacy' },
   { id: 'resources', label: 'Resources', href: '/resources' },
 ] as const
+
+/** Sector-specific quick prompts, prepended to QUICK_PROMPTS when a buyer's sector is known. */
+export const SECTOR_QUICK_PROMPTS: Record<string, string[]> = {
+  'Consumer Goods': [
+    'Recycled or bio-based packaging suppliers',
+    'GRS-certified recycled textile suppliers',
+  ],
+  'Construction': [
+    'Low-carbon cement and concrete suppliers',
+    'FSC-certified timber suppliers',
+  ],
+  // extend as tenant sectors appear
+}
+
+export function quickPromptsForSector(sector?: string): QuickPrompt[] {
+  const extra = sector ? SECTOR_QUICK_PROMPTS[sector] : undefined
+  if (extra?.length) {
+    return [...extra.map((query) => ({ label: query, query })), ...QUICK_PROMPTS]
+  }
+  return QUICK_PROMPTS
+}

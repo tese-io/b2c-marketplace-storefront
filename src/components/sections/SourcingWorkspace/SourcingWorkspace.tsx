@@ -18,7 +18,7 @@ import { SendInquiryButton } from "@/components/sections/SourcingInquiries/SendI
 
 import { AI_SOURCING_HOOK, AI_SOURCING_PROMO, AI_SOURCING_TAGLINE } from '@/data/explorer-copy'
 
-import { QUICK_PROMPTS, STAGES } from "./constants"
+import { STAGES, quickPromptsForSector } from "./constants"
 import { SourcingInput } from "./SourcingInput"
 import { SourcingLegalNotice } from "./SourcingLegalNotice"
 
@@ -185,6 +185,18 @@ function CatalogCard({
           </a>
           {price && <span className="text-sm font-semibold text-tese-ice shrink-0">{price}</span>}
         </div>
+        {!!pick.match_reasons?.length && (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {pick.match_reasons.slice(0, 2).map((m) => (
+              <span
+                key={m}
+                className="text-[11px] rounded-full bg-tese-lime-soft text-tese-ink px-2 py-0.5"
+              >
+                {m}
+              </span>
+            ))}
+          </div>
+        )}
         {pick.category && (
           <span className="text-[11px] uppercase tracking-wide text-secondary">
             {pick.category}
@@ -364,6 +376,32 @@ function AssistantBlock({
   }
   return (
     <div className="flex flex-col gap-5">
+      {r.personalization?.company_name && (
+        <div className="rounded-xl border bg-tese-surface px-4 py-3">
+          <p className="text-sm font-semibold text-primary">
+            Personalised for <span className="text-tese-ice">{r.personalization.company_name}</span>
+          </p>
+          {!!r.personalization.applied?.length && (
+            <details className="mt-1">
+              <summary className="cursor-pointer select-none text-[12px] font-medium text-secondary hover:text-primary">
+                Your sourcing context
+              </summary>
+              <ul className="mt-2 flex flex-col gap-1 text-[12px] text-secondary">
+                {r.personalization.sector && (
+                  <li>
+                    <span className="text-tese-ice font-medium">Sector:</span>{" "}
+                    {r.personalization.sector}
+                  </li>
+                )}
+                {r.personalization.applied.map((a) => (
+                  <li key={a}>{a.replace(/_/g, " ")}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
+      )}
+
       {r.answer && (
         <div className="tese-card p-5">
           <MarkdownLite text={r.answer} />
@@ -440,6 +478,16 @@ function AssistantBlock({
   )
 }
 
+function latestSector(msgs: Message[]): string | undefined {
+  for (let i = msgs.length - 1; i >= 0; i--) {
+    const m = msgs[i]
+    if (m.role === "assistant" && m.result?.personalization?.sector) {
+      return m.result.personalization.sector
+    }
+  }
+  return undefined
+}
+
 function persistConversation (
   id: string,
   title: string,
@@ -467,6 +515,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
   const [threadId, setThreadId] = useState<string | null>(threadParam)
   const [threadTitle, setThreadTitle] = useState("")
   const [threadCreatedAt, setThreadCreatedAt] = useState<number | undefined>()
+  const [sector, setSector] = useState<string | undefined>()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const bootedRef = useRef(false)
 
@@ -485,6 +534,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
       setThreadCreatedAt(undefined)
       setMessages([])
       setInput("")
+      setSector(undefined)
       bootedRef.current = false
       return
     }
@@ -502,14 +552,14 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
             setThreadId(thread.id)
             setThreadTitle(thread.title || "")
             setThreadCreatedAt(undefined)
-            setMessages(
-              (thread.messages || []).map(
-                (m: { role: "user" | "assistant"; content: string; result?: Record<string, unknown> }) =>
-                  m.role === "assistant"
-                    ? { role: "assistant", content: m.content || "", result: m.result as SourcingResult | undefined }
-                    : { role: "user", content: m.content || "" }
-              )
+            const loaded: Message[] = (thread.messages || []).map(
+              (m: { role: "user" | "assistant"; content: string; result?: Record<string, unknown> }) =>
+                m.role === "assistant"
+                  ? { role: "assistant", content: m.content || "", result: m.result as SourcingResult | undefined }
+                  : { role: "user", content: m.content || "" }
             )
+            setMessages(loaded)
+            setSector(latestSector(loaded))
             setInput("")
             bootedRef.current = true
             return
@@ -526,6 +576,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
         setThreadTitle(thread.title)
         setThreadCreatedAt(thread.createdAt)
         setMessages(thread.messages as Message[])
+        setSector(latestSector(thread.messages as Message[]))
         setInput("")
         bootedRef.current = true
       }
@@ -584,6 +635,9 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
       })
       const data: SourcingResult = await res.json()
       serverThreadId = data.thread_id
+      if (data.personalization?.sector) {
+        setSector(data.personalization.sector)
+      }
       if (serverThreadId && serverThreadId !== threadId) {
         setThreadId(serverThreadId)
         // reflect it in the URL without a navigation
@@ -677,7 +731,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
           />
 
           <div className="tese-sourcing-pills" role="group" aria-label="Suggested searches">
-            {QUICK_PROMPTS.map((item) => (
+            {quickPromptsForSector(sector).map((item) => (
               <button
                 key={item.label}
                 type="button"
