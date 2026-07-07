@@ -70,13 +70,16 @@ export async function proxySourcingSearch(body: {
 }
 
 export async function proxyListSourcingThreads() {
-  return storefrontBffFetch('/sourcing/threads', { method: 'GET' })
+  const { json } = await storefrontBffFetch('/sourcing/threads', { method: 'GET' })
+  return json
 }
 
 export async function proxyGetSourcingThread(id: string) {
-  return storefrontBffFetch(`/sourcing/threads/${encodeURIComponent(id)}`, { method: 'GET' })
+  const { json } = await storefrontBffFetch(`/sourcing/threads/${encodeURIComponent(id)}`, { method: 'GET' })
+  return json
 }
 
 export async function proxyDeleteSourcingThread(id: string) {
-  return storefrontBffFetch(`/sourcing/threads/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  const { json } = await storefrontBffFetch(`/sourcing/threads/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  return json
 }
