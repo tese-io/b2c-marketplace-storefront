@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { LogoutButton } from '@/components/atoms'
 import { TeseLogo } from '@/components/atoms/TeseLogo/TeseLogo'
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
-import { CollapseIcon, HamburgerMenuIcon } from '@/icons'
+import { BinIcon, CollapseIcon, HamburgerMenuIcon } from '@/icons'
 import {
   SidebarBookmarkIcon,
   SidebarHeartIcon,
@@ -26,9 +26,9 @@ import {
   type SourcingSidebarIconComponent,
 } from '@/icons/sourcing-sidebar-icons'
 import {
+  deleteSourcingThread,
   listSourcingThreads,
   SOURCING_HISTORY_EVENT,
-  type SourcingThread,
 } from '@/lib/sourcing-history'
 import { SourcingPageFooter } from '@/components/sections/SourcingWorkspace/SourcingPageFooter'
 
@@ -117,6 +117,13 @@ const NAV_SECTIONS: NavSection[] = [
     label: 'Account',
     items: [
       {
+        id: 'overview',
+        label: 'Overview',
+        href: '/user',
+        icon: SidebarSparkIcon,
+        match: (path) => /\/user\/?$/.test(path),
+      },
+      {
         id: 'addresses',
         label: 'Addresses',
         href: '/user/addresses',
@@ -154,8 +161,12 @@ function isActive (pathname: string, item: NavItem) {
   return pathname.includes(item.href)
 }
 
-function formatRelativeTime (ts: number): string {
-  const diff = Date.now() - ts
+type ShellThread = { id: string; title: string; updatedAt: number | string }
+
+function formatRelativeTime (ts: number | string): string {
+  const ms = typeof ts === 'string' ? Date.parse(ts) : ts
+  if (!Number.isFinite(ms)) return ''
+  const diff = Date.now() - ms
   const mins = Math.floor(diff / 60000)
   if (mins < 1) return 'Just now'
   if (mins < 60) return `${mins}m ago`
@@ -163,7 +174,7 @@ function formatRelativeTime (ts: number): string {
   if (hours < 24) return `${hours}h ago`
   const days = Math.floor(hours / 24)
   if (days < 7) return `${days}d ago`
-  return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+  return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
 export function SourcingAppShell ({
@@ -175,17 +186,55 @@ export function SourcingAppShell ({
   const unreads = useMatrixUnreads()
   const activeThreadId = searchParams.get('thread')
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [threads, setThreads] = useState<SourcingThread[]>([])
+  const [threads, setThreads] = useState<ShellThread[]>([])
+  const [threadsServerBacked, setThreadsServerBacked] = useState(false)
 
-  const refreshThreads = useCallback(() => {
+  const refreshThreads = useCallback(async () => {
+    try {
+      const res = await fetch('/api/sourcing/threads', { cache: 'no-store' })
+      if (res.ok) {
+        const { threads: server } = await res.json()
+        if (Array.isArray(server) && server.length) {
+          setThreads(server.map((t: { id: string; title: string; updatedAt: number | string }) => ({
+            id: t.id,
+            title: t.title,
+            updatedAt: t.updatedAt,
+          })))
+          setThreadsServerBacked(true)
+          return
+        }
+      }
+    } catch {
+      // fall through to localStorage
+    }
     setThreads(listSourcingThreads())
+    setThreadsServerBacked(false)
   }, [])
 
   useEffect(() => {
     refreshThreads()
-    window.addEventListener(SOURCING_HISTORY_EVENT, refreshThreads)
-    return () => window.removeEventListener(SOURCING_HISTORY_EVENT, refreshThreads)
+    const onEvt = () => refreshThreads()
+    window.addEventListener(SOURCING_HISTORY_EVENT, onEvt)
+    return () => window.removeEventListener(SOURCING_HISTORY_EVENT, onEvt)
   }, [refreshThreads])
+
+  const handleDeleteThread = useCallback(
+    async (event: React.MouseEvent, id: string) => {
+      event.preventDefault()
+      event.stopPropagation()
+      if (threadsServerBacked) {
+        try {
+          await fetch(`/api/sourcing/threads/${encodeURIComponent(id)}`, { method: 'DELETE' })
+        } catch {
+          // ignore network errors; refreshThreads() below reconciles state either way
+        }
+      } else {
+        deleteSourcingThread(id)
+      }
+      refreshThreads()
+    },
+    [threadsServerBacked, refreshThreads]
+  )
 
   const closeSidebar = useCallback(() => setSidebarOpen(false), [])
 
@@ -256,11 +305,11 @@ export function SourcingAppShell ({
                 const isActiveThread =
                   activeThreadId === thread.id && pathname.includes('/sourcing')
                 return (
-                  <li key={thread.id}>
+                  <li key={thread.id} className="flex items-center gap-1">
                     <LocalizedClientLink
                       href={`/sourcing?thread=${thread.id}`}
                       onClick={closeSidebar}
-                      className={`tese-sourcing-history-item ${isActiveThread ? 'is-active' : ''}`}
+                      className={`tese-sourcing-history-item flex-1 min-w-0 ${isActiveThread ? 'is-active' : ''}`}
                       title={thread.title}
                     >
                       <span className="tese-sourcing-history-item-title">{thread.title}</span>
@@ -268,6 +317,14 @@ export function SourcingAppShell ({
                         {formatRelativeTime(thread.updatedAt)}
                       </span>
                     </LocalizedClientLink>
+                    <button
+                      type="button"
+                      onClick={(event) => handleDeleteThread(event, thread.id)}
+                      className="shrink-0 inline-flex items-center justify-center rounded-md p-1.5 text-neutral-400 hover:text-red-600 hover:bg-black/5"
+                      aria-label={`Delete ${thread.title}`}
+                    >
+                      <BinIcon size={14} />
+                    </button>
                   </li>
                 )
               })}
