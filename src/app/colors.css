@@ -14,18 +14,33 @@
     --neutral-900: 22, 22, 22;
     --neutral-1000: 9, 9, 9;
 
-    /* Brand colors are used across all interactive elements such as buttons, links, inputs, etc. This color can define the overall feel and can elicit emotion. */
-    --brand-25: 247, 247, 247;
-    --brand-50: 238, 238, 238;
-    --brand-100: 226, 226, 226;
-    --brand-200: 198, 198, 198;
-    --brand-300: 163, 163, 163;
-    --brand-400: 115, 115, 115;
-    --brand-500: 82, 82, 82;
-    --brand-600: 64, 64, 64;
-    --brand-700: 27, 27, 27;
-    --brand-800: 22, 22, 22;
-    --brand-900: 9, 9, 9;
+    /* Brand colors — Tese green ramp (lime #BBDB48 accent -> deep green-black #001405).
+       Used across all interactive elements (buttons, links, inputs). */
+    --brand-25: 248, 250, 240;
+    --brand-50: 245, 250, 228;
+    --brand-100: 225, 255, 110;
+    --brand-200: 213, 245, 98;
+    --brand-300: 187, 219, 72;
+    --brand-400: 149, 181, 34;
+    --brand-500: 111, 142, 0;
+    --brand-600: 72, 104, 0;
+    --brand-700: 34, 66, 0;
+    --brand-800: 10, 45, 0;
+    --brand-900: 0, 20, 5;
+
+    /* Tese signature accents — for marketplace/storefront surfaces. */
+    --tese-lime: 187, 219, 72;
+    --tese-lime-soft: 225, 255, 110;
+    --tese-ink: 0, 20, 5;
+    --tese-ink-soft: 10, 45, 0;
+    --tese-forest: 10, 45, 0;
+    --tese-ice: 29, 98, 93;
+    --tese-ice-soft: 144, 213, 208;
+    --tese-surface: 242, 242, 242;
+
+    /* Marketplace pulse accent colors (legacy price-up/down tokens). */
+    --price-up: 23, 163, 74;
+    --price-down: 217, 45, 32;
     
     /* Red colors are used across error states and in "destructive" actions. */
     --red-25: 254, 243, 242;

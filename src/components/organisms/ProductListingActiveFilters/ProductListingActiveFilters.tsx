@@ -3,14 +3,17 @@
 import { ActiveFilterElement } from "@/components/cells"
 import useGetAllSearchParams from "@/hooks/useGetAllSearchParams"
 
-export const ProductListingActiveFilters = () => {
+const ALWAYS_EXCLUDED = ["sortBy", "page", "sold", "products[page]"]
+
+export const ProductListingActiveFilters = ({
+  exclude = [],
+}: {
+  exclude?: string[]
+}) => {
   const { allSearchParams } = useGetAllSearchParams()
+  const excluded = new Set([...ALWAYS_EXCLUDED, ...exclude])
   const filters = Object.entries(allSearchParams).filter(
-    (element) =>
-      element[0] !== "sortBy" &&
-      element[0] !== "page" &&
-      element[0] !== "sold" &&
-      element[0] !== "products[page]"
+    (element) => !excluded.has(element[0])
   )
 
   return (

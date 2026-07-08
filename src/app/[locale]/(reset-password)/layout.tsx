@@ -1,29 +1,26 @@
-import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
-import Image from "next/image"
+import { Footer, Header } from "@/components/organisms"
+import { checkRegion } from "@/lib/helpers/check-region"
+import { redirect } from "next/navigation"
 
-export default function ResetPasswordLayout({
+export default async function ResetPasswordLayout({
   children,
-}: {
+  params,
+}: Readonly<{
   children: React.ReactNode
-}) {
+  params: Promise<{ locale: string }>
+}>) {
+  const { locale } = await params
+  const regionCheck = await checkRegion(locale)
+
+  if (!regionCheck) {
+    return redirect("/")
+  }
+
   return (
     <>
-      <header>
-        <div className="relative w-full py-2 lg:px-8 px-4">
-          <div className="flex items-center justify-center pl-4 lg:pl-0 w-full">
-            <LocalizedClientLink href="/" className="text-2xl font-bold">
-              <Image
-                src="/Logo.svg"
-                width={126}
-                height={40}
-                alt="Logo"
-                priority
-              />
-            </LocalizedClientLink>
-          </div>
-        </div>
-      </header>
+      <Header locale={locale} />
       {children}
+      <Footer />
     </>
   )
 }

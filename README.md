@@ -65,7 +65,7 @@ cd b2c-marketplace-storefront
 Install dependencies
 
 ```js
-npm install
+yarn install
 ```
 
 &nbsp;
@@ -102,7 +102,7 @@ NEXT_PUBLIC_TALKJS_APP_ID=<your talkjs app id>
 Start storefront
 
 ```js
-npm run dev
+yarn dev
 ```
 
 &nbsp;

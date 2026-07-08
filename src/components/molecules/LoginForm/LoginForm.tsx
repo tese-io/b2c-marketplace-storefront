@@ -1,91 +1,86 @@
-"use client"
+'use client'
+
+import Link from 'next/link'
+import { useParams, useSearchParams } from 'next/navigation'
+
+import { Alert } from '@/components/atoms/Alert/Alert'
+import { AuthShell } from '@/components/sections/Auth/AuthShell'
+import { TeseIoButton } from '@/components/sections/Auth/TeseIoButton'
 import {
-  FieldError,
-  FieldValues,
-  FormProvider,
-  useForm,
-  useFormContext,
-} from "react-hook-form"
-import { Button } from "@/components/atoms"
-import { zodResolver } from "@hookform/resolvers/zod"
-import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
-import { LabeledInput } from "@/components/cells"
-import { loginFormSchema, LoginFormData } from "./schema"
-import { useState } from "react"
-import { login } from "@/lib/data/customer"
-import { useRouter } from "next/navigation"
+  getContinueWithTeseUrl,
+  getTeseSignupUrl,
+} from '@/lib/helpers/tese-auth-urls'
 
-export const LoginForm = () => {
-  const methods = useForm<LoginFormData>({
-    resolver: zodResolver(loginFormSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  })
-
-  return (
-    <FormProvider {...methods}>
-      <Form />
-    </FormProvider>
-  )
+function getStatusMessage (searchParams: URLSearchParams) {
+  if (searchParams.get('sessionExpired') === 'true') {
+    return 'Your session has expired. Sign in with tese.io to continue.'
+  }
+  if (searchParams.get('sessionRequired') === 'true') {
+    return 'Please sign in to continue.'
+  }
+  if (searchParams.get('error') === 'sso_missing_key') {
+    return 'Sign-in could not be completed. Please try again.'
+  }
+  if (searchParams.get('error') === 'sso_failed') {
+    return 'tese.io sign-in failed. Please try again.'
+  }
+  return null
 }
 
-const Form = () => {
-  const [error, setError] = useState("")
-  const {
-    handleSubmit,
-    register,
-    formState: { errors, isSubmitting },
-  } = useFormContext()
-  const router = useRouter()
-
-  const submit = async (data: FieldValues) => {
-    const formData = new FormData()
-    formData.append("email", data.email)
-    formData.append("password", data.password)
-
-    const res = await login(formData)
-    if (res) {
-      setError(res)
-      return
-    }
-    setError("")
-    router.push("/user")
-  }
+export function LoginForm () {
+  const searchParams = useSearchParams()
+  const params = useParams()
+  const locale = (params?.locale as string) || 'pl'
+  const marketplacePath = searchParams.get('redirect') || '/user'
+  const statusMessage = getStatusMessage(searchParams)
+  const continueHref = getContinueWithTeseUrl(marketplacePath, locale)
+  const signupHref = getTeseSignupUrl(marketplacePath, locale)
 
   return (
-    <main className="container">
-      <h1 className="heading-xl text-center uppercase my-6">
-        Log in to your account
-      </h1>
-      <form onSubmit={handleSubmit(submit)}>
-        <div className="w-96 max-w-full mx-auto space-y-4">
-          <LabeledInput
-            label="E-mail"
-            placeholder="Your e-mail address"
-            error={errors.email as FieldError}
-            {...register("email")}
-          />
-          <LabeledInput
-            label="Password"
-            placeholder="Your password"
-            type="password"
-            error={errors.password as FieldError}
-            {...register("password")}
-          />
-          {error && <p className="label-md text-negative">{error}</p>}
-          <Button className="w-full" disabled={isSubmitting}>
-            Log in
-          </Button>
-          <p className="text-center label-md">
-            Don&apos;t have an account yet?{" "}
-            <LocalizedClientLink href="/user/register" className="underline">
-              Sign up!
-            </LocalizedClientLink>
-          </p>
-        </div>
-      </form>
-    </main>
+    <AuthShell
+      title="Sign in to the marketplace"
+      lead="One tese.io account for sourcing, orders, and your profile."
+      testId="login-page"
+    >
+      {statusMessage ? (
+        <Alert
+          title={statusMessage}
+          className="tese-auth-alert"
+          icon
+          data-testid="login-auth-alert"
+        />
+      ) : null}
+
+      <div data-testid="login-form-container">
+        <TeseIoButton
+          href={continueHref}
+          testId="login-continue-with-tese"
+        />
+        <p className="tese-auth-helper">
+          Sign in with your tese.io account — no separate marketplace password.
+        </p>
+      </div>
+
+      <div className="tese-auth-footer">
+        <p className="tese-auth-footer-copy">
+          New to tese.io?{' '}
+          <a
+            href={signupHref}
+            className="tese-auth-footer-link"
+            data-testid="login-register-link"
+          >
+            Create an account
+          </a>
+        </p>
+        <p className="tese-auth-footer-copy">
+          <Link
+            href="/register"
+            className="tese-auth-footer-link"
+          >
+            Learn about joining tese.io
+          </Link>
+        </p>
+      </div>
+    </AuthShell>
   )
 }

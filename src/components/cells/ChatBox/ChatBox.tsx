@@ -1,71 +1,69 @@
-"use client"
+'use client';
 
-import { useEffect, useRef } from "react"
-import Talk from "talkjs"
+import { useEffect, useState } from 'react';
 
-type ChatProps = {
-  order_id?: string
-  product_id?: string
-  subject?: string | null
-  currentUser: {
-    id: string
-    name: string
-    email: string | null
-    photoUrl?: string
-    role: string
-  }
-  supportUser: {
-    id: string
-    name: string
-    email: string | null
-    photoUrl?: string
-    role: string
-  }
-}
+import { MatrixChat } from '@/components/cells/MatrixChat/MatrixChat';
+import { ensureSellerChatRoom } from '@/lib/data/matrix';
 
-export function ChatBox({
-  currentUser,
-  supportUser,
-  subject,
-  order_id,
-  product_id,
-}: ChatProps) {
-  const chatboxRef = useRef<HTMLDivElement>(null)
+type ChatBoxProps = {
+  seller_id: string;
+  /** Product or order id the chat is about (drives the deterministic room). */
+  context_id?: string;
+  subject?: string | null;
+  /** Closes the surrounding drawer; wired to MatrixChat's in-header back. */
+  onClose?: () => void;
+};
+
+/**
+ * Get-or-create the customer<->seller Matrix room for this context, then
+ * render the chat pane (replaces the mounted TalkJS chatbox).
+ */
+export function ChatBox({ seller_id, context_id, subject, onClose }: ChatBoxProps) {
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    let session: Talk.Session | undefined
+    let disposed = false;
 
-    Talk.ready.then(() => {
-      const me = new Talk.User(currentUser)
-      const other = new Talk.User(supportUser)
-
-      session = new Talk.Session({
-        appId: process.env.NEXT_PUBLIC_TALKJS_APP_ID || "",
-        me,
-      })
-
-      const conversationId = `product-${product_id || order_id}-${me.id}-${
-        other.id
-      }`
-
-      const conversation = session.getOrCreateConversation(conversationId)
-
-      if (subject) {
-        conversation.subject = subject
+    ensureSellerChatRoom({
+      seller_id,
+      context_id,
+      subject: subject || undefined
+    }).then(room => {
+      if (disposed) return;
+      if (room?.room_id) {
+        setRoomId(room.room_id);
+      } else {
+        setFailed(true);
       }
+    });
 
-      conversation.setParticipant(me)
-      conversation.setParticipant(other)
+    return () => {
+      disposed = true;
+    };
+  }, [seller_id, context_id, subject]);
 
-      const chatbox = session.createChatbox()
-      chatbox.select(conversation)
-      if (chatboxRef.current) {
-        chatbox.mount(chatboxRef.current)
-      }
-    })
+  if (failed) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <p className="text-secondary text-md">
+          The chat is unavailable right now — please try again later.
+        </p>
+      </div>
+    );
+  }
 
-    return () => session?.destroy()
-  }, [currentUser, supportUser])
+  if (!roomId) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <p className="text-secondary text-md">Opening chat…</p>
+      </div>
+    );
+  }
 
-  return <div className="w-full h-[500px]" ref={chatboxRef} />
+  return (
+    <div className="h-full w-full">
+      <MatrixChat roomId={roomId} className="h-full" onBack={onClose} />
+    </div>
+  );
 }

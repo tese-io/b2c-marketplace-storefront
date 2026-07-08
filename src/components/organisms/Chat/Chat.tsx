@@ -1,14 +1,14 @@
-"use client"
+'use client';
 
-import { Button } from "@/components/atoms"
-import { ChatBox } from "@/components/cells/ChatBox/ChatBox"
-import { Modal } from "@/components/molecules"
-import { useState } from "react"
-import { HttpTypes } from "@medusajs/types"
-import { SellerProps } from "@/types/seller"
-import { MessageIcon } from "@/icons"
+import { useState } from 'react';
 
-const TALKJS_APP_ID = process.env.NEXT_PUBLIC_TALKJS_APP_ID || ""
+import { HttpTypes } from '@medusajs/types';
+
+import { Button } from '@/components/atoms';
+import { MessageIcon } from '@/icons';
+import { SellerProps } from '@/types/seller';
+
+import { ChatDrawer } from './ChatDrawer';
 
 export const Chat = ({
   user,
@@ -18,55 +18,42 @@ export const Chat = ({
   product,
   subject,
   order_id,
+  variant = 'tonal',
+  buttonSize = 'small'
 }: {
-  user: HttpTypes.StoreCustomer | null
-  seller: SellerProps
-  buttonClassNames?: string
-  icon?: boolean
-  product?: HttpTypes.StoreProduct
-  subject?: string
-  order_id?: string
+  user: HttpTypes.StoreCustomer | null;
+  seller: SellerProps;
+  buttonClassNames?: string;
+  icon?: boolean;
+  product?: HttpTypes.StoreProduct;
+  subject?: string;
+  order_id?: string;
+  variant?: 'tonal' | 'filled';
+  buttonSize?: 'small' | 'large';
 }) => {
-  const [modal, setModal] = useState(false)
+  const [modal, setModal] = useState(false);
 
-  if (!TALKJS_APP_ID) {
-    return null
+  if (!user?.id || !seller?.id) {
+    return null;
   }
 
   return (
     <>
       <Button
-        variant="tonal"
+        variant={variant}
         onClick={() => setModal(true)}
         className={buttonClassNames}
+        size={buttonSize}
       >
-        {icon ? <MessageIcon size={20} /> : "Write to seller"}
+        {icon ? <MessageIcon size={20} /> : 'Write to seller'}
       </Button>
-      {modal && (
-        <Modal heading="Chat" onClose={() => setModal(false)}>
-          <div className="px-4">
-            <ChatBox
-              order_id={order_id}
-              product_id={product?.id}
-              subject={subject || product?.title || null}
-              currentUser={{
-                id: user?.id || "",
-                name: `${user?.first_name} ${user?.last_name}` || "",
-                email: user?.email || null,
-                photoUrl: "/talkjs-placeholder.jpg",
-                role: "customer",
-              }}
-              supportUser={{
-                id: seller?.id || "",
-                name: seller?.name || "",
-                email: seller?.email || null,
-                photoUrl: seller.photo || "/talkjs-placeholder.jpg",
-                role: "seller",
-              }}
-            />
-          </div>
-        </Modal>
-      )}
+      <ChatDrawer
+        open={modal}
+        onClose={() => setModal(false)}
+        seller_id={seller.id}
+        context_id={product?.id || order_id}
+        subject={subject || product?.title || null}
+      />
     </>
-  )
-}
+  );
+};

@@ -10,17 +10,17 @@ import { Dropdown } from "@/components/molecules"
 import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
 import { ProfileIcon } from "@/icons"
 import { HttpTypes } from "@medusajs/types"
-import { useUnreads } from "@talkjs/react"
+import { useMatrixUnreads } from "@/components/providers/Matrix/MatrixProvider"
 import { useState } from "react"
 
 export const UserDropdown = ({
-  user,
+  isLoggedIn,
 }: {
-  user: HttpTypes.StoreCustomer | null
+  isLoggedIn: boolean
 }) => {
   const [open, setOpen] = useState(false)
 
-  const unreads = useUnreads()
+  const unreads = useMatrixUnreads()
 
   return (
     <div
@@ -30,26 +30,27 @@ export const UserDropdown = ({
       onFocus={() => setOpen(true)}
     >
       <LocalizedClientLink
-        href="/user"
+        href={isLoggedIn ? "/user" : "/login"}
         className="relative"
         aria-label="Go to user profile"
       >
         <ProfileIcon size={20} />
       </LocalizedClientLink>
       <Dropdown show={open}>
-        {user ? (
+        {isLoggedIn ? (
           <div className="p-1">
             <div className="lg:w-[200px]">
               <h3 className="uppercase heading-xs border-b p-4">
                 Your account
               </h3>
             </div>
+            <NavigationItem href="/sourcing">AI Sourcing</NavigationItem>
             <NavigationItem href="/user/orders">Orders</NavigationItem>
             <NavigationItem href="/user/messages" className="relative">
               Messages
-              {Boolean(unreads?.length) && (
+              {unreads > 0 && (
                 <Badge className="absolute top-3 left-24 w-4 h-4 p-0">
-                  {unreads?.length}
+                  {unreads}
                 </Badge>
               )}
             </NavigationItem>
@@ -63,8 +64,8 @@ export const UserDropdown = ({
           </div>
         ) : (
           <div className="p-1">
-            <NavigationItem href="/user">Login</NavigationItem>
-            <NavigationItem href="/user/register">Register</NavigationItem>
+            <NavigationItem href="/login">Sign in</NavigationItem>
+            <NavigationItem href="/register">Create account</NavigationItem>
           </div>
         )}
       </Dropdown>

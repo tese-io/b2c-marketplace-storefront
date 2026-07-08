@@ -1,60 +1,95 @@
-import { Carousel } from "@/components/cells"
-import { ProductCard } from "../ProductCard/ProductCard"
-import { listProducts } from "@/lib/data/products"
-import { Product } from "@/types/product"
-import { HttpTypes } from "@medusajs/types"
-import { getProductPrice } from "@/lib/helpers/get-product-price"
+import { Carousel } from '@/components/cells'
+import { FeaturedListingCard } from '@/components/organisms/FeaturedListingCard/FeaturedListingCard'
+import { listProducts } from '@/lib/data/products'
+import { dedupeCatalogGridProducts } from '@/lib/helpers/catalog-product'
+import {
+  buildCategoriesById,
+  getProductSectorLabels,
+} from '@/lib/helpers/sector-preferences'
+import { getWishlistState } from '@/lib/helpers/wishlist-state'
+import { SellerProps } from '@/types/seller'
+import { Product } from '@/types/product'
+import { HttpTypes } from '@medusajs/types'
 
 export const HomeProductsCarousel = async ({
   locale,
   sellerProducts,
   home,
+  b2b = false,
+  parentCategories = [],
 }: {
   locale: string
   sellerProducts: Product[]
   home: boolean
+  b2b?: boolean
+  parentCategories?: HttpTypes.StoreProductCategory[]
 }) => {
-  const {
-    response: { products },
-  } = await listProducts({
-    countryCode: locale,
-    queryParams: {
-      limit: home ? 4 : 99999,
-      order: "created_at",
-      ...(home
-        ? { fields: "id,title,handle,thumbnail,*variants.calculated_price" }
-        : {}),
-    },
-  })
+  let products = sellerProducts
 
-  if (!products.length && !sellerProducts.length) return null
+  if (!products.length) {
+    const {
+      response: { products: fetched },
+    } = await listProducts({
+      countryCode: locale,
+      queryParams: {
+        limit: home ? 24 : undefined,
+        order: 'created_at',
+      },
+      forceCache: !home,
+    })
+    products = fetched as Product[]
+  }
+
+  if (!products.length) return null
+
+  const wishlistState = await getWishlistState(locale)
+  const categoriesById = buildCategoriesById(parentCategories)
+
+  if (b2b) {
+    const gridItems = dedupeCatalogGridProducts(
+      products as (HttpTypes.StoreProduct & { seller?: SellerProps })[]
+    )
+
+    return (
+      <div className="tese-featured-grid">
+        {gridItems.map(({ product, vendorCount, displayTitle }, index) => (
+          <FeaturedListingCard
+            key={product.id}
+            product={product as HttpTypes.StoreProduct & { seller?: SellerProps }}
+            index={index}
+            sectorLabels={
+              parentCategories.length
+                ? getProductSectorLabels(product, categoriesById)
+                : undefined
+            }
+            vendorCount={vendorCount}
+            displayTitle={displayTitle}
+            isLoggedIn={wishlistState.isLoggedIn}
+            initiallyWishlisted={wishlistState.wishlistedIds.has(product.id)}
+          />
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="flex justify-center w-full">
       <Carousel
         align="start"
-        items={(sellerProducts.length ? sellerProducts : products).map(
-          (product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              api_product={
-                home
-                  ? (product as HttpTypes.StoreProduct)
-                  : products.find((p) => {
-                      const { cheapestPrice } = getProductPrice({
-                        product: p,
-                      })
-                      return (
-                        cheapestPrice &&
-                        p.id === product.id &&
-                        Boolean(cheapestPrice)
-                      )
-                    })
-              }
+        items={products.map((product, index) => (
+          <div key={product.id} className="w-[280px] shrink-0">
+            <FeaturedListingCard
+              product={product as HttpTypes.StoreProduct & { seller?: SellerProps }}
+              index={index}
+              sectorLabels={getProductSectorLabels(
+                product as HttpTypes.StoreProduct,
+                categoriesById
+              )}
+              isLoggedIn={wishlistState.isLoggedIn}
+              initiallyWishlisted={wishlistState.wishlistedIds.has(product.id)}
             />
-          )
-        )}
+          </div>
+        ))}
       />
     </div>
   )

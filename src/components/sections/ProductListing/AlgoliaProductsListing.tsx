@@ -1,141 +1,184 @@
 "use client"
 
 import { HttpTypes } from "@medusajs/types"
+import { ProductsPagination } from "@/components/organisms"
 import {
-  AlgoliaProductSidebar,
-  ProductCard,
-  ProductListingActiveFilters,
-  ProductsPagination,
-} from "@/components/organisms"
-import { client } from "@/lib/client"
-import { Configure, useHits } from "react-instantsearch"
-import { InstantSearchNext } from "react-instantsearch-nextjs"
+  ProductListingLoadingView,
+  ProductListingProductsView,
+} from "@/components/molecules"
+import { ListingSearchToolbar } from "@/components/molecules/ListingSearchToolbar/ListingSearchToolbar"
+import { SellerProductsEmpty } from "@/components/molecules/SellerProductsEmpty/SellerProductsEmpty"
 import { useSearchParams } from "next/navigation"
 import { getFacedFilters } from "@/lib/helpers/get-faced-filters"
 import { PRODUCT_LIMIT } from "@/const"
 import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
 import { useEffect, useState } from "react"
-import { listProducts } from "@/lib/data/products"
-import { getProductPrice } from "@/lib/helpers/get-product-price"
+import { searchProducts } from "@/lib/data/products"
+import { FacetCounts } from "@/components/organisms/ProductSidebar/AlgoliaProductSidebar"
 
 export const AlgoliaProductsListing = ({
   category_id,
   collection_id,
   seller_handle,
   locale = process.env.NEXT_PUBLIC_DEFAULT_REGION,
+  currency_code,
+  orbitUrl,
+  sellerName,
+  isLoggedIn,
+  wishlistedIds,
 }: {
   category_id?: string
   collection_id?: string
   locale?: string
   seller_handle?: string
-  currency_code?: string
+  currency_code: string
+  orbitUrl?: string | null
+  sellerName?: string
+  isLoggedIn?: boolean
+  wishlistedIds?: string[]
 }) => {
-  const searchParamas = useSearchParams()
+  const searchParams = useSearchParams()
 
-  const facetFilters: string = getFacedFilters(searchParamas)
-  const query: string = searchParamas.get("query") || ""
+  const facetFilters: string = getFacedFilters(searchParams)
+  const query: string = searchParams.get("query") || ""
+  const page: number = +(searchParams.get("page") || 1)
 
   const filters = `${
     seller_handle
-      ? `NOT seller:null AND seller.handle:${seller_handle} AND `
-      : "NOT seller:null AND "
-  }NOT seller.store_status:SUSPENDED AND supported_countries:${locale}${
+      ? `has_seller:true AND seller.handle:${seller_handle} AND `
+      : "has_seller:true AND "
+  }NOT seller.store_status:SUSPENDED AND supported_countries:${locale} AND variants.prices.currency_code:${currency_code} AND variants.prices.amount > 0${
     category_id
       ? ` AND categories.id:${category_id}${
           collection_id !== undefined
-            ? ` AND collections.id:${collection_id}`
+            ? ` AND collection.id:${collection_id}`
             : ""
         } ${facetFilters}`
       : ` ${facetFilters}`
   }`
 
   return (
-    <InstantSearchNext searchClient={client} indexName="products">
-      <Configure query={query} filters={filters} />
-      <ProductsListing locale={locale} />
-    </InstantSearchNext>
+      <ProductsListing
+        locale={locale}
+        currency_code={currency_code}
+        filters={filters}
+        query={query}
+        page={page}
+        seller_handle={seller_handle}
+        orbitUrl={orbitUrl}
+        sellerName={sellerName}
+        isLoggedIn={isLoggedIn}
+        wishlistedIds={wishlistedIds}
+      />
   )
 }
 
-const ProductsListing = ({ locale }: { locale?: string }) => {
-  const [prod, setProd] = useState<HttpTypes.StoreProduct[] | null>(null)
-  const { items, results } = useHits()
-
-  const searchParamas = useSearchParams()
+const ProductsListing = ({
+  locale,
+  currency_code,
+  filters,
+  query,
+  page,
+  seller_handle,
+  orbitUrl,
+  sellerName,
+  isLoggedIn,
+  wishlistedIds,
+}: {
+  locale?: string
+  currency_code: string
+  filters: string
+  query: string
+  page: number
+  seller_handle?: string
+  orbitUrl?: string | null
+  sellerName?: string
+  isLoggedIn?: boolean
+  wishlistedIds?: string[]
+}) => {
+  const [products, setProducts] = useState<
+    (HttpTypes.StoreProduct & { seller?: any })[]
+  >([])
+  const [facets, setFacets] = useState<Record<string, FacetCounts>>({})
+  const [isLoading, setIsLoading] = useState(true)
+  const [count, setCount] = useState(0)
+  const [pages, setPages] = useState(1)
 
   useEffect(() => {
-    listProducts({
-      countryCode: locale,
-      queryParams: {
-        fields:
-          "*variants.calculated_price,*seller.reviews,-thumbnail,-images,-type,-tags,-variants.options,-options,-collection,-collection_id",
-        limit: 999,
-      },
-    }).then(({ response }) => {
-      setProd(
-        response.products.filter((prod) => {
-          const { cheapestPrice } = getProductPrice({ product: prod })
-          return Boolean(cheapestPrice) && prod
+    async function fetchProducts() {
+      if (!locale) return
+
+      try {
+        setIsLoading(true)
+        const result = await searchProducts({
+          query: query || undefined,
+          page: page - 1,
+          hitsPerPage: PRODUCT_LIMIT,
+          filters,
+          currency_code,
+          countryCode: locale,
         })
-      )
-    })
-  }, [])
 
-  if (!results?.processingTimeMS) return <ProductListingSkeleton />
+        setProducts(result.products)
+        setFacets(result.facets)
+        setCount(result.nbHits)
+        setPages(result.nbPages)
+      } catch (error) {
+        setProducts([])
+        setFacets({})
+        setCount(0)
+        setPages(0)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-  const page: number = +(searchParamas.get("page") || 1)
-  const filteredProducts = items.filter((pr) =>
-    prod?.some((p: any) => p.id === pr.objectID)
-  )
+    fetchProducts()
+  }, [locale, filters, query, page, currency_code])
 
-  const products = filteredProducts
-    .filter((pr) => prod?.some((p: any) => p.id === pr.objectID))
-    .slice((page - 1) * PRODUCT_LIMIT, page * PRODUCT_LIMIT)
+  if (isLoading && products.length === 0) return <ProductListingSkeleton />
 
-  const count = filteredProducts?.length || 0
-  const pages = Math.ceil(count / PRODUCT_LIMIT) || 1
+  const searchPlaceholder = seller_handle
+    ? `Search ${sellerName || 'this supplier'}'s listings…`
+    : 'Search listings…'
 
   return (
-    <div className="min-h-[70vh]">
-      <div className="flex justify-between w-full items-center">
-        <div className="my-4 label-md">{`${count} listings`}</div>
-      </div>
-      <div className="hidden md:block">
-        <ProductListingActiveFilters />
-      </div>
-      <div className="md:flex gap-4">
-        <div className="w-[280px] flex-shrink-0 hidden md:block">
-          <AlgoliaProductSidebar />
-        </div>
-        <div className="w-full">
-          {!items.length ? (
-            <div className="text-center w-full my-10">
-              <h2 className="uppercase text-primary heading-lg">no results</h2>
-              <p className="mt-4 text-lg">
-                Sorry, we can&apos;t find any results for your criteria
-              </p>
-            </div>
-          ) : (
-            <div className="w-full">
-              <ul className="flex flex-wrap gap-4">
-                {products.map(
-                  (hit) =>
-                    prod?.find((p: any) => p.id === hit.objectID) && (
-                      <ProductCard
-                        api_product={prod?.find(
-                          (p: any) => p.id === hit.objectID
-                        )}
-                        key={hit.objectID}
-                        product={hit}
-                      />
-                    )
-                )}
-              </ul>
-            </div>
-          )}
+    <div className="tese-seller-listing min-h-[50vh]">
+      <ListingSearchToolbar
+        count={count}
+        facets={facets}
+        showSectors={!seller_handle}
+        searchPlaceholder={searchPlaceholder}
+      />
+      <div className="tese-seller-grid-wrap">
+        {isLoading && <ProductListingLoadingView />}
+
+        {!isLoading && !products.length && seller_handle && (
+          <SellerProductsEmpty sellerName={sellerName} orbitUrl={orbitUrl} />
+        )}
+
+        {!isLoading && !products.length && !seller_handle && (
+          <div className="tese-seller-empty">
+            <h2 className="tese-seller-empty-title">No results</h2>
+            <p className="tese-seller-empty-hint">
+              Sorry, we couldn&apos;t find any results for your criteria.
+            </p>
+          </div>
+        )}
+
+        {!isLoading && products.length > 0 && (
+          <ProductListingProductsView
+            products={products}
+            isLoggedIn={isLoggedIn}
+            wishlistedIds={wishlistedIds}
+            wideLayout
+          />
+        )}
+
+        <div className="mt-auto">
+          <ProductsPagination pages={pages} />
         </div>
       </div>
-      <ProductsPagination pages={pages} />
     </div>
   )
 }

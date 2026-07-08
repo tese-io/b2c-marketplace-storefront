@@ -1,9 +1,11 @@
-import Image from "next/image"
-import { HttpTypes } from "@medusajs/types"
-import { convertToLocale } from "@/lib/helpers/money"
-import { DeleteCartItemButton } from "@/components/molecules"
-import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
-import { UpdateCartItemButton } from "@/components/molecules/UpdateCartItemButton/UpdateCartItemButton"
+import { HttpTypes } from '@medusajs/types';
+import Image from 'next/image';
+
+import { DeleteCartItemButton } from '@/components/molecules';
+import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink';
+import { UpdateCartItemButton } from '@/components/molecules/UpdateCartItemButton/UpdateCartItemButton';
+import { filterValidCartItems } from '@/lib/helpers/filter-valid-cart-items';
+import { convertToLocale } from '@/lib/helpers/money';
 
 export const CartItemsProducts = ({
   products,
@@ -11,90 +13,89 @@ export const CartItemsProducts = ({
   delete_item = true,
   change_quantity = true,
 }: {
-  products: HttpTypes.StoreCartLineItem[]
-  currency_code: string
-  delete_item?: boolean
-  change_quantity?: boolean
+  products: HttpTypes.StoreCartLineItem[];
+  currency_code: string;
+  delete_item?: boolean;
+  change_quantity?: boolean;
 }) => {
-  return (
-    <div>
-      {products.map((product) => {
-        const { options } = product.variant ?? {}
+  const validProducts = filterValidCartItems(products);
 
+  return (
+    <ul className="tese-cart-lines">
+      {validProducts.map((product, index) => {
+        const { options } = product.variant ?? {};
         const total = convertToLocale({
-          amount: product.subtotal,
+          amount: product.subtotal ?? 0,
           currency_code,
-        })
+        });
+        const isLast = index === validProducts.length - 1;
 
         return (
-          <div key={product.id} className="border rounded-sm p-1 flex gap-2">
-            <LocalizedClientLink href={`/products/${product.product_handle}`}>
-              <div className="w-[100px] h-[132px] flex items-center justify-center">
-                {product.thumbnail ? (
-                  <Image
-                    src={decodeURIComponent(product.thumbnail)}
-                    alt="Product thumbnail"
-                    width={100}
-                    height={132}
-                    className="rounded-xs w-[100px] h-[132px] object-contain"
-                  />
-                ) : (
-                  <Image
-                    src={"/images/placeholder.svg"}
-                    alt="Product thumbnail"
-                    width={50}
-                    height={66}
-                    className="rounded-xs w-[50px] h-[66px] object-contain opacity-30"
-                  />
-                )}
-              </div>
+          <li
+            key={product.id}
+            data-testid={`cart-item-${product.id}`}
+            className={`tese-cart-line ${isLast ? '' : 'tese-cart-line--bordered'}`}
+          >
+            <LocalizedClientLink
+              href={`/products/${product.product_handle}`}
+              className="tese-cart-line-media"
+            >
+              {product.thumbnail ? (
+                <Image
+                  src={decodeURIComponent(product.thumbnail)}
+                  alt={product.product_title || 'Product image'}
+                  width={96}
+                  height={96}
+                  className="tese-cart-line-image"
+                  data-testid="cart-item-image"
+                />
+              ) : (
+                <Image
+                  src="/images/placeholder.svg"
+                  alt={product.product_title || 'Product image'}
+                  width={48}
+                  height={48}
+                  className="tese-cart-line-image tese-cart-line-image--placeholder"
+                />
+              )}
             </LocalizedClientLink>
 
-            <div className="w-full p-2">
-              <div className="flex justify-between lg:mb-4">
-                <LocalizedClientLink
-                  href={`/products/${product.product_handle}`}
-                >
-                  <div className="w-[100px] md:w-[200px] lg:w-[280px] mb-4 lg:mb-0">
-                    <h3 className="heading-xs uppercase truncate">
-                      {product.subtitle}
-                    </h3>
-                  </div>
+            <div className="tese-cart-line-body">
+              <div className="tese-cart-line-top">
+                <LocalizedClientLink href={`/products/${product.product_handle}`}>
+                  <h3 className="tese-cart-line-title" data-testid="cart-item-title">
+                    {product.product_title}
+                    {product.subtitle ? ` · ${product.subtitle}` : ''}
+                  </h3>
                 </LocalizedClientLink>
-                {delete_item && (
-                  <div className="lg:flex">
-                    <DeleteCartItemButton id={product.id} />
-                  </div>
-                )}
+                {delete_item && <DeleteCartItemButton id={product.id} />}
               </div>
-              <div className="lg:flex justify-between -mt-4 lg:mt-0">
-                <div className="label-md text-secondary">
-                  {options?.map(({ option, id, value }) => (
-                    <p key={id}>
-                      {option?.title}:{" "}
-                      <span className="text-primary">{value}</span>
-                    </p>
-                  ))}
-                  {change_quantity ? (
-                    <UpdateCartItemButton
-                      quantity={product.quantity}
-                      lineItemId={product.id}
-                    />
-                  ) : (
-                    <p>
-                      Quantity:{" "}
-                      <span className="text-primary">{product.quantity}</span>
-                    </p>
-                  )}
-                </div>
-                <div className="lg:text-right flex lg:block items-center gap-2 mt-4 lg:mt-0">
-                  <p className="label-lg">{total}</p>
-                </div>
+
+              <div className="tese-cart-line-details" data-testid="cart-item-details">
+                {options?.map(({ option, id, value }) => (
+                  <p key={id} className="tese-cart-line-variant">
+                    {option?.title}: <span>{value}</span>
+                  </p>
+                ))}
+              </div>
+
+              <div className="tese-cart-line-foot">
+                {change_quantity ? (
+                  <UpdateCartItemButton
+                    quantity={product.quantity}
+                    lineItemId={product.id}
+                  />
+                ) : (
+                  <p className="tese-cart-line-qty">Qty {product.quantity}</p>
+                )}
+                <p className="tese-cart-line-price" data-testid="cart-item-price">
+                  {total}
+                </p>
               </div>
             </div>
-          </div>
-        )
+          </li>
+        );
       })}
-    </div>
-  )
-}
+    </ul>
+  );
+};

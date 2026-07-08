@@ -1,42 +1,40 @@
-import { Footer, Header } from "@/components/organisms"
-import { retrieveCustomer } from "@/lib/data/customer"
-import { checkRegion } from "@/lib/helpers/check-region"
-import { Session } from "@talkjs/react"
-import { redirect } from "next/navigation"
+import { redirect } from 'next/navigation';
+
+import { Footer, Header } from '@/components/organisms';
+import { MatrixProvider } from '@/components/providers';
+import { retrieveCustomer } from '@/lib/data/customer';
+import { checkRegion } from '@/lib/helpers/check-region';
 
 export default async function RootLayout({
   children,
-  params,
+  params
 }: Readonly<{
-  children: React.ReactNode
-  params: Promise<{ locale: string }>
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }>) {
-  const APP_ID = process.env.NEXT_PUBLIC_TALKJS_APP_ID
-  const { locale } = await params
+  const { locale } = await params;
 
-  const user = await retrieveCustomer()
-  const regionCheck = await checkRegion(locale)
+  const user = await retrieveCustomer();
+  const regionCheck = await checkRegion(locale);
 
   if (!regionCheck) {
-    return redirect("/")
+    return redirect('/');
   }
 
-  if (!APP_ID || !user)
+  if (!user?.id)
     return (
       <>
-        <Header />
+        <Header locale={locale} />
         {children}
         <Footer />
       </>
-    )
+    );
 
   return (
-    <>
-      <Session appId={APP_ID} userId={user.id}>
-        <Header />
-        {children}
-        <Footer />
-      </Session>
-    </>
-  )
+    <MatrixProvider>
+      <Header locale={locale} />
+      {children}
+      <Footer />
+    </MatrixProvider>
+  );
 }

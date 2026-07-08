@@ -1,5 +1,9 @@
-import { ProductDetailsPage } from "@/components/sections"
-import { listProducts } from "@/lib/data/products"
+import { ProductDetailsPage } from "@/components/sections/ProductDetailsPage/ProductDetailsPage"
+import { listCatalogListings, listProducts } from "@/lib/data/products"
+import { getSectorPreferencesFromCookies } from "@/lib/data/cookies"
+import { listCategories } from "@/lib/data/categories"
+import { resolveSectorPreferences } from "@/lib/helpers/sector-preferences"
+import { getCatalogDisplayTitle, getCatalogHandle } from "@/lib/helpers/catalog-product"
 import { generateProductMetadata } from "@/lib/helpers/seo"
 import type { Metadata } from "next"
 
@@ -12,22 +16,51 @@ export async function generateMetadata({
 
   const prod = await listProducts({
     countryCode: locale,
-    queryParams: { handle },
+    queryParams: { handle: [handle], limit: 1 },
+    forceCache: true,
   }).then(({ response }) => response.products[0])
+
+  if (!prod) {
+    return generateProductMetadata(prod)
+  }
+
+  const catalogHandle = getCatalogHandle(prod) || handle
+  const listings = await listCatalogListings({
+    countryCode: locale,
+    catalogHandle,
+  })
+
+  if (listings.length > 1) {
+    return generateProductMetadata({
+      ...prod,
+      title: getCatalogDisplayTitle(listings),
+    })
+  }
 
   return generateProductMetadata(prod)
 }
 
 export default async function ProductPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ handle: string; locale: string }>
+  searchParams: Promise<{ brand?: string }>
 }) {
   const { handle, locale } = await params
+  const { brand } = await searchParams
+  const cookiePrefs = await getSectorPreferencesFromCookies()
+  const { parentCategories } = await listCategories()
+  const { sectorId } = resolveSectorPreferences(undefined, cookiePrefs, parentCategories)
 
   return (
-    <main className="container">
-      <ProductDetailsPage handle={handle} locale={locale} />
+    <main className="w-full bg-white">
+      <ProductDetailsPage
+        handle={handle}
+        locale={locale}
+        brand={brand}
+        sectorId={sectorId}
+      />
     </main>
   )
 }
