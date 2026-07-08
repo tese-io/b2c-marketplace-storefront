@@ -1,5 +1,6 @@
 type WorkspaceAccountPageProps = {
   title?: string
+  lead?: string
   children: React.ReactNode
   testId?: string
   className?: string
@@ -7,6 +8,7 @@ type WorkspaceAccountPageProps = {
 
 export function WorkspaceAccountPage ({
   title,
+  lead,
   children,
   testId,
   className = '',
@@ -17,7 +19,12 @@ export function WorkspaceAccountPage ({
       data-testid={testId}
     >
       {title ? (
-        <h1 className="tese-sourcing-account-title">{title}</h1>
+        <header className="tese-sourcing-account-header">
+          <h1 className="tese-sourcing-account-title">{title}</h1>
+          {lead ? (
+            <p className="tese-sourcing-account-lead">{lead}</p>
+          ) : null}
+        </header>
       ) : null}
       {children}
     </div>

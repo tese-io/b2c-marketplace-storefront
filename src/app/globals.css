@@ -208,7 +208,7 @@ button:disabled svg path {
   box-shadow: 0 4px 12px rgba(0, 20, 5, 0.08), 0 16px 40px rgba(0, 20, 5, 0.1);
 }
 
-/* Continuous marquee for the commodity price ticker. */
+/* Continuous marquee for the marketplace pulse bar. */
 @keyframes tese-marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -1843,11 +1843,34 @@ button:disabled svg path {
   text-transform: none !important;
 }
 
+.tese-pdp-secondary-links {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(var(--tese-ink), 0.08);
+}
+
+.tese-pdp-secondary-label {
+  margin: 0 0 0.5rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-pdp-secondary-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
 .tese-pdp-explore-link {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  margin-top: 1rem;
   font-size: 13px;
   font-weight: 600;
   color: rgb(var(--tese-ice));
@@ -4466,6 +4489,10 @@ button.tese-sourcing-sidebar-logout {
   z-index: 1;
 }
 
+.tese-sourcing-content:has(.tese-sourcing-account--messages) {
+  min-height: 0;
+}
+
 @keyframes tese-sourcing-bg-drift-a {
   0% {
     transform: translate(0, 0) scale(1);
@@ -5170,15 +5197,19 @@ button.tese-sourcing-sidebar-logout {
   justify-content: center;
   min-height: 2.75rem;
   padding: 0 1.25rem;
+  border: none;
   border-radius: 9999px;
   background: rgb(var(--tese-ink));
   color: white;
   font-size: 14px;
   font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
   transition: background 150ms ease;
 }
 .tese-sourcing-placeholder-cta:hover {
-  background: rgb(var(--tese-forest));
+  background: rgb(var(--tese-ink-soft));
+  color: white;
 }
 
 /* Inquiries list */
@@ -5229,6 +5260,594 @@ button.tese-sourcing-sidebar-logout {
   flex-shrink: 0;
 }
 
+/* Inquiry detail page */
+.tese-inquiry-detail {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  max-width: min(64rem, 100%);
+  margin-inline: auto;
+  padding: clamp(1rem, 2.5vw, 2rem);
+  animation: tese-inquiry-detail-enter 0.4s ease-out both;
+}
+
+@keyframes tese-inquiry-detail-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tese-inquiry-detail {
+    animation: none;
+  }
+}
+
+.tese-inquiry-detail-nav {
+  margin-bottom: 1rem;
+}
+
+.tese-inquiry-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem 0.375rem 0.375rem;
+  margin-left: -0.375rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(var(--neutral-500));
+  text-decoration: none;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.tese-inquiry-detail-back:hover {
+  color: rgb(var(--tese-ink));
+  background: rgba(var(--tese-ink), 0.04);
+}
+
+.tese-inquiry-detail-hero {
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border-radius: clamp(0.875rem, 1.5vw, 1rem);
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(var(--tese-lime), 0.08) 0%, transparent 55%),
+    radial-gradient(80% 60% at 0% 100%, rgba(var(--tese-ice), 0.06) 0%, transparent 50%),
+    white;
+  box-shadow:
+    0 1px 2px rgba(var(--tese-ink), 0.04),
+    0 8px 28px rgba(var(--tese-ink), 0.05);
+}
+
+.tese-inquiry-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tese-inquiry-detail-title {
+  margin: 0;
+  font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(var(--tese-ink), 0.05);
+  color: rgb(var(--neutral-500));
+}
+
+.tese-inquiry-status.is-open {
+  background: rgba(var(--tese-lime), 0.35);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-status.is-quoted {
+  background: rgba(var(--tese-lime), 0.5);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-status.is-accepted {
+  background: rgba(var(--tese-forest), 0.12);
+  color: rgb(var(--tese-forest));
+}
+
+.tese-inquiry-status.is-draft,
+.tese-inquiry-status.is-neutral {
+  background: rgba(var(--tese-ink), 0.05);
+  color: rgb(var(--neutral-500));
+}
+
+.tese-inquiry-status.is-muted {
+  background: rgba(var(--tese-ink), 0.04);
+  color: rgb(var(--neutral-400));
+}
+
+.tese-inquiry-detail-requirement {
+  margin: 1rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: rgb(var(--neutral-500));
+  white-space: pre-wrap;
+}
+
+.tese-inquiry-detail-date {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-400));
+}
+
+.tese-inquiry-detail-hero--with-product {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tese-inquiry-detail-request {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(var(--tese-ink), 0.08);
+}
+
+.tese-inquiry-detail-hero--with-product .tese-inquiry-detail-requirement {
+  margin-top: 0;
+}
+
+.tese-inquiry-product-strip {
+  width: 100%;
+}
+
+.tese-inquiry-product-strip-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .tese-inquiry-product-strip-main {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.tese-inquiry-product-media {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 7.5rem;
+}
+
+.tese-inquiry-product-image,
+.tese-inquiry-product-placeholder,
+.tese-inquiry-product-skeleton {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 0.75rem;
+  object-fit: cover;
+}
+
+.tese-inquiry-product-placeholder,
+.tese-inquiry-product-skeleton {
+  background: rgba(var(--tese-ink), 0.06);
+}
+
+.tese-inquiry-product-skeleton {
+  animation: tese-inquiry-detail-shimmer 1.4s ease-in-out infinite;
+}
+
+.tese-inquiry-product-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.tese-inquiry-product-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tese-inquiry-product-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.tese-inquiry-product-title {
+  margin: 0;
+  font-size: clamp(1.0625rem, 2.2vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-product-category {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-inquiry-product-price {
+  margin: 0.375rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(var(--tese-ice));
+}
+
+.tese-inquiry-product-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.tese-inquiry-product-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background: rgba(var(--tese-ink), 0.03);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-inquiry-product-pill-label {
+  font-weight: 600;
+  color: rgb(var(--tese-ice));
+}
+
+.tese-inquiry-product-link {
+  display: inline-flex;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgb(var(--neutral-500));
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.tese-inquiry-product-link:hover {
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-product-link:focus-visible {
+  outline: 2px solid rgb(var(--tese-lime));
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+.tese-inquiry-quote-product-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.125rem 0 0;
+  min-width: 0;
+}
+
+.tese-inquiry-quote-product-thumb {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  background: rgba(var(--tese-ink), 0.06);
+}
+
+.tese-inquiry-detail-quotes {
+  margin-top: 1.5rem;
+}
+
+.tese-inquiry-detail-quotes-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+.tese-inquiry-detail-quotes-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-detail-quotes-count {
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-400));
+}
+
+.tese-inquiry-detail-quotes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tese-inquiry-quote-card {
+  padding: clamp(1rem, 2.5vw, 1.25rem);
+  border-radius: clamp(0.875rem, 1.5vw, 1rem);
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background: white;
+  box-shadow: 0 1px 2px rgba(var(--tese-ink), 0.04);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.tese-inquiry-quote-card:hover {
+  border-color: rgba(var(--tese-ink), 0.12);
+  box-shadow: 0 4px 16px rgba(var(--tese-ink), 0.05);
+}
+
+.tese-inquiry-quote-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.tese-inquiry-quote-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: rgb(var(--tese-ink));
+  color: white;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.tese-inquiry-quote-meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.tese-inquiry-quote-seller {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-quote-product {
+  margin: 0.125rem 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-inquiry-quote-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.625rem;
+  background: rgba(var(--tese-lime), 0.12);
+  border: 1px solid rgba(var(--tese-lime), 0.25);
+}
+
+.tese-inquiry-quote-price-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-inquiry-quote-price-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgb(var(--tese-ink));
+  font-variant-numeric: tabular-nums;
+}
+
+.tese-inquiry-quote-notes {
+  margin: 0.875rem 0 0;
+  padding: 0.75rem 0.875rem;
+  border-left: 3px solid rgba(var(--tese-ink), 0.1);
+  border-radius: 0 0.5rem 0.5rem 0;
+  background: rgba(var(--tese-ink), 0.02);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: rgb(var(--neutral-500));
+  white-space: pre-wrap;
+}
+
+.tese-inquiry-quote-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tese-inquiry-btn-primary,
+.tese-inquiry-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 150ms ease, border-color 150ms ease, opacity 150ms ease, transform 150ms ease;
+}
+
+.tese-inquiry-btn-primary {
+  border: none;
+  background: rgb(var(--tese-lime));
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-btn-primary:hover:not(:disabled) {
+  background: rgb(var(--tese-lime-soft));
+  transform: translateY(-1px);
+}
+
+.tese-inquiry-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tese-inquiry-btn-secondary {
+  border: 1px solid rgba(var(--tese-ink), 0.12);
+  background: white;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-btn-secondary:hover:not(:disabled) {
+  border-color: rgba(var(--tese-ink), 0.22);
+  background: rgba(var(--tese-ink), 0.02);
+}
+
+.tese-inquiry-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tese-inquiry-detail-no-quotes,
+.tese-inquiry-detail-empty {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border-radius: 0.875rem;
+  border: 1px dashed rgba(var(--tese-ink), 0.12);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.tese-inquiry-detail-no-quotes p,
+.tese-inquiry-detail-empty-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-inquiry-detail-no-quotes-hint {
+  margin: 0.5rem 0 0 !important;
+  font-size: 0.8125rem !important;
+  font-weight: 400 !important;
+  color: rgb(var(--neutral-500)) !important;
+}
+
+.tese-inquiry-detail-empty {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tese-inquiry-detail-error {
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.625rem;
+  background: rgba(220, 38, 38, 0.08);
+  font-size: 0.875rem;
+  color: rgb(185, 28, 28);
+}
+
+.tese-inquiry-detail-skeleton-back,
+.tese-inquiry-detail-skeleton-line,
+.tese-inquiry-detail-skeleton-hero,
+.tese-inquiry-detail-skeleton-quote {
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--tese-ink), 0.06) 25%,
+    rgba(var(--tese-ink), 0.1) 50%,
+    rgba(var(--tese-ink), 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: tese-inquiry-detail-shimmer 1.4s ease-in-out infinite;
+}
+
+.tese-inquiry-detail-skeleton-back {
+  width: 6rem;
+  height: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.tese-inquiry-detail-skeleton-hero {
+  height: 9rem;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tese-inquiry-detail-skeleton-quote {
+  height: 8rem;
+  border-radius: 1rem;
+}
+
+.tese-inquiry-detail-skeleton-line {
+  display: none;
+}
+
+@keyframes tese-inquiry-detail-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tese-inquiry-detail-skeleton-back,
+  .tese-inquiry-detail-skeleton-hero,
+  .tese-inquiry-detail-skeleton-quote {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .tese-inquiry-detail-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.625rem;
+  }
+
+  .tese-inquiry-quote-actions {
+    flex-direction: column;
+  }
+
+  .tese-inquiry-btn-primary,
+  .tese-inquiry-btn-secondary {
+    width: 100%;
+  }
+}
+
 /* ── Workspace account pages ── */
 
 .tese-sourcing-account {
@@ -5246,8 +5865,16 @@ button.tese-sourcing-sidebar-logout {
   font-size: 1.375rem;
   font-weight: 600;
   color: rgb(var(--tese-ink));
-  margin: 0 0 1.25rem;
+  margin: 0;
   letter-spacing: -0.01em;
+}
+
+.tese-sourcing-account-header {
+  margin-bottom: 1.25rem;
+}
+
+.tese-sourcing-account-header .tese-sourcing-account-lead {
+  margin-top: 0.375rem;
 }
 
 .tese-sourcing-account-lead {
@@ -5270,9 +5897,27 @@ button.tese-sourcing-sidebar-logout {
   justify-content: center;
   padding: 3rem 1.5rem;
   text-align: center;
-  background: white;
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(var(--tese-lime), 0.08) 0%, transparent 55%),
+    radial-gradient(80% 60% at 0% 100%, rgba(var(--tese-ice), 0.06) 0%, transparent 50%),
+    white;
   border: 1px solid rgba(var(--tese-ink), 0.08);
   border-radius: 1rem;
+  box-shadow:
+    0 1px 2px rgba(var(--tese-ink), 0.04),
+    0 8px 28px rgba(var(--tese-ink), 0.05);
+}
+
+.tese-sourcing-account-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 1rem;
+  border-radius: 9999px;
+  background: rgba(var(--tese-lime), 0.35);
+  color: rgb(var(--tese-ink));
 }
 
 .tese-sourcing-account-empty-title {
@@ -5313,9 +5958,328 @@ button.tese-sourcing-sidebar-logout {
   transition: border-color 150ms ease, background 150ms ease;
 }
 
-.tese-sourcing-account-empty-secondary:hover {
+.tese-sourcing-account-empty-secondary:hover:not(:disabled) {
   border-color: rgba(var(--tese-ink), 0.25);
   background: rgba(var(--tese-ink), 0.03);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-sourcing-account-empty-secondary:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.tese-user-dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tese-user-dashboard-stat-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tese-user-dashboard-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.125rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background: white;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.tese-user-dashboard-stat:hover {
+  border-color: rgba(var(--tese-lime), 0.55);
+  box-shadow: 0 8px 24px rgba(var(--tese-ink), 0.05);
+}
+
+.tese-user-dashboard-stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-user-dashboard-stat-label {
+  font-size: 13px;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-user-dashboard-account-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.125rem 1.25rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(var(--tese-lime), 0.08) 0%, transparent 55%),
+    white;
+}
+
+.tese-user-dashboard-account-label {
+  margin: 0 0 0.25rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-user-dashboard-account-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-user-dashboard-account-email {
+  margin: 0.25rem 0 0;
+  font-size: 14px;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-user-dashboard-account-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 1rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(var(--tese-ink), 0.12);
+  background: white;
+  color: rgb(var(--tese-ink));
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.tese-user-dashboard-account-link:hover {
+  border-color: rgba(var(--tese-ink), 0.25);
+  background: rgba(var(--tese-ink), 0.03);
+}
+
+.tese-user-dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.tese-user-dashboard-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tese-user-dashboard-section-title {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-user-dashboard-section-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-user-dashboard-section-link:hover {
+  color: rgb(var(--tese-ink-soft));
+}
+
+.tese-user-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .tese-user-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .tese-user-dashboard-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.tese-user-dashboard-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-height: 6.5rem;
+  padding: 1rem 1.125rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background: white;
+  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.tese-user-dashboard-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.tese-user-dashboard-pending-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding: 0 0.375rem;
+  border-radius: 9999px;
+  background: rgb(var(--price-down));
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tese-user-dashboard-card:hover {
+  border-color: rgba(var(--tese-lime), 0.55);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(var(--tese-ink), 0.05);
+}
+
+.tese-user-dashboard-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-user-dashboard-card-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-user-dashboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tese-user-dashboard-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background: white;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.tese-user-dashboard-list-item:hover {
+  border-color: rgba(var(--tese-lime), 0.45);
+  background: rgba(var(--tese-lime), 0.06);
+}
+
+.tese-user-dashboard-list-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(var(--tese-ink));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tese-user-dashboard-list-meta {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-user-dashboard-empty-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 0.875rem;
+  border: 1px dashed rgba(var(--tese-ink), 0.12);
+  background: rgba(var(--tese-ice), 0.35);
+}
+
+.tese-user-dashboard-empty-copy {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-account-identity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(var(--tese-lime), 0.08) 0%, transparent 55%),
+    white;
+}
+
+.tese-account-identity-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tese-account-identity-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tese-account-identity-value {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-account-identity-note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-account-identity-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 1023px) {
+  .tese-user-dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .tese-user-dashboard-stats {
+    grid-template-columns: 1fr;
+  }
 }
 
 .tese-sourcing-nav-section {
@@ -5354,6 +6318,1863 @@ button.tese-sourcing-sidebar-logout {
 .tese-sourcing-account .border.rounded-sm {
   border-color: rgba(var(--tese-ink), 0.08);
   background: white;
+}
+
+/* ── Addresses page ── */
+
+/* ── Auth pages (login / register) ── */
+
+.tese-auth-chrome {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: rgb(var(--tese-surface));
+}
+
+.tese-auth-chrome-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.tese-auth-stage {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  overflow: visible;
+  --auth-pointer-x: 0.5;
+  --auth-pointer-y: 0.5;
+  --auth-shift-x: 0;
+  --auth-shift-y: 0;
+}
+
+.tese-auth-ambient {
+  position: absolute;
+  inset: -10rem -8rem;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(
+    ellipse 72% 68% at 50% 48%,
+    rgb(0 0 0 / 1) 0%,
+    rgb(0 0 0 / 0.72) 42%,
+    rgb(0 0 0 / 0.28) 62%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(
+    ellipse 72% 68% at 50% 48%,
+    rgb(0 0 0 / 1) 0%,
+    rgb(0 0 0 / 0.72) 42%,
+    rgb(0 0 0 / 0.28) 62%,
+    transparent 78%
+  );
+}
+
+.tese-auth-blob-track {
+  position: absolute;
+  width: 72%;
+  height: 72%;
+  transform: translate3d(
+    calc(var(--auth-shift-x) * 40px),
+    calc(var(--auth-shift-y) * 34px),
+    0
+  );
+  transition: transform 220ms ease-out;
+  will-change: transform;
+}
+
+.tese-auth-blob-track--lime {
+  top: -18%;
+  right: -14%;
+}
+
+.tese-auth-blob-track--ice {
+  bottom: -20%;
+  left: -16%;
+}
+
+.tese-auth-blob-track--mint {
+  top: 30%;
+  left: 40%;
+  width: 56%;
+  height: 56%;
+}
+
+.tese-auth-blob {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0.52;
+  transform: scale(1.35);
+  will-change: transform, background-color, filter;
+  filter: blur(128px) saturate(1.05)
+    hue-rotate(calc(var(--auth-shift-x) * 22deg + var(--auth-shift-y) * 14deg));
+  animation: tese-auth-drift 20s ease-in-out infinite alternate;
+}
+
+.tese-auth-blob--lime {
+  background: rgb(var(--tese-lime));
+  animation:
+    tese-auth-drift 18s ease-in-out infinite alternate,
+    tese-auth-color-lime 12s ease-in-out infinite alternate;
+}
+
+.tese-auth-blob--ice {
+  background: rgb(var(--tese-ice-soft));
+  animation:
+    tese-auth-drift 22s ease-in-out infinite alternate-reverse,
+    tese-auth-color-ice 14s ease-in-out infinite alternate;
+}
+
+.tese-auth-blob--mint {
+  background: rgb(var(--tese-lime-soft));
+  animation:
+    tese-auth-drift 16s ease-in-out infinite alternate,
+    tese-auth-color-mint 10s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes tese-auth-color-lime {
+  0% {
+    background-color: rgb(var(--tese-lime));
+  }
+  50% {
+    background-color: rgb(var(--tese-ice-soft));
+  }
+  100% {
+    background-color: rgb(var(--tese-lime-soft));
+  }
+}
+
+@keyframes tese-auth-color-ice {
+  0% {
+    background-color: rgb(var(--tese-ice-soft));
+  }
+  50% {
+    background-color: rgb(var(--tese-ice));
+  }
+  100% {
+    background-color: rgb(var(--tese-lime));
+  }
+}
+
+@keyframes tese-auth-color-mint {
+  0% {
+    background-color: rgb(var(--tese-lime-soft));
+  }
+  50% {
+    background-color: rgb(var(--tese-lime));
+  }
+  100% {
+    background-color: rgb(var(--tese-ice-soft));
+  }
+}
+
+@keyframes tese-auth-drift {
+  0% {
+    transform: scale(1.35) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.42) translate3d(-10%, 12%, 0);
+  }
+  100% {
+    transform: scale(1.28) translate3d(8%, -8%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tese-auth-blob-track {
+    transition: none;
+    transform: none;
+  }
+
+  .tese-auth-blob {
+    animation: none;
+    filter: blur(128px);
+    transform: scale(1.35);
+  }
+}
+
+.tese-auth-chrome-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem clamp(1rem, 4vw, 2rem);
+  border-bottom: 1px solid rgba(var(--tese-ink), 0.06);
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+}
+
+.tese-auth-chrome-back {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(var(--neutral-600));
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.tese-auth-chrome-back:hover {
+  color: rgb(var(--tese-ink));
+}
+
+.tese-auth-chrome-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem 2rem;
+  border-top: 1px solid rgba(var(--tese-ink), 0.06);
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+}
+
+.tese-auth-chrome-legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.25rem;
+}
+
+.tese-auth-chrome-legal a {
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-500));
+  text-decoration: none;
+}
+
+.tese-auth-chrome-legal a:hover {
+  color: rgb(var(--tese-ink));
+}
+
+.tese-auth-chrome-copy {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgb(var(--neutral-400));
+}
+
+.tese-auth-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 2rem);
+}
+
+.tese-auth-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 28rem;
+  padding: clamp(1.5rem, 4vw, 2rem);
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--tese-ink), 0.05);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 8px 32px rgba(var(--tese-ink), 0.06),
+    0 2px 8px rgba(var(--tese-ink), 0.03);
+}
+
+.tese-auth-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.tese-auth-brand-logo {
+  flex-shrink: 0;
+}
+
+.tese-auth-heading {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.tese-auth-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.375rem, 3vw, 1.625rem);
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(var(--tese-ink));
+  letter-spacing: -0.02em;
+}
+
+.tese-auth-lead {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-auth-alert {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.tese-auth-primary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.625rem;
+  background: rgb(var(--tese-lime));
+  color: rgb(var(--tese-ink));
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.tese-auth-primary-btn:hover {
+  background: rgb(var(--tese-lime-soft));
+  box-shadow: 0 8px 24px rgba(var(--tese-lime), 0.28);
+}
+
+.tese-auth-primary-btn:focus-visible {
+  outline: 2px solid rgb(var(--tese-forest));
+  outline-offset: 2px;
+}
+
+.tese-auth-primary-btn-icon {
+  flex-shrink: 0;
+}
+
+.tese-auth-helper {
+  margin: 0.875rem 0 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-auth-footer {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(var(--tese-ink), 0.06);
+  text-align: center;
+}
+
+.tese-auth-footer-copy {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgb(var(--neutral-600));
+}
+
+.tese-auth-footer-copy:last-child {
+  margin-bottom: 0;
+}
+
+.tese-auth-footer-link {
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tese-auth-footer-link:hover {
+  color: rgb(var(--tese-forest));
+}
+
+.tese-address-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tese-address-toolbar-count {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-address-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tese-address-fetch-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.tese-address-fetch-message {
+  margin: 0 0 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(var(--tese-forest), 0.16);
+  background: rgba(var(--tese-lime), 0.12);
+  color: rgb(var(--tese-ink));
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.tese-address-fetch-message-error {
+  border-color: rgba(185, 28, 28, 0.2);
+  background: rgba(254, 226, 226, 0.65);
+  color: rgb(127, 29, 29);
+}
+
+.tese-address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tese-address-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1rem, 2.5vw, 1.25rem);
+  border-radius: clamp(0.875rem, 1.5vw, 1rem);
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(var(--tese-lime), 0.06) 0%, transparent 55%),
+    white;
+  box-shadow: 0 1px 2px rgba(var(--tese-ink), 0.04);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.tese-address-card:hover {
+  border-color: rgba(var(--tese-ink), 0.12);
+  box-shadow: 0 4px 16px rgba(var(--tese-ink), 0.05);
+}
+
+.tese-address-card-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  min-width: 0;
+}
+
+.tese-address-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 0.75rem;
+  background: rgba(var(--tese-lime), 0.35);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-address-card-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.tese-address-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tese-address-card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-address-card-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(var(--tese-lime), 0.45);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-address-card-name {
+  margin: 0.25rem 0 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-address-card-line,
+.tese-address-card-contact {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-address-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid rgba(var(--tese-ink), 0.06);
+}
+
+.tese-address-btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0 1rem;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 9999px;
+  background: rgba(220, 38, 38, 0.06);
+  color: rgb(185, 28, 28);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.tese-address-btn-danger:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.35);
+}
+
+.tese-address-btn-danger:focus-visible {
+  outline: 2px solid rgba(220, 38, 38, 0.35);
+  outline-offset: 2px;
+}
+
+.tese-address-delete-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.tese-address-delete-copy {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-address-delete-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* ── Workspace modal ── */
+
+.tese-workspace-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem) 1rem;
+  overflow-y: auto;
+}
+
+.tese-workspace-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  border: none;
+  background: rgba(var(--tese-ink), 0.45);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.tese-workspace-modal-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 36rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(var(--tese-lime), 0.08) 0%, transparent 55%),
+    white;
+  box-shadow:
+    0 1px 2px rgba(var(--tese-ink), 0.04),
+    0 24px 64px rgba(var(--tese-ink), 0.16);
+  animation: tese-workspace-modal-enter 0.25s ease-out both;
+}
+
+@keyframes tese-workspace-modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tese-workspace-modal-panel {
+    animation: none;
+  }
+}
+
+.tese-workspace-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.125rem 1.25rem;
+  border-bottom: 1px solid rgba(var(--tese-ink), 0.08);
+}
+
+.tese-workspace-modal-title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-workspace-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(var(--tese-ink), 0.05);
+  color: rgb(var(--neutral-500));
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.tese-workspace-modal-close:hover {
+  background: rgba(var(--tese-ink), 0.08);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-workspace-modal-close:focus-visible {
+  outline: 2px solid rgb(var(--tese-lime));
+  outline-offset: 2px;
+}
+
+.tese-workspace-modal-body {
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+/* ── Address form (workspace modal) ── */
+
+.tese-address-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tese-address-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .tese-address-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.tese-address-form-span-2 {
+  grid-column: 1 / -1;
+}
+
+.tese-address-form-country {
+  grid-column: 1 / -1;
+}
+
+.tese-address-form label.label-sm {
+  display: block;
+}
+
+.tese-address-form label.label-sm > p {
+  margin: 0 0 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-address-form input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid rgba(var(--tese-ink), 0.12);
+  border-radius: 0.625rem;
+  background: white;
+  font-size: 0.9375rem;
+  color: rgb(var(--tese-ink));
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.tese-address-form input:focus {
+  outline: none;
+  border-color: rgba(var(--tese-forest), 0.45);
+  box-shadow: 0 0 0 3px rgba(var(--tese-lime), 0.35);
+}
+
+.tese-address-form input::placeholder {
+  color: rgb(var(--neutral-400));
+}
+
+.tese-address-form-error {
+  margin: 0.375rem 0 0;
+  font-size: 0.8125rem;
+  color: rgb(185, 28, 28);
+}
+
+.tese-address-form-submit {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.tese-address-form .listbox-button,
+.tese-address-form button[role="combobox"] {
+  min-height: 2.75rem;
+  border-radius: 0.625rem !important;
+  border-color: rgba(var(--tese-ink), 0.12) !important;
+}
+
+/* ─── Messages inbox ─── */
+
+.tese-sourcing-account--messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: min(72rem, 100%);
+  margin-inline: auto;
+  padding: clamp(0.75rem, 2.5vw, 2rem);
+  min-height: 0;
+}
+
+.tese-messages-section {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+
+.tese-messages-section > * {
+  flex: 1;
+  min-height: 0;
+}
+
+.tese-messages {
+  height: 100%;
+  min-height: 0;
+  animation: tese-messages-enter 0.4s ease-out both;
+}
+
+@keyframes tese-messages-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tese-messages {
+    animation: none;
+  }
+}
+
+.tese-messages-shell {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: clamp(0.75rem, 1.5vw, 1rem);
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(var(--tese-lime), 0.06) 0%, transparent 55%),
+    radial-gradient(80% 60% at 0% 100%, rgba(var(--tese-ice), 0.05) 0%, transparent 50%),
+    white;
+  box-shadow:
+    0 1px 2px rgba(var(--tese-ink), 0.04),
+    0 12px 40px rgba(var(--tese-ink), 0.06);
+}
+
+.tese-messages-list {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(var(--tese-ink), 0.06);
+  background: rgba(var(--tese-surface), 0.5);
+}
+
+.tese-messages-list-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(var(--tese-ink), 0.06);
+}
+
+.tese-messages-list-head-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tese-messages-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-total-badge,
+.tese-messages-thread-unread,
+.tese-messages-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.35rem;
+  border-radius: 9999px;
+  background: rgb(var(--tese-lime));
+  color: rgb(var(--tese-ink));
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tese-messages-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  min-height: 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(var(--tese-ink), 0.1);
+  background: white;
+  color: rgb(var(--neutral-400));
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.tese-messages-search:focus-within {
+  border-color: rgba(var(--tese-lime), 0.6);
+  box-shadow: 0 0 0 3px rgba(var(--tese-lime), 0.15);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: rgb(var(--tese-ink));
+  outline: none;
+}
+
+.tese-messages-search-input::placeholder {
+  color: rgb(var(--neutral-400));
+}
+
+.tese-messages-tabs {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.tese-messages-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgb(var(--neutral-500));
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.tese-messages-tab:hover {
+  background: rgba(var(--tese-ink), 0.04);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-tab.is-active {
+  background: white;
+  border-color: rgba(var(--tese-ink), 0.1);
+  color: rgb(var(--tese-ink));
+  box-shadow: 0 1px 2px rgba(var(--tese-ink), 0.04);
+}
+
+.tese-messages-threads {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tese-messages-threads-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-thread {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: none;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid rgba(var(--tese-ink), 0.04);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.tese-messages-thread:hover {
+  background: rgba(var(--tese-ink), 0.03);
+}
+
+.tese-messages-thread.is-selected {
+  background: white;
+  border-left-color: rgb(var(--tese-lime));
+}
+
+.tese-messages-thread-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: rgba(var(--tese-ink), 0.06);
+  color: rgb(var(--tese-ink));
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.tese-messages-thread-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.tese-messages-thread-top,
+.tese-messages-thread-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tese-messages-thread-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-thread-name.is-unread {
+  font-weight: 700;
+}
+
+.tese-messages-thread-time {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: rgb(var(--neutral-400));
+}
+
+.tese-messages-thread-preview {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-thread-preview.is-unread {
+  color: rgb(var(--tese-ink));
+  font-weight: 500;
+}
+
+.tese-messages-chat {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.tese-messages-chat-pane {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+
+.tese-messages-chat-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid rgba(var(--tese-ink), 0.06);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.tese-messages-back {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(var(--tese-ink), 0.1);
+  border-radius: 9999px;
+  background: white;
+  color: rgb(var(--tese-ink));
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.tese-messages-back:hover {
+  background: rgba(var(--tese-ink), 0.04);
+}
+
+.tese-messages-chat-head-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: rgb(var(--tese-ink));
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.tese-messages-chat-head-text {
+  min-width: 0;
+}
+
+.tese-messages-chat-head-name {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-chat-head-context {
+  margin: 0.125rem 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-timeline {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.tese-messages-timeline-empty,
+.tese-messages-chat-loading,
+.tese-messages-chat-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-chat-placeholder-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 0.75rem;
+  border-radius: 9999px;
+  background: rgba(var(--tese-ink), 0.05);
+  color: rgb(var(--neutral-400));
+}
+
+.tese-messages-chat-placeholder-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-chat-placeholder-desc {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.tese-messages-date-separator {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0 0.75rem;
+}
+
+.tese-messages-date-separator span {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(var(--tese-ink), 0.05);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-system-note {
+  display: flex;
+  justify-content: center;
+  padding: 0.25rem 0 0.5rem;
+}
+
+.tese-messages-system-note p {
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(var(--tese-ink), 0.05);
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.125rem;
+}
+
+.tese-messages-row.is-own {
+  justify-content: flex-end;
+}
+
+.tese-messages-row.is-incoming {
+  justify-content: flex-start;
+}
+
+.tese-messages-row.is-group-start {
+  margin-top: 0.5rem;
+}
+
+.tese-messages-row-avatar-slot {
+  width: 1.5rem;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.tese-messages-row-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: rgba(var(--tese-ink), 0.06);
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-row-content {
+  display: flex;
+  max-width: min(72%, 28rem);
+  flex-direction: column;
+}
+
+.tese-messages-row.is-own .tese-messages-row-content {
+  align-items: flex-end;
+}
+
+.tese-messages-sender-name {
+  margin: 0 0 0.125rem;
+  padding-left: 0.25rem;
+  font-size: 0.75rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-bubble {
+  padding: 0.625rem 0.875rem;
+  border-radius: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.tese-messages-bubble.is-own {
+  border-bottom-right-radius: 0.25rem;
+  background: rgb(var(--tese-ink));
+  color: white;
+}
+
+.tese-messages-bubble.is-incoming {
+  border-top-left-radius: 0.25rem;
+  background: #f4f6f2;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-bubble.is-own p,
+.tese-messages-bubble.is-own a {
+  color: white;
+}
+
+.tese-messages-meta {
+  margin: 0.125rem 0 0;
+  padding: 0 0.25rem;
+  font-size: 0.6875rem;
+  color: rgb(var(--neutral-400));
+}
+
+.tese-messages-typing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-typing-dots {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.tese-messages-typing-dots span {
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 9999px;
+  background: rgb(var(--neutral-400));
+  animation: tese-messages-typing 1.2s ease-in-out infinite;
+}
+
+.tese-messages-typing-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.tese-messages-typing-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes tese-messages-typing {
+  0%, 80%, 100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tese-messages-typing-dots span {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+.tese-messages-composer {
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid rgba(var(--tese-ink), 0.06);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.tese-messages-composer-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 0.375rem 0.375rem 0.375rem 0.625rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(var(--tese-ink), 0.1);
+  background: white;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.tese-messages-composer-inner:focus-within {
+  border-color: rgba(var(--tese-lime), 0.55);
+  box-shadow: 0 0 0 3px rgba(var(--tese-lime), 0.12);
+}
+
+.tese-messages-attach {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: rgb(var(--neutral-500));
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.tese-messages-attach:hover:not(:disabled) {
+  background: rgba(var(--tese-ink), 0.04);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-attach:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tese-messages-input {
+  flex: 1;
+  min-width: 0;
+  max-height: 8rem;
+  resize: none;
+  border: none;
+  background: transparent;
+  padding: 0.5rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: rgb(var(--tese-ink));
+  outline: none;
+}
+
+.tese-messages-send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 9999px;
+  background: rgb(var(--tese-lime));
+  color: rgb(var(--tese-ink));
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease, opacity 150ms ease;
+}
+
+.tese-messages-send:hover:not(:disabled) {
+  background: rgb(var(--tese-lime-soft));
+  transform: scale(1.03);
+}
+
+.tese-messages-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tese-messages-send-label {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tese-messages-card {
+  width: min(16rem, 100%);
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background: white;
+  box-shadow: 0 4px 16px rgba(var(--tese-ink), 0.06);
+}
+
+.tese-messages-card--quote {
+  width: min(18rem, 100%);
+}
+
+.tese-messages-card-image {
+  width: 100%;
+  height: 8rem;
+  object-fit: cover;
+}
+
+.tese-messages-card-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 8rem;
+  background: rgba(var(--tese-ink), 0.04);
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.75rem;
+}
+
+.tese-messages-card-title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-card-price {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-card-actions,
+.tese-messages-quote-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+}
+
+.tese-messages-card-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: 9999px;
+  border: none;
+  background: rgb(var(--tese-lime));
+  color: rgb(var(--tese-ink));
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 150ms ease, opacity 150ms ease;
+}
+
+.tese-messages-card-cta:hover {
+  background: rgb(var(--tese-lime-soft));
+}
+
+.tese-messages-card-cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tese-messages-card-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(var(--tese-ink), 0.12);
+  background: white;
+  color: rgb(var(--tese-ink));
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.tese-messages-card-secondary:hover:not(:disabled) {
+  border-color: rgba(var(--tese-ink), 0.22);
+  background: rgba(var(--tese-ink), 0.02);
+}
+
+.tese-messages-card-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tese-messages-card-quote-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid rgba(var(--tese-ink), 0.06);
+}
+
+.tese-messages-card-quote-label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-quote-chip {
+  margin-left: auto;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.tese-messages-quote-chip--pending {
+  background: rgba(var(--tese-ink), 0.06);
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-quote-chip--accepted {
+  background: rgba(var(--tese-lime), 0.35);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-quote-chip--declined {
+  background: rgba(var(--tese-ink), 0.06);
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-quote-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(var(--tese-ink), 0.06);
+}
+
+.tese-messages-quote-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.tese-messages-quote-item-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tese-messages-quote-item-qty {
+  flex-shrink: 0;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-quote-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-quote-validity {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-quote-validity.is-expired {
+  color: rgb(var(--negative, 220 38 38));
+}
+
+.tese-messages-quote-notes {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.8125rem;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-quote-link {
+  font-size: 0.8125rem;
+  color: rgb(var(--tese-ink));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tese-messages-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  min-height: clamp(18rem, 50vh, 28rem);
+  padding: clamp(1.5rem, 4vw, 2rem);
+  text-align: center;
+  border-radius: clamp(0.75rem, 1.5vw, 1rem);
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background: white;
+}
+
+.tese-messages-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1rem;
+  border-radius: 9999px;
+  background: rgba(var(--tese-lime), 0.2);
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-empty-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: rgb(var(--tese-ink));
+}
+
+.tese-messages-empty-desc {
+  margin: 0 0 1.25rem;
+  max-width: 22rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-messages-empty-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 9999px;
+  background: rgb(var(--tese-lime));
+  color: rgb(var(--tese-ink));
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 150ms ease;
+}
+
+.tese-messages-empty-cta:hover {
+  background: rgb(var(--tese-lime-soft));
+}
+
+.tese-messages-skeleton {
+  display: flex;
+  flex: 1;
+  min-height: clamp(18rem, 55vh, 100%);
+  overflow: hidden;
+  border-radius: clamp(0.75rem, 1.5vw, 1rem);
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  background: white;
+}
+
+.tese-messages-skeleton-list {
+  width: 20rem;
+  flex-shrink: 0;
+  padding: 1rem;
+  border-right: 1px solid rgba(var(--tese-ink), 0.06);
+}
+
+.tese-messages-skeleton-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.tese-messages-skeleton-avatar,
+.tese-messages-skeleton-line {
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--tese-ink), 0.06) 25%,
+    rgba(var(--tese-ink), 0.1) 50%,
+    rgba(var(--tese-ink), 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: tese-messages-shimmer 1.4s ease-in-out infinite;
+}
+
+.tese-messages-skeleton-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+}
+
+.tese-messages-skeleton-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.tese-messages-skeleton-line {
+  height: 0.625rem;
+  border-radius: 9999px;
+}
+
+.tese-messages-skeleton-line--short {
+  width: 40%;
+}
+
+.tese-messages-skeleton-chat {
+  flex: 1;
+  margin: 1rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--tese-ink), 0.04) 25%,
+    rgba(var(--tese-ink), 0.08) 50%,
+    rgba(var(--tese-ink), 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: tese-messages-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes tese-messages-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tese-messages-skeleton-avatar,
+  .tese-messages-skeleton-line,
+  .tese-messages-skeleton-chat {
+    animation: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .tese-sourcing-account--messages {
+    padding: 0.75rem;
+  }
+
+  .tese-messages-section {
+    min-height: 0;
+  }
+
+  .tese-messages-shell {
+    flex-direction: column;
+  }
+
+  .tese-messages-list:not(.tese-messages-list--hidden-mobile),
+  .tese-messages-chat:not(.tese-messages-chat--hidden-mobile) {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+  }
+
+  .tese-messages-list {
+    width: 100%;
+  }
+
+  .tese-messages-list--hidden-mobile {
+    display: none;
+  }
+
+  .tese-messages-chat--hidden-mobile {
+    display: none;
+  }
+
+  .tese-messages-back {
+    display: flex;
+  }
+
+  .tese-messages-list-head {
+    padding: 0.875rem 0.875rem 0.625rem;
+    gap: 0.625rem;
+  }
+
+  .tese-messages-thread {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .tese-messages-row-content {
+    max-width: 88%;
+  }
+
+  .tese-messages-composer {
+    padding: 0.625rem 0.75rem 0.875rem;
+  }
+
+  .tese-messages-skeleton {
+    flex-direction: column;
+  }
+
+  .tese-messages-skeleton-list {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(var(--tese-ink), 0.06);
+  }
+}
+
+@media (min-width: 768px) {
+  .tese-messages-shell {
+    display: grid;
+    grid-template-columns: minmax(14rem, 28%) minmax(0, 1fr);
+  }
+
+  .tese-messages-list {
+    width: auto;
+  }
+
+  .tese-messages-chat--hidden-mobile {
+    display: flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tese-messages-shell {
+    grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
+  }
+
+  .tese-messages-list-head {
+    padding: 1.125rem 1.125rem 0.875rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .tese-messages-shell {
+    grid-template-columns: minmax(17.5rem, 320px) minmax(0, 1fr);
+  }
 }
 
 /* ─── Cart page (B2B checkout) ─── */

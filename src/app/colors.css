@@ -33,11 +33,12 @@
     --tese-lime-soft: 225, 255, 110;
     --tese-ink: 0, 20, 5;
     --tese-ink-soft: 10, 45, 0;
+    --tese-forest: 10, 45, 0;
     --tese-ice: 29, 98, 93;
     --tese-ice-soft: 144, 213, 208;
     --tese-surface: 242, 242, 242;
 
-    /* Commodity / price movement signals (metalbook-style ticker). */
+    /* Marketplace pulse accent colors (legacy price-up/down tokens). */
     --price-up: 23, 163, 74;
     --price-down: 217, 45, 32;
     

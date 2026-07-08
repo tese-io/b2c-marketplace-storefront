@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { HttpTypes } from '@medusajs/types';
 import { FieldError, FieldValues, FormProvider, useForm, useFormContext } from 'react-hook-form';
 
-import { Button } from '@/components/atoms';
 import { LabeledInput } from '@/components/cells';
 import CountrySelect from '@/components/cells/CountrySelect/CountrySelect';
 import { addCustomerAddress, updateCustomerAddress } from '@/lib/data/customer';
@@ -91,108 +90,104 @@ const Form: FC<Props> = ({ regions, handleClose }) => {
   return (
     <form
       onSubmit={handleSubmit(submit)}
+      className="tese-address-form"
       data-testid="address-form"
     >
-      <div className="space-y-4 px-4">
-        <div className="items-top mb-4 grid max-w-full grid-cols-2 gap-4">
-          <LabeledInput
-            label="Address name"
-            placeholder="Type address name"
-            className="col-span-2"
-            error={errors.firstName as FieldError}
-            data-testid="address-form-address-name-input"
-            {...register('addressName')}
+      <div className="tese-address-form-grid">
+        <LabeledInput
+          label="Address name"
+          placeholder="e.g. Warehouse, Office"
+          className="tese-address-form-span-2"
+          error={errors.addressName as FieldError}
+          data-testid="address-form-address-name-input"
+          {...register('addressName')}
+        />
+        <LabeledInput
+          label="First name"
+          placeholder="First name"
+          error={errors.firstName as FieldError}
+          data-testid="address-form-first-name-input"
+          {...register('firstName')}
+        />
+        <LabeledInput
+          label="Last name"
+          placeholder="Last name"
+          error={errors.lastName as FieldError}
+          data-testid="address-form-last-name-input"
+          {...register('lastName')}
+        />
+        <LabeledInput
+          label="Company (optional)"
+          placeholder="Company name"
+          error={errors.company as FieldError}
+          data-testid="address-form-company-input"
+          {...register('company')}
+        />
+        <LabeledInput
+          label="Street address"
+          placeholder="Street and number"
+          error={errors.address as FieldError}
+          data-testid="address-form-address-input"
+          {...register('address')}
+        />
+        <LabeledInput
+          label="City"
+          placeholder="City"
+          error={errors.city as FieldError}
+          data-testid="address-form-city-input"
+          {...register('city')}
+        />
+        <LabeledInput
+          label="Postal code"
+          placeholder="Postal code"
+          error={errors.postalCode as FieldError}
+          data-testid="address-form-postal-code-input"
+          {...register('postalCode')}
+        />
+        <LabeledInput
+          label="State / province"
+          placeholder="State or province"
+          error={errors.province as FieldError}
+          data-testid="address-form-province-input"
+          {...register('province')}
+        />
+        <div className="tese-address-form-country">
+          <CountrySelect
+            region={region as HttpTypes.StoreRegion}
+            {...register('countryCode')}
+            value={watch('countryCode')}
+            data-testid="address-form-country-select"
           />
-          <LabeledInput
-            label="First name"
-            placeholder="Type first name"
-            error={errors.firstName as FieldError}
-            data-testid="address-form-first-name-input"
-            {...register('firstName')}
-          />
-          <LabeledInput
-            label="Last name"
-            placeholder="Type last name"
-            error={errors.firstName as FieldError}
-            data-testid="address-form-last-name-input"
-            {...register('lastName')}
-          />
-          <LabeledInput
-            label="Company (optional)"
-            placeholder="Type company"
-            error={errors.company as FieldError}
-            data-testid="address-form-company-input"
-            {...register('company')}
-          />
-          <LabeledInput
-            label="Address"
-            placeholder="Type address"
-            error={errors.address as FieldError}
-            data-testid="address-form-address-input"
-            {...register('address')}
-          />
-          <LabeledInput
-            label="City"
-            placeholder="Type city"
-            error={errors.city as FieldError}
-            data-testid="address-form-city-input"
-            {...register('city')}
-          />
-          <LabeledInput
-            label="Postal code"
-            placeholder="Type postal code"
-            error={errors.postalCode as FieldError}
-            data-testid="address-form-postal-code-input"
-            {...register('postalCode')}
-          />
-          <LabeledInput
-            label="State / Province"
-            placeholder="Type state / province"
-            error={errors.province as FieldError}
-            data-testid="address-form-province-input"
-            {...register('province')}
-          />
-          <div>
-            <CountrySelect
-              region={region as HttpTypes.StoreRegion}
-              {...register('countryCode')}
-              value={watch('countryCode')}
-              className="h-12"
-              data-testid="address-form-country-select"
-            />
-            {errors.countryCode && (
-              <p
-                className="label-sm text-negative"
-                data-testid="address-form-country-error"
-              >
-                {(errors.countryCode as FieldError).message}
-              </p>
-            )}
-          </div>
-
-          <LabeledInput
-            label="Phone"
-            placeholder="Type phone number"
-            error={errors.phone as FieldError}
-            data-testid="address-form-phone-input"
-            {...register('phone')}
-          />
+          {errors.countryCode ? (
+            <p
+              className="tese-address-form-error"
+              data-testid="address-form-country-error"
+            >
+              {(errors.countryCode as FieldError).message}
+            </p>
+          ) : null}
         </div>
-        {error && (
-          <p
-            className="label-md text-negative"
-            data-testid="address-form-error"
-          >
-            {error}
-          </p>
-        )}
-        <Button
-          className="w-full"
-          data-testid="address-form-submit-button"
-        >
-          Save address
-        </Button>
+        <LabeledInput
+          label="Phone"
+          placeholder="Phone number"
+          className="tese-address-form-span-2"
+          error={errors.phone as FieldError}
+          data-testid="address-form-phone-input"
+          {...register('phone')}
+        />
       </div>
+      {error ? (
+        <p className="tese-address-form-error" data-testid="address-form-error">
+          {error}
+        </p>
+      ) : null}
+      <button
+        type="submit"
+        className="tese-inquiry-btn-primary tese-address-form-submit"
+        data-testid="address-form-submit-button"
+      >
+        Save address
+      </button>
     </form>
   );
 };

@@ -21,16 +21,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'api.mercurjs.com'
+        hostname: 'api.marketplace.tese.io'
       },
       {
         protocol: 'http',
         hostname: 'localhost'
-      },
-      {
-        protocol: 'https',
-        hostname: 'api-sandbox.mercurjs.com',
-        pathname: '/static/**'
       },
       {
         protocol: 'https',

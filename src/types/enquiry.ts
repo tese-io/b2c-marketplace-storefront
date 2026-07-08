@@ -55,6 +55,22 @@ export type EnquiryTarget = {
   quoteNotes?: string
 }
 
+export type StructuredRequirement = {
+  material?: string
+  grade?: string
+  quantity?: string
+  unit?: string
+  region?: string
+  certifications?: string[]
+}
+
+export type EnquirySource = {
+  type?: EnquirySourceType
+  sessionId?: string | null
+  query?: string
+  sourcingThreadId?: string | null
+}
+
 export type Enquiry = {
   enquiryId: string
   title: string
@@ -62,6 +78,8 @@ export type Enquiry = {
   status: EnquiryStatus | string
   createdAt: string
   targets?: EnquiryTarget[]
+  structuredRequirement?: StructuredRequirement
+  source?: EnquirySource
 }
 
 /** POST /api/storefront/enquiries request body (see SendInquiryButton). */

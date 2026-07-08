@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { loginWithTeseSSO } from '@/lib/data/customer';
+import { getPublicStorefrontOrigin } from '@/lib/helpers/public-origin';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,7 @@ export async function GET(
   const { locale } = await params;
   const key = req.nextUrl.searchParams.get('key');
   const redirectTo = req.nextUrl.searchParams.get('redirect') ?? '';
-  const origin = req.nextUrl.origin;
+  const origin = getPublicStorefrontOrigin(req);
 
   if (!key) {
     return NextResponse.redirect(

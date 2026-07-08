@@ -13,6 +13,7 @@ import type { RoomMessageEventContent } from 'matrix-js-sdk/lib/@types/events';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useMatrix } from '@/components/providers/Matrix/MatrixProvider';
+import { ArrowLeftIcon } from '@/icons';
 import { cn } from '@/lib/utils';
 
 import {
@@ -152,22 +153,49 @@ function MessageContent({
 }
 
 const DateSeparator = ({ ts }: { ts: number }) => (
-  <div className="flex items-center gap-3 py-1">
-    <hr className="flex-1" />
-    <p className="text-secondary text-sm">{formatDateSeparator(ts)}</p>
-    <hr className="flex-1" />
+  <div className="tese-messages-date-separator">
+    <span>{formatDateSeparator(ts)}</span>
   </div>
 );
+
+function AttachIcon ({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M16.5 6.5V15.25a4.25 4.25 0 1 1-8.5 0V5.75a2.75 2.75 0 1 1 5.5 0v9.5a1.25 1.25 0 1 1-2.5 0V6.5"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function SendIcon () {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M5 12h12M13 7l5 5-5 5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 /**
  * Single-room chat pane: timeline with commerce cards + composer.
  */
 export function MatrixChat({
   roomId,
-  className
+  className,
+  onBack
 }: {
   roomId: string;
   className?: string;
+  onBack?: () => void;
 }) {
   const { client, ready } = useMatrix();
   const [events, setEvents] = useState<MatrixEvent[]>([]);
@@ -177,6 +205,7 @@ export function MatrixChat({
   const [typingNames, setTypingNames] = useState<string[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lastTypingSentRef = useRef(0);
   const lastReadSentRef = useRef<string | null>(null);
 
@@ -279,6 +308,21 @@ export function MatrixChat({
         ) || null
     );
   }, [client, room]);
+
+  const latestProductTitle = useMemo(() => {
+    for (let i = events.length - 1; i >= 0; i--) {
+      const card = getProductCard(events[i].getContent());
+      if (card?.product?.title) return card.product.title;
+    }
+    return null;
+  }, [events]);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
+  }, [text]);
 
   /** Index of the last event the counterpart has read (-1 if none). */
   const counterpartReadIndex = useMemo(() => {
@@ -391,20 +435,43 @@ export function MatrixChat({
 
   if (!client || !ready || !room) {
     return (
-      <div className={cn('flex h-full items-center justify-center', className)}>
-        <p className="text-secondary text-md">Loading chat…</p>
+      <div className={cn('tese-messages-chat-loading', className)}>
+        <p>Loading chat…</p>
       </div>
     );
   }
 
+  const headerName = counterpart?.name || room.name || 'Conversation';
+  const headerInitials = initials(headerName);
+
   return (
-    <div className={cn('flex h-full min-h-0 flex-col', className)}>
-      <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-1 py-3">
-        {events.length === 0 && (
-          <div className="flex h-full items-center justify-center">
-            <p className="text-secondary text-md">
-              No messages yet — say hello!
+    <div className={cn('tese-messages-chat-pane', className)}>
+      <header className="tese-messages-chat-head">
+        {onBack ? (
+          <button
+            type="button"
+            className="tese-messages-back"
+            onClick={onBack}
+            aria-label="Back to conversations"
+          >
+            <ArrowLeftIcon size={18} />
+          </button>
+        ) : null}
+        <span className="tese-messages-chat-head-avatar">{headerInitials}</span>
+        <div className="tese-messages-chat-head-text">
+          <p className="tese-messages-chat-head-name">{headerName}</p>
+          {latestProductTitle ? (
+            <p className="tese-messages-chat-head-context">
+              Re: {latestProductTitle}
             </p>
+          ) : null}
+        </div>
+      </header>
+
+      <div className="tese-messages-timeline">
+        {events.length === 0 && (
+          <div className="tese-messages-timeline-empty">
+            <p>No messages yet — say hello!</p>
           </div>
         )}
         {timeline.map(({ event, groupStart, groupEnd, newDay }, index) => {
@@ -416,10 +483,8 @@ export function MatrixChat({
             return (
               <div key={event.getId()}>
                 {newDay && <DateSeparator ts={event.getTs()} />}
-                <div className="flex justify-center py-1">
-                  <p className="text-secondary rounded-full bg-component-secondary px-3 py-0.5 text-sm">
-                    {content.body}
-                  </p>
+                <div className="tese-messages-system-note">
+                  <p>{content.body}</p>
                 </div>
               </div>
             );
@@ -434,28 +499,23 @@ export function MatrixChat({
               {newDay && <DateSeparator ts={event.getTs()} />}
               <div
                 className={cn(
-                  'flex gap-2',
-                  own ? 'justify-end' : 'justify-start',
-                  groupStart && 'mt-2'
+                  'tese-messages-row',
+                  own ? 'is-own' : 'is-incoming',
+                  groupStart && 'is-group-start'
                 )}
               >
                 {!own && (
-                  <div className="w-6 shrink-0 self-end">
+                  <div className="tese-messages-row-avatar-slot">
                     {groupEnd && (
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-component-secondary text-xs">
+                      <span className="tese-messages-row-avatar">
                         {initials(event.sender?.name)}
                       </span>
                     )}
                   </div>
                 )}
-                <div
-                  className={cn(
-                    'flex max-w-[72%] flex-col',
-                    own ? 'items-end' : 'items-start'
-                  )}
-                >
+                <div className="tese-messages-row-content">
                   {!own && groupStart && (
-                    <p className="text-secondary mb-0.5 px-1 text-sm">
+                    <p className="tese-messages-sender-name">
                       {event.sender?.name || event.getSender()}
                     </p>
                   )}
@@ -469,10 +529,8 @@ export function MatrixChat({
                   ) : (
                     <div
                       className={cn(
-                        'rounded-lg px-3 py-2',
-                        own
-                          ? 'bg-action text-action-on-primary rounded-br-sm'
-                          : 'rounded-tl-sm bg-component-secondary'
+                        'tese-messages-bubble',
+                        own ? 'is-own' : 'is-incoming'
                       )}
                     >
                       <MessageContent
@@ -484,7 +542,7 @@ export function MatrixChat({
                     </div>
                   )}
                   {(groupEnd || seen) && (
-                    <p className="text-secondary mt-0.5 px-1 text-sm">
+                    <p className="tese-messages-meta">
                       {formatTimeOfDay(event.getTs())}
                       {seen && ' · Seen'}
                     </p>
@@ -495,14 +553,19 @@ export function MatrixChat({
           );
         })}
         {typingNames.length > 0 && (
-          <p className="text-secondary pt-1 text-sm italic">
+          <div className="tese-messages-typing" aria-live="polite">
+            <span className="tese-messages-typing-dots" aria-hidden>
+              <span />
+              <span />
+              <span />
+            </span>
             {typingNames.join(', ')} is typing…
-          </p>
+          </div>
         )}
         <div ref={bottomRef} />
       </div>
 
-      <div className="flex items-end gap-2 border-t pt-3">
+      <div className="tese-messages-composer">
         <input
           ref={fileInputRef}
           type="file"
@@ -513,39 +576,47 @@ export function MatrixChat({
             e.target.value = '';
           }}
         />
-        <button
-          type="button"
-          aria-label="Attach a file"
-          disabled={sending}
-          onClick={() => fileInputRef.current?.click()}
-          className="text-secondary hover:text-primary px-2 py-2"
-        >
-          📎
-        </button>
-        <textarea
-          value={text}
-          onChange={e => {
-            setText(e.target.value);
-            notifyTyping();
-          }}
-          onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              sendText();
-            }
-          }}
-          rows={1}
-          placeholder="Type a message…"
-          className="text-md focus:border-primary max-h-32 flex-1 resize-none rounded-xl border px-4 py-2 outline-none"
-        />
-        <button
-          type="button"
-          disabled={sending || !text.trim()}
-          onClick={sendText}
-          className="bg-action text-action-on-primary rounded-sm px-4 py-2 text-md disabled:opacity-40"
-        >
-          {sending ? 'Sending…' : 'Send'}
-        </button>
+        <div className="tese-messages-composer-inner">
+          <button
+            type="button"
+            aria-label="Attach a file"
+            disabled={sending}
+            onClick={() => fileInputRef.current?.click()}
+            className="tese-messages-attach"
+          >
+            <AttachIcon />
+          </button>
+          <textarea
+            ref={textareaRef}
+            value={text}
+            onChange={e => {
+              setText(e.target.value);
+              notifyTyping();
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendText();
+              }
+            }}
+            rows={1}
+            placeholder="Type a message…"
+            className="tese-messages-input"
+          />
+          <button
+            type="button"
+            disabled={sending || !text.trim()}
+            onClick={sendText}
+            className="tese-messages-send"
+            aria-label={sending ? 'Sending message' : 'Send message'}
+          >
+            {sending ? (
+              <span className="tese-messages-send-label">…</span>
+            ) : (
+              <SendIcon />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

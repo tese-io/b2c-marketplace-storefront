@@ -1,8 +1,8 @@
-import { Footer, Header } from "@/components/organisms"
-import { checkRegion } from "@/lib/helpers/check-region"
-import { redirect } from "next/navigation"
+import { AuthChrome } from '@/components/sections/Auth/AuthChrome'
+import { checkRegion } from '@/lib/helpers/check-region'
+import { redirect } from 'next/navigation'
 
-export default async function AuthLayout({
+export default async function AuthLayout ({
   children,
   params,
 }: Readonly<{
@@ -13,15 +13,12 @@ export default async function AuthLayout({
   const regionCheck = await checkRegion(locale)
 
   if (!regionCheck) {
-    return redirect("/")
+    return redirect('/')
   }
 
   return (
-    <>
-      <Header locale={locale} />
+    <AuthChrome>
       {children}
-      <Footer />
-    </>
+    </AuthChrome>
   )
 }
-

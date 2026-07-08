@@ -1,198 +1,86 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import Link from 'next/link'
+import { useParams, useSearchParams } from 'next/navigation'
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { FieldError, FieldValues, FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { Alert } from '@/components/atoms/Alert/Alert'
+import { AuthShell } from '@/components/sections/Auth/AuthShell'
+import { TeseIoButton } from '@/components/sections/Auth/TeseIoButton'
+import {
+  getContinueWithTeseUrl,
+  getTeseSignupUrl,
+} from '@/lib/helpers/tese-auth-urls'
 
-import { Button } from '@/components/atoms';
-import { Alert } from '@/components/atoms/Alert/Alert';
-import { LabeledInput } from '@/components/cells';
-import { login, transferCart } from '@/lib/data/customer';
-import { toast } from '@/lib/helpers/toast';
+function getStatusMessage (searchParams: URLSearchParams) {
+  if (searchParams.get('sessionExpired') === 'true') {
+    return 'Your session has expired. Sign in with tese.io to continue.'
+  }
+  if (searchParams.get('sessionRequired') === 'true') {
+    return 'Please sign in to continue.'
+  }
+  if (searchParams.get('error') === 'sso_missing_key') {
+    return 'Sign-in could not be completed. Please try again.'
+  }
+  if (searchParams.get('error') === 'sso_failed') {
+    return 'tese.io sign-in failed. Please try again.'
+  }
+  return null
+}
 
-import { LoginFormData, loginFormSchema } from './schema';
-
-export const LoginForm = () => {
-  const methods = useForm<LoginFormData>({
-    resolver: zodResolver(loginFormSchema),
-    defaultValues: {
-      email: '',
-      password: ''
-    }
-  });
-
-  return (
-    <FormProvider {...methods}>
-      <Form />
-    </FormProvider>
-  );
-};
-
-const Form = () => {
-  const [isAuthError, setIsAuthError] = useState(false);
-  const {
-    handleSubmit,
-    register,
-    formState: { errors, isSubmitting }
-  } = useFormContext();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const params = useParams();
-  const isSessionExpired = searchParams.get('sessionExpired') === 'true';
-  const isSessionRequired = searchParams.get('sessionRequired') === 'true';
-
-  // tese SSO entry: bounce to the dashboard, which (re)uses the tese session,
-  // mints a one-time SSO key and returns the user here via /sso-callback —
-  // already authenticated. The marketplace path to land on defaults to /user.
-  const locale = (params?.locale as string) || 'pl';
-  const dashboardUrl = (
-    process.env.NEXT_PUBLIC_TESE_DASHBOARD_URL || 'http://148.113.8.184:4200'
-  ).replace(/\/$/, '');
-  const marketplacePath = searchParams.get('redirect') || '/user';
-  const continueWithTeseHref = `${dashboardUrl}/marketplace/enter?path=${encodeURIComponent(
-    marketplacePath
-  )}&locale=${encodeURIComponent(locale)}`;
-
-  const submit = async (data: FieldValues) => {
-    const formData = new FormData();
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-
-    const res = await login(formData);
-
-    if (res.success) {
-      router.push('/user');
-      await transferCart();
-    } else {
-      toast.error({ title: res.message || 'An error occurred. Please try again.' });
-    }
-
-    setIsAuthError(false);
-    router.push('/user');
-  };
-
-  const clearApiError = () => {
-    isAuthError && setIsAuthError(false);
-  };
-
-  const getAuthMessage = () => {
-    if (isSessionExpired) {
-      return 'Your session has expired. Please log in to continue.';
-    }
-    if (isSessionRequired) {
-      return 'Please log in to continue.';
-    }
-    return null;
-  };
-
-  const authMessage = getAuthMessage();
+export function LoginForm () {
+  const searchParams = useSearchParams()
+  const params = useParams()
+  const locale = (params?.locale as string) || 'pl'
+  const marketplacePath = searchParams.get('redirect') || '/user'
+  const statusMessage = getStatusMessage(searchParams)
+  const continueHref = getContinueWithTeseUrl(marketplacePath, locale)
+  const signupHref = getTeseSignupUrl(marketplacePath, locale)
 
   return (
-    <main
-      className="container"
-      data-testid="login-page"
+    <AuthShell
+      title="Sign in to the marketplace"
+      lead="One tese.io account for sourcing, orders, and your profile."
+      testId="login-page"
     >
-      <div className="mx-auto mt-6 w-full max-w-xl space-y-4">
-        {authMessage && (
-          <Alert
-            title={authMessage}
-            className="w-full"
-            icon
-            data-testid="login-auth-alert"
-          />
-        )}
-        <div
-          className="rounded-sm border p-4"
-          data-testid="login-form-container"
-        >
-          <h1 className="heading-md mb-8 uppercase text-primary">Log in</h1>
-          <form
-            onSubmit={handleSubmit(submit)}
-            data-testid="login-form"
-          >
-            <div className="space-y-4">
-              <LabeledInput
-                label="E-mail"
-                placeholder="Your e-mail address"
-                error={
-                  (errors.email as FieldError) ||
-                  (isAuthError ? ({ message: '' } as FieldError) : undefined)
-                }
-                data-testid="login-email-input"
-                {...register('email', {
-                  onChange: clearApiError
-                })}
-              />
-              <LabeledInput
-                label="Password"
-                placeholder="Your password"
-                type="password"
-                error={
-                  (errors.password as FieldError) ||
-                  (isAuthError ? ({ message: '' } as FieldError) : undefined)
-                }
-                data-testid="login-password-input"
-                {...register('password', {
-                  onChange: clearApiError
-                })}
-              />
-            </div>
+      {statusMessage ? (
+        <Alert
+          title={statusMessage}
+          className="tese-auth-alert"
+          icon
+          data-testid="login-auth-alert"
+        />
+      ) : null}
 
-            <Link
-              href="/forgot-password"
-              className="label-md mt-4 block text-right uppercase text-action-on-secondary"
-              data-testid="login-forgot-password-link"
-            >
-              Forgot your password?
-            </Link>
+      <div data-testid="login-form-container">
+        <TeseIoButton
+          href={continueHref}
+          testId="login-continue-with-tese"
+        />
+        <p className="tese-auth-helper">
+          Sign in with your tese.io account — no separate marketplace password.
+        </p>
+      </div>
 
-            <Button
-              className="mt-8 w-full uppercase"
-              disabled={isSubmitting}
-              data-testid="login-submit-button"
-            >
-              Log in
-            </Button>
-          </form>
-
-          <div className="my-6 flex items-center gap-4">
-            <span className="h-px flex-1 bg-black/[0.08]" />
-            <span className="label-sm uppercase text-secondary">or</span>
-            <span className="h-px flex-1 bg-black/[0.08]" />
-          </div>
-
+      <div className="tese-auth-footer">
+        <p className="tese-auth-footer-copy">
+          New to tese.io?{' '}
           <a
-            href={continueWithTeseHref}
-            data-testid="login-continue-with-tese"
-            className="flex w-full items-center justify-center gap-2 rounded-sm bg-action px-4 py-3 label-md uppercase text-action-on-primary transition-opacity hover:opacity-90"
-          >
-            Continue with tese
-          </a>
-          <p className="mt-3 text-center label-sm text-secondary">
-            Use your tese account — no separate marketplace password needed.
-          </p>
-        </div>
-
-        <div className="rounded-sm border p-4">
-          <h2 className="heading-md mb-4 uppercase text-primary">
-            Don&apos;t have an account yet?
-          </h2>
-          <Link
-            href="/register"
+            href={signupHref}
+            className="tese-auth-footer-link"
             data-testid="login-register-link"
           >
-            <Button
-              variant="tonal"
-              className="mt-8 flex w-full justify-center uppercase"
-            >
-              Create account
-            </Button>
+            Create an account
+          </a>
+        </p>
+        <p className="tese-auth-footer-copy">
+          <Link
+            href="/register"
+            className="tese-auth-footer-link"
+          >
+            Learn about joining tese.io
           </Link>
-        </div>
+        </p>
       </div>
-    </main>
-  );
-};
+    </AuthShell>
+  )
+}

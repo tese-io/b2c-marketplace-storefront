@@ -3,7 +3,6 @@ import Image from "next/image"
 import { HttpTypes } from "@medusajs/types"
 import { WishlistButton } from "../WishlistButton/WishlistButton"
 import { Wishlist } from "@/types/wishlist"
-import { convertToLocale } from "@/lib/helpers/money"
 import { Button } from "@/components/atoms"
 import clsx from "clsx"
 import { getProductPrice } from "@/lib/helpers/get-product-price"
@@ -23,10 +22,7 @@ export const WishlistItem = ({
   testIdPrefix?: string;
 }) => {
   const { cheapestPrice } = getProductPrice({ product });
-  const price = convertToLocale({
-    amount: cheapestPrice?.calculated_price_number,
-    currency_code: cheapestPrice?.currency_code
-  });
+  const price = cheapestPrice?.calculated_price || "Price on request";
 
   return (
     <div

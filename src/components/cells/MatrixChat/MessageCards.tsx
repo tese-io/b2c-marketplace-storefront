@@ -17,7 +17,7 @@ import {
 
 export type QuoteStatus = 'pending' | 'accepted' | 'declined';
 
-const cardShell = 'w-64 overflow-hidden rounded-sm border bg-primary';
+const cardShell = 'tese-messages-card';
 
 /** Product card shared into the chat — buyer view with commerce CTAs. */
 export function ProductCardMessage({ card }: { card: ProductCardPayload }) {
@@ -52,17 +52,17 @@ export function ProductCardMessage({ card }: { card: ProductCardPayload }) {
           alt={product.title}
           width={256}
           height={128}
-          className="h-32 w-full object-cover"
+          className="tese-messages-card-image"
         />
       ) : (
-        <div className="flex h-32 w-full items-center justify-center bg-component-secondary">
-          <span className="text-secondary text-sm">No image</span>
+        <div className="tese-messages-card-image-placeholder">
+          <span>No image</span>
         </div>
       )}
-      <div className="flex flex-col gap-1 px-3 py-2">
-        <p className="truncate text-[15px] font-semibold">{product.title}</p>
+      <div className="tese-messages-card-body">
+        <p className="tese-messages-card-title">{product.title}</p>
         {product.price && (
-          <p className="text-md font-semibold">
+          <p className="tese-messages-card-price">
             {product.price.formatted ||
               convertToLocale({
                 amount: product.price.amount,
@@ -70,10 +70,10 @@ export function ProductCardMessage({ card }: { card: ProductCardPayload }) {
               })}
           </p>
         )}
-        <div className="mt-1 flex flex-col gap-1.5">
+        <div className="tese-messages-card-actions">
           <LocalizedClientLink
             href={`/products/${product.handle}`}
-            className="bg-action text-action-on-primary block w-full rounded-sm px-3 py-1.5 text-center text-sm"
+            className="tese-messages-card-cta"
           >
             View product
           </LocalizedClientLink>
@@ -81,7 +81,7 @@ export function ProductCardMessage({ card }: { card: ProductCardPayload }) {
             <button
               onClick={handleAddToCart}
               disabled={adding || added}
-              className="block w-full rounded-sm border px-3 py-1.5 text-center text-sm disabled:opacity-60"
+              className="tese-messages-card-secondary"
             >
               {added ? 'Added ✓' : adding ? 'Adding…' : 'Add to cart'}
             </button>
@@ -93,9 +93,9 @@ export function ProductCardMessage({ card }: { card: ProductCardPayload }) {
 }
 
 const statusChip: Record<QuoteStatus, { label: string; className: string }> = {
-  pending: { label: '⏳ Awaiting response', className: 'bg-component-secondary' },
-  accepted: { label: '✅ Accepted', className: 'bg-positive text-action-on-primary' },
-  declined: { label: '❌ Declined', className: 'bg-component-secondary' }
+  pending: { label: 'Awaiting response', className: 'tese-messages-quote-chip--pending' },
+  accepted: { label: 'Accepted', className: 'tese-messages-quote-chip--accepted' },
+  declined: { label: 'Declined', className: 'tese-messages-quote-chip--declined' }
 };
 
 /** Quotation card — buyer view with Accept / Decline actions. */
@@ -136,33 +136,25 @@ export function QuotationCardMessage({
   };
 
   return (
-    <div className={cn(cardShell, 'w-72')}>
-      <div className="flex items-center gap-2 border-b px-3 py-2">
-        <p className="text-md font-semibold">💰 Quotation</p>
-        <span
-          className={cn(
-            'ml-auto rounded-full px-2 py-0.5 text-xs',
-            chip.className
-          )}
-        >
+    <div className={cn(cardShell, 'tese-messages-card--quote')}>
+      <div className="tese-messages-card-quote-head">
+        <p className="tese-messages-card-quote-label">Quotation</p>
+        <span className={cn('tese-messages-quote-chip', chip.className)}>
           {chip.label}
         </span>
       </div>
 
-      <div className="flex flex-col gap-2 px-3 py-2">
-        <p className="text-lg font-semibold">
+      <div className="tese-messages-card-body">
+        <p className="tese-messages-card-price">
           {formatCardAmount(quotation.amount, quotation.currency_code)}
         </p>
 
         {!!quotation.items?.length && (
-          <div className="flex flex-col gap-1 rounded-sm border px-2 py-1.5">
+          <div className="tese-messages-quote-items">
             {quotation.items.map((item, i) => (
-              <div
-                key={i}
-                className="flex items-baseline justify-between gap-2 text-sm"
-              >
-                <span className="truncate">{item.title}</span>
-                <span className="text-secondary shrink-0">
+              <div key={i} className="tese-messages-quote-item">
+                <span className="tese-messages-quote-item-title">{item.title}</span>
+                <span className="tese-messages-quote-item-qty">
                   {item.quantity} ×{' '}
                   {formatCardAmount(item.unit_amount, quotation.currency_code)}
                 </span>
@@ -172,7 +164,7 @@ export function QuotationCardMessage({
         )}
 
         {(quotation.moq || quotation.lead_time || quotation.payment_terms) && (
-          <div className="text-secondary flex flex-col gap-0.5 text-sm">
+          <div className="tese-messages-quote-meta">
             {quotation.moq && <span>MOQ: {quotation.moq}</span>}
             {quotation.lead_time && <span>Lead time: {quotation.lead_time}</span>}
             {quotation.payment_terms && (
@@ -183,7 +175,10 @@ export function QuotationCardMessage({
 
         {validUntil && !isNaN(validUntil.getTime()) && (
           <p
-            className={cn('text-sm', expired ? 'text-negative' : 'text-secondary')}
+            className={cn(
+              'tese-messages-quote-validity',
+              expired && 'is-expired'
+            )}
           >
             {expired ? 'Expired ' : 'Valid until '}
             {validUntil.toLocaleDateString([], {
@@ -195,24 +190,22 @@ export function QuotationCardMessage({
         )}
 
         {quotation.notes && (
-          <p className="text-secondary whitespace-pre-wrap text-sm">
-            {quotation.notes}
-          </p>
+          <p className="tese-messages-quote-notes">{quotation.notes}</p>
         )}
 
         {canRespond && status === 'pending' && !expired && (
-          <div className="mt-1 flex gap-2">
+          <div className="tese-messages-quote-actions">
             <button
               onClick={() => respond('accepted')}
               disabled={!!responding}
-              className="bg-action text-action-on-primary flex-1 rounded-sm px-3 py-1.5 text-sm disabled:opacity-60"
+              className="tese-messages-card-cta"
             >
               {responding === 'accepted' ? 'Accepting…' : 'Accept'}
             </button>
             <button
               onClick={() => respond('declined')}
               disabled={!!responding}
-              className="flex-1 rounded-sm border px-3 py-1.5 text-sm disabled:opacity-60"
+              className="tese-messages-card-secondary"
             >
               {responding === 'declined' ? 'Declining…' : 'Decline'}
             </button>
@@ -222,7 +215,7 @@ export function QuotationCardMessage({
         {quotation.enquiry_id && (
           <LocalizedClientLink
             href="/sourcing/inquiries"
-            className="text-sm underline"
+            className="tese-messages-quote-link"
           >
             View in sourcing inquiries
           </LocalizedClientLink>

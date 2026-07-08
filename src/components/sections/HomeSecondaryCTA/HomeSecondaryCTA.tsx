@@ -1,6 +1,30 @@
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
 import { HOME_SECONDARY_CTA } from '@/data/homepage'
 
+function CtaLink ({
+  href,
+  className,
+  children,
+}: {
+  href: string
+  className: string
+  children: React.ReactNode
+}) {
+  if (href.startsWith('http')) {
+    return (
+      <a href={href} className={className}>
+        {children}
+      </a>
+    )
+  }
+
+  return (
+    <LocalizedClientLink href={href} className={className}>
+      {children}
+    </LocalizedClientLink>
+  )
+}
+
 export function HomeSecondaryCTA() {
   const cta = HOME_SECONDARY_CTA
 
@@ -16,18 +40,18 @@ export function HomeSecondaryCTA() {
             <p className="tese-secondary-cta-desc">{cta.description}</p>
           </div>
           <div className="tese-secondary-cta-actions">
-            <LocalizedClientLink
+            <CtaLink
               href={cta.primaryHref}
               className="tese-secondary-cta-btn tese-secondary-cta-btn-outline"
             >
               {cta.primaryLabel}
-            </LocalizedClientLink>
-            <LocalizedClientLink
+            </CtaLink>
+            <CtaLink
               href={cta.secondaryHref}
               className="tese-secondary-cta-btn tese-cta"
             >
               {cta.secondaryLabel}
-            </LocalizedClientLink>
+            </CtaLink>
           </div>
         </div>
       </div>

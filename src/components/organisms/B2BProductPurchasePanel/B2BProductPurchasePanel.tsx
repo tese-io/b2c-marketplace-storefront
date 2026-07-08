@@ -201,27 +201,35 @@ export function B2BProductPurchasePanel({
         </Button>
       </div>
 
-      <LocalizedClientLink
-        href={`/sourcing?q=${quoteQuery}`}
-        className="tese-pdp-explore-link"
-      >
-        Or explore alternatives with AI sourcing
-        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-          <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </LocalizedClientLink>
-
-      {category?.handle && (
-        <LocalizedClientLink
-          href={`/categories/${category.handle}`}
-          className="tese-pdp-explore-link"
-        >
-          Explore {category.name}
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-            <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </LocalizedClientLink>
-      )}
+      <div className="tese-pdp-secondary-links">
+        <p className="tese-pdp-secondary-label">Not what you need?</p>
+        <ul className="tese-pdp-secondary-list">
+          <li>
+            <LocalizedClientLink
+              href={`/sourcing?q=${quoteQuery}`}
+              className="tese-pdp-explore-link"
+            >
+              Find alternatives with AI sourcing
+              <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </LocalizedClientLink>
+          </li>
+          {category?.handle && (
+            <li>
+              <LocalizedClientLink
+                href={`/categories/${category.handle}`}
+                className="tese-pdp-explore-link"
+              >
+                Browse more in {category.name}
+                <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                  <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </LocalizedClientLink>
+            </li>
+          )}
+        </ul>
+      </div>
 
       {user && product.seller && (
         <div className="tese-pdp-chat-wrap">

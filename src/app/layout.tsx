@@ -134,15 +134,19 @@ export default async function RootLayout({
           rel="dns-prefetch"
           href="https://s3.eu-central-1.amazonaws.com"
         />
-        <link
-          rel="preconnect"
-          href="https://api.mercurjs.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="dns-prefetch"
-          href="https://api.mercurjs.com"
-        />
+        {process.env.MEDUSA_BACKEND_URL?.startsWith('http') && (
+          <>
+            <link
+              rel="preconnect"
+              href={process.env.MEDUSA_BACKEND_URL}
+              crossOrigin="anonymous"
+            />
+            <link
+              rel="dns-prefetch"
+              href={process.env.MEDUSA_BACKEND_URL}
+            />
+          </>
+        )}
       </Head>
       <body className={`${poppins.className} relative bg-primary text-secondary antialiased`}>
         <HtmlLangSetter />

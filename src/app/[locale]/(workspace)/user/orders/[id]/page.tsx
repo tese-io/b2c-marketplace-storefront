@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 import { Button } from '@/components/atoms'
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
@@ -7,7 +7,23 @@ import { OrderDetailsSection } from '@/components/sections/OrderDetailsSection/O
 import { WorkspaceAccountPage } from '@/components/sections/SourcingAppShell/WorkspaceAccountPage'
 import { ArrowLeftIcon } from '@/icons'
 import { retrieveCustomer } from '@/lib/data/customer'
-import { retrieveOrderSet } from '@/lib/data/orders'
+import { retrieveOrder, retrieveOrderSet } from '@/lib/data/orders'
+
+async function resolveOrderSet (id: string) {
+  let orderSet = await retrieveOrderSet(id).catch(() => null)
+
+  if (!orderSet && id.startsWith('order_')) {
+    const order = await retrieveOrder(id).catch(() => null) as {
+      order_set?: { id: string }
+    } | null
+
+    if (order?.order_set?.id) {
+      orderSet = await retrieveOrderSet(order.order_set.id).catch(() => null)
+    }
+  }
+
+  return orderSet
+}
 
 export default async function UserOrderDetailPage ({
   params,
@@ -17,9 +33,10 @@ export default async function UserOrderDetailPage ({
   const { id } = await params
 
   const user = await retrieveCustomer()
-  const orderSet = await retrieveOrderSet(id)
+  const orderSet = await resolveOrderSet(id)
 
   if (!user) return redirect('/login')
+  if (!orderSet) return notFound()
 
   return (
     <WorkspaceAccountPage>

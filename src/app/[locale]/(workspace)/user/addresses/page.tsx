@@ -14,7 +14,11 @@ export default async function AddressesPage () {
   }
 
   return (
-    <WorkspaceAccountPage title="Addresses" testId="addresses-page">
+    <WorkspaceAccountPage
+      title="Addresses"
+      lead="Save delivery addresses for faster checkout and accurate order updates."
+      testId="addresses-page"
+    >
       <Addresses {...{ user, regions }} />
     </WorkspaceAccountPage>
   )

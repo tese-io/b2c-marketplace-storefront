@@ -1,19 +1,23 @@
-import { LoginForm, ProfileDetails } from '@/components/molecules'
-import { ProfilePassword } from '@/components/molecules/ProfileDetails/ProfilePassword'
+import { redirect } from 'next/navigation'
+
+import { AccountIdentityPanel } from '@/components/sections/UserAccountSettings/AccountIdentityPanel'
 import { WorkspaceAccountPage } from '@/components/sections/SourcingAppShell/WorkspaceAccountPage'
 import { retrieveCustomer } from '@/lib/data/customer'
 
 export default async function SettingsPage () {
   const user = await retrieveCustomer()
 
-  if (!user) return <LoginForm />
+  if (!user) {
+    redirect('/login')
+  }
 
   return (
-    <WorkspaceAccountPage title="Settings" testId="profile-settings-page">
-      <div className="space-y-8" data-testid="profile-settings-container">
-        <ProfileDetails user={user} />
-        <ProfilePassword user={user} />
-      </div>
+    <WorkspaceAccountPage
+      title="Settings"
+      lead="Marketplace preferences and links to your tese.io account."
+      testId="profile-settings-page"
+    >
+      <AccountIdentityPanel user={user} />
     </WorkspaceAccountPage>
   )
 }

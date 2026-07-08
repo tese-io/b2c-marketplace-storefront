@@ -27,8 +27,9 @@ function SuccessIcon () {
 export function OrderConfirmedSection ({
   order,
 }: {
-  order: HttpTypes.StoreOrder
+  order: HttpTypes.StoreOrder & { order_set?: { id: string } }
 }) {
+  const orderSetId = order.order_set?.id ?? order.id
   const itemCount = order.items?.reduce((sum, item) => sum + (item.quantity ?? 0), 0) ?? 0
   const orderDate = order.created_at
     ? format(new Date(order.created_at), 'dd MMM yyyy')
@@ -102,7 +103,7 @@ export function OrderConfirmedSection ({
       </div>
 
       <div className="tese-order-actions">
-        <LocalizedClientLink href={`/user/orders/${order.id}`}>
+        <LocalizedClientLink href={`/user/orders/${orderSetId}`}>
           <Button className="tese-cart-checkout-btn w-full sm:w-auto px-8 py-3">
             View order details
           </Button>

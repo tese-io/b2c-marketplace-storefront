@@ -9,7 +9,7 @@ export default async function MessagesPage () {
   if (!user) return <LoginForm />
 
   return (
-    <WorkspaceAccountPage title="Messages" className="tese-sourcing-account--wide">
+    <WorkspaceAccountPage className="tese-sourcing-account--wide tese-sourcing-account--messages">
       <UserMessagesSection />
     </WorkspaceAccountPage>
   )

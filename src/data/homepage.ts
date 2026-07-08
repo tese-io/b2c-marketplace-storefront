@@ -186,7 +186,7 @@ export const HOME_SECONDARY_CTA: HomeSecondaryCta = {
   heading: 'List your sustainable products on tese.io',
   description:
     'Reach procurement teams actively searching for certified, low-carbon materials. Onboard in minutes and start receiving qualified RFQs.',
-  primaryLabel: 'Sell on tese.io',
+  primaryLabel: 'Create account on tese.io',
   primaryHref: '/register',
   secondaryLabel: 'Talk to an expert',
   secondaryHref: '/sourcing',

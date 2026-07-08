@@ -64,8 +64,8 @@ export const UserDropdown = ({
           </div>
         ) : (
           <div className="p-1">
-            <NavigationItem href="/login">Login</NavigationItem>
-            <NavigationItem href="/register">Register</NavigationItem>
+            <NavigationItem href="/login">Sign in</NavigationItem>
+            <NavigationItem href="/register">Create account</NavigationItem>
           </div>
         )}
       </Dropdown>
