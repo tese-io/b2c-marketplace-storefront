@@ -4158,6 +4158,7 @@ button:disabled svg path {
 .tese-partner-badge {
   display: inline-flex;
   align-items: center;
+  gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 9999px;
   border: 1px solid rgba(var(--tese-ink), 0.1);
@@ -4170,6 +4171,16 @@ button:disabled svg path {
 .tese-partner-badge:hover {
   border-color: rgba(var(--tese-lime), 0.45);
   color: rgb(var(--tese-ink));
+}
+/* Logos vary wildly in aspect ratio (square marks and wide wordmarks), so pin
+   the height and let width follow. Rendered in full colour, unaltered — many
+   certification bodies' trademark guidelines forbid recolouring their mark. */
+.tese-partner-logo {
+  height: 20px;
+  width: auto;
+  max-width: 72px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 /* ── AI Sourcing workspace (Accio-style app shell) ── */
