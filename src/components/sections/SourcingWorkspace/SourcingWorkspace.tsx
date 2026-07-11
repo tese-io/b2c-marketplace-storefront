@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-import { SparkIcon } from "@/icons"
 import { safeExternalHref } from "@/lib/helpers/url"
 import { TeseLogoMark } from "@/components/atoms/TeseLogo/TeseLogoMark"
 import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
@@ -21,6 +20,8 @@ import { AI_SOURCING_HOOK, AI_SOURCING_PROMO, AI_SOURCING_TAGLINE } from '@/data
 import { STAGES, quickPromptsForSector } from "./constants"
 import { SourcingInput } from "./SourcingInput"
 import { SourcingLegalNotice } from "./SourcingLegalNotice"
+import { FollowUpChips, normalizeFollowUps, type FollowUpChip } from "./FollowUpChips"
+import { UiBlockRenderer, type UiBlock } from "./UiBlocks"
 
 type Citation = { title?: string; url?: string }
 
@@ -48,12 +49,25 @@ type CatalogPick = {
   match_reasons?: string[]
 }
 
+type ContextEntity = {
+  kind: "supplier" | "product" | string
+  name: string
+  handle?: string | null
+  summary?: string
+  why_relevant?: string
+  region?: string | null
+  offerings?: string[]
+  certifications?: string[]
+}
+
 type SourcingResult = {
   status: string
   answer: string
   suppliers: Supplier[]
   catalog_picks: CatalogPick[]
-  follow_ups: string[]
+  follow_ups: Array<string | FollowUpChip>
+  ui_blocks?: UiBlock[]
+  intent?: { name?: string; confidence?: number } | null
   meta?: Record<string, unknown>
   thread_id?: string
   personalization?: { company_name: string; sector: string; applied: string[] }
@@ -361,7 +375,7 @@ function AssistantBlock({
 }: {
   msg: Extract<Message, { role: "assistant" }>
   locale: string
-  onFollowUp: (q: string) => void
+  onFollowUp: (chip: FollowUpChip) => void
   lastUserQuery: string
   sourcingThreadId?: string | null
 }) {
@@ -374,6 +388,7 @@ function AssistantBlock({
       </div>
     )
   }
+  const followUps = normalizeFollowUps(r.follow_ups)
   return (
     <div className="flex flex-col gap-5">
       {r.personalization?.company_name && (
@@ -407,6 +422,8 @@ function AssistantBlock({
           <MarkdownLite text={r.answer} />
         </div>
       )}
+
+      <UiBlockRenderer blocks={r.ui_blocks} />
 
       {!!r.catalog_picks?.length && (
         <div className="flex flex-col gap-3">
@@ -447,27 +464,7 @@ function AssistantBlock({
         </div>
       )}
 
-      {!!r.follow_ups?.length && (
-        <div className="tese-sourcing-followups">
-          <p className="tese-sourcing-followups-label">Click a sample to refine ✨</p>
-          <ul className="tese-sourcing-followups-list">
-            {r.follow_ups.map((f, i) => (
-              <li key={i}>
-                <button
-                  type="button"
-                  onClick={() => onFollowUp(f)}
-                  className="tese-sourcing-followups-item"
-                >
-                  <span className="tese-sourcing-followups-wand" aria-hidden>
-                    <SparkIcon size={14} color="rgb(var(--neutral-400))" />
-                  </span>
-                  {f}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <FollowUpChips items={followUps} onSelect={onFollowUp} />
 
       {r.status !== "ok" && (
         <p className="text-[12px] text-warning">
@@ -598,7 +595,48 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
     [messages]
   )
 
-  async function runSearch(query: string) {
+  const contextEntities = useMemo(() => {
+    const out: ContextEntity[] = []
+    const seen = new Set<string>()
+    const push = (e: ContextEntity) => {
+      const key = String(e.handle || e.name || "").trim().toLowerCase()
+      if (!key || seen.has(key)) return
+      seen.add(key)
+      out.push(e)
+    }
+    for (let i = messages.length - 1; i >= 0 && out.length < 8; i--) {
+      const m = messages[i]
+      if (m.role !== "assistant" || !m.result) continue
+      for (const s of m.result.suppliers || []) {
+        if (!s?.name) continue
+        push({
+          kind: "supplier",
+          name: s.name,
+          summary: s.summary || "",
+          why_relevant: s.why_relevant || "",
+          region: s.region || null,
+          offerings: s.offerings || [],
+          certifications: s.certifications || [],
+        })
+      }
+      for (const p of m.result.catalog_picks || []) {
+        if (!p?.handle) continue
+        push({
+          kind: "product",
+          name: p.title || p.handle,
+          handle: p.handle,
+          summary: p.reason || "",
+          why_relevant: p.reason || "",
+        })
+      }
+    }
+    return out
+  }, [messages])
+
+  async function runSearch(
+    query: string,
+    opts?: { intent_hint?: string | null }
+  ) {
     const q = query.trim()
     if (!q || loading) return
 
@@ -619,6 +657,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
     setLoading(true)
     setInput("")
     const priorHistory = history
+    const priorEntities = contextEntities
     let serverThreadId: string | undefined
 
     setMessages((prev) => [
@@ -631,7 +670,13 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
       const res = await fetch("/api/sourcing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q, chat_history: priorHistory, thread_id: threadId ?? undefined }),
+        body: JSON.stringify({
+          query: q,
+          chat_history: priorHistory,
+          context_entities: priorEntities,
+          thread_id: activeThreadId ?? undefined,
+          intent_hint: opts?.intent_hint || undefined,
+        }),
       })
       const data: SourcingResult = await res.json()
       serverThreadId = data.thread_id
@@ -679,6 +724,12 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  function handleFollowUp (chip: FollowUpChip) {
+    void runSearch(chip.prompt, {
+      intent_hint: chip.intent || undefined,
+    })
   }
 
   useEffect(() => {
@@ -771,7 +822,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
                 key={i}
                 msg={m}
                 locale={locale}
-                onFollowUp={runSearch}
+                onFollowUp={handleFollowUp}
                 lastUserQuery={lastUserQuery}
                 sourcingThreadId={threadId}
               />

@@ -45,7 +45,9 @@ export async function storefrontBffFetch<T>(
 export async function proxySourcingSearch(body: {
   query?: string
   chat_history?: { role: string; content: string }[]
+  context_entities?: Record<string, unknown>[]
   thread_id?: string
+  intent_hint?: string
 }) {
   const { ok, json } = await storefrontBffFetch<Record<string, unknown>>(
     '/sourcing/search',
@@ -62,6 +64,7 @@ export async function proxySourcingSearch(body: {
       suppliers: [],
       catalog_picks: [],
       follow_ups: [],
+      ui_blocks: [],
       meta: {},
     }
   }

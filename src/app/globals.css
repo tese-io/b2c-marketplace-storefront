@@ -5170,9 +5170,69 @@ button.tese-sourcing-sidebar-logout {
 .tese-sourcing-followups-item:hover {
   background: rgba(var(--tese-lime), 0.06);
 }
+.tese-sourcing-followups-item.is-action {
+  font-weight: 550;
+  background: rgba(var(--tese-lime), 0.04);
+}
 .tese-sourcing-followups-wand {
   flex-shrink: 0;
   display: inline-flex;
+}
+
+.tese-sourcing-ui-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.tese-sourcing-comparison {
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  border-radius: 0.875rem;
+  background: white;
+  overflow: hidden;
+}
+.tese-sourcing-comparison-head {
+  padding: 0.875rem 1rem 0.5rem;
+}
+.tese-sourcing-comparison-kicker {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--neutral-500));
+  margin-bottom: 0.25rem;
+}
+.tese-sourcing-comparison-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+.tese-sourcing-comparison-scroll {
+  overflow-x: auto;
+}
+.tese-sourcing-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.tese-sourcing-comparison-table th,
+.tese-sourcing-comparison-table td {
+  padding: 0.625rem 1rem;
+  text-align: left;
+  border-top: 1px solid rgba(var(--tese-ink), 0.06);
+  vertical-align: top;
+}
+.tese-sourcing-comparison-table th {
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+  background: rgba(var(--tese-ink), 0.02);
+  white-space: nowrap;
+}
+.tese-sourcing-comparison-table td.is-criterion {
+  font-weight: 550;
+  color: rgb(var(--neutral-600));
+  white-space: nowrap;
 }
 
 /* Placeholder views */
