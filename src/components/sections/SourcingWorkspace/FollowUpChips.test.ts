@@ -59,10 +59,24 @@ describe('UiBlockRenderer', () => {
     expect(html).toContain('Lead time')
   })
 
+  it('renders checklist artifact cards', () => {
+    const html = renderToStaticMarkup(
+      createElement(UiBlockRenderer, {
+        blocks: [{
+          type: 'checklist',
+          title: 'RFQ checklist',
+          items: ['Confirm MOQ', 'Ask lead time', 'Verify FSC'],
+        }],
+      })
+    )
+    expect(html).toContain('RFQ checklist')
+    expect(html).toContain('Confirm MOQ')
+  })
+
   it('ignores unknown block types', () => {
     const html = renderToStaticMarkup(
       createElement(UiBlockRenderer, {
-        blocks: [{ type: 'checklist', title: 'RFQ' }],
+        blocks: [{ type: 'timeline', title: 'RFQ' }],
       })
     )
     expect(html).not.toContain('RFQ')

@@ -22,6 +22,8 @@ import { SourcingInput } from "./SourcingInput"
 import { SourcingLegalNotice } from "./SourcingLegalNotice"
 import { FollowUpChips, normalizeFollowUps, type FollowUpChip } from "./FollowUpChips"
 import { UiBlockRenderer, type UiBlock } from "./UiBlocks"
+import { AnswerMinimap, type MinimapSection } from "./AnswerMinimap"
+import { SourcingCanvas, type CanvasDoc } from "./SourcingCanvas"
 
 type Citation = { title?: string; url?: string }
 
@@ -77,7 +79,13 @@ type Message =
   | { role: "user"; content: string }
   | { role: "assistant"; content: string; result?: SourcingResult; pending?: boolean; error?: boolean }
 
-function MarkdownLite({ text }: { text: string }) {
+function MarkdownLite({
+  text,
+  idPrefix,
+}: {
+  text: string
+  idPrefix?: string
+}) {
   const blocks = text.split(/\n{2,}/)
   const renderInline = (s: string) => {
     const parts = s.split(/(\*\*[^*]+\*\*)/g)
@@ -91,6 +99,7 @@ function MarkdownLite({ text }: { text: string }) {
       )
     )
   }
+  let headingIdx = 0
   return (
     <div className="flex flex-col gap-3 text-[15px] leading-relaxed text-secondary">
       {blocks.map((b, i) => {
@@ -105,15 +114,17 @@ function MarkdownLite({ text }: { text: string }) {
           )
         }
         if (b.startsWith("## ")) {
+          const sid = idPrefix ? `${idPrefix}-h-${headingIdx++}` : undefined
           return (
-            <h3 key={i} className="text-lg font-semibold text-primary">
+            <h3 key={i} id={sid} className="text-lg font-semibold text-primary scroll-mt-6">
               {renderInline(b.replace(/^##\s*/, ""))}
             </h3>
           )
         }
         if (b.startsWith("# ")) {
+          const sid = idPrefix ? `${idPrefix}-h-${headingIdx++}` : undefined
           return (
-            <h2 key={i} className="text-xl font-semibold text-primary">
+            <h2 key={i} id={sid} className="text-xl font-semibold text-primary scroll-mt-6">
               {renderInline(b.replace(/^#\s*/, ""))}
             </h2>
           )
@@ -126,6 +137,19 @@ function MarkdownLite({ text }: { text: string }) {
       })}
     </div>
   )
+}
+
+function answerMinimapSections(text: string, idPrefix: string): MinimapSection[] {
+  const sections: MinimapSection[] = []
+  let headingIdx = 0
+  for (const block of text.split(/\n{2,}/)) {
+    if (block.startsWith("## ") || block.startsWith("# ")) {
+      const label = block.replace(/^#+\s*/, "").replace(/\*\*/g, "").trim()
+      if (!label) continue
+      sections.push({ id: `${idPrefix}-h-${headingIdx++}`, label })
+    }
+  }
+  return sections
 }
 
 function MetaRow({ metadata }: { metadata?: Record<string, unknown> }) {
@@ -372,12 +396,18 @@ function AssistantBlock({
   onFollowUp,
   lastUserQuery,
   sourcingThreadId,
+  messageKey,
+  scrollRoot,
+  onOpenCanvas,
 }: {
   msg: Extract<Message, { role: "assistant" }>
   locale: string
   onFollowUp: (chip: FollowUpChip) => void
   lastUserQuery: string
   sourcingThreadId?: string | null
+  messageKey: string
+  scrollRoot: HTMLElement | null
+  onOpenCanvas: (block: UiBlock) => void
 }) {
   if (msg.pending) return <PendingBlock />
   const r = msg.result
@@ -389,8 +419,9 @@ function AssistantBlock({
     )
   }
   const followUps = normalizeFollowUps(r.follow_ups)
+  const sections = r.answer ? answerMinimapSections(r.answer, messageKey) : []
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 relative">
       {r.personalization?.company_name && (
         <div className="rounded-xl border bg-tese-surface px-4 py-3">
           <p className="text-sm font-semibold text-primary">
@@ -418,12 +449,13 @@ function AssistantBlock({
       )}
 
       {r.answer && (
-        <div className="tese-card p-5">
-          <MarkdownLite text={r.answer} />
+        <div className="tese-card p-5 tese-sourcing-answer-wrap">
+          <AnswerMinimap sections={sections} scrollRoot={scrollRoot} />
+          <MarkdownLite text={r.answer} idPrefix={messageKey} />
         </div>
       )}
 
-      <UiBlockRenderer blocks={r.ui_blocks} />
+      <UiBlockRenderer blocks={r.ui_blocks} onOpenCanvas={onOpenCanvas} />
 
       {!!r.catalog_picks?.length && (
         <div className="flex flex-col gap-3">
@@ -513,7 +545,10 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
   const [threadTitle, setThreadTitle] = useState("")
   const [threadCreatedAt, setThreadCreatedAt] = useState<number | undefined>()
   const [sector, setSector] = useState<string | undefined>()
+  const [canvasDoc, setCanvasDoc] = useState<CanvasDoc | null>(null)
+  const [scrollEl, setScrollEl] = useState<HTMLElement | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const lastCanvasMsgRef = useRef(-1)
   const bootedRef = useRef(false)
 
   const hasConversation = messages.length > 0
@@ -532,6 +567,8 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
       setMessages([])
       setInput("")
       setSector(undefined)
+      setCanvasDoc(null)
+      lastCanvasMsgRef.current = -1
       bootedRef.current = false
       return
     }
@@ -732,6 +769,39 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
     })
   }
 
+  function openCanvasFromBlock (block: UiBlock) {
+    if (block.type !== 'checklist' && block.type !== 'doc') return
+    setCanvasDoc({
+      id: `canvas-${Date.now()}`,
+      type: block.type,
+      title: block.title || (block.type === 'checklist' ? 'Checklist' : 'Document'),
+      items: block.items || [],
+      markdown: block.markdown || '',
+    })
+  }
+
+  // Auto-open canvas when a new artifact block arrives
+  useEffect(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i]
+      if (m.role !== 'assistant' || !m.result?.ui_blocks?.length) continue
+      const artifact = m.result.ui_blocks.find(
+        (b) => b.type === 'checklist' || b.type === 'doc'
+      )
+      if (artifact && i > lastCanvasMsgRef.current) {
+        lastCanvasMsgRef.current = i
+        setCanvasDoc({
+          id: `canvas-${i}`,
+          type: artifact.type as 'checklist' | 'doc',
+          title: artifact.title || (artifact.type === 'checklist' ? 'Checklist' : 'Document'),
+          items: artifact.items || [],
+          markdown: artifact.markdown || '',
+        })
+      }
+      break
+    }
+  }, [messages])
+
   useEffect(() => {
     if (bootedRef.current) return
     const q = searchParams.get("q")
@@ -809,36 +879,53 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
   }
 
   return (
-    <div className="tese-sourcing-chat">
-      <div ref={scrollContainerRef} className="tese-sourcing-chat-scroll">
-        <div className="tese-sourcing-chat-inner">
-          {messages.map((m, i) =>
-            m.role === "user" ? (
-              <div key={i} className="tese-sourcing-user-bubble">
-                {m.content}
-              </div>
-            ) : (
-              <AssistantBlock
-                key={i}
-                msg={m}
-                locale={locale}
-                onFollowUp={handleFollowUp}
-                lastUserQuery={lastUserQuery}
-                sourcingThreadId={threadId}
-              />
-            )
-          )}
+    <div className={`tese-sourcing-chat ${canvasDoc ? 'has-canvas' : ''}`}>
+      <div className="tese-sourcing-chat-main">
+        <div
+          ref={(el) => {
+            scrollContainerRef.current = el
+            setScrollEl((prev) => (prev === el ? prev : el))
+          }}
+          className="tese-sourcing-chat-scroll"
+        >
+          <div className="tese-sourcing-chat-inner">
+            {messages.map((m, i) =>
+              m.role === "user" ? (
+                <div key={i} className="tese-sourcing-user-bubble">
+                  {m.content}
+                </div>
+              ) : (
+                <AssistantBlock
+                  key={i}
+                  msg={m}
+                  locale={locale}
+                  onFollowUp={handleFollowUp}
+                  lastUserQuery={lastUserQuery}
+                  sourcingThreadId={threadId}
+                  messageKey={`msg-${i}`}
+                  scrollRoot={scrollEl}
+                  onOpenCanvas={openCanvasFromBlock}
+                />
+              )
+            )}
+          </div>
+        </div>
+
+        <div className="tese-sourcing-chat-composer">
+          <SourcingInput
+            input={input}
+            setInput={setInput}
+            loading={loading}
+            onSubmit={runSearch}
+          />
         </div>
       </div>
 
-      <div className="tese-sourcing-chat-composer">
-        <SourcingInput
-          input={input}
-          setInput={setInput}
-          loading={loading}
-          onSubmit={runSearch}
-        />
-      </div>
+      <SourcingCanvas
+        doc={canvasDoc}
+        onClose={() => setCanvasDoc(null)}
+        onChange={setCanvasDoc}
+      />
     </div>
   )
 }

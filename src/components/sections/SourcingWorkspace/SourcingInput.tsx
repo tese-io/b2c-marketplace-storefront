@@ -39,9 +39,30 @@ function SkillsIcon ({ size = 18, color = 'currentColor' }: { size?: number; col
   )
 }
 
+function MicIcon ({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="9" y="3.5" width="6" height="11" rx="3" stroke={color} strokeWidth="1.5" />
+      <path d="M6.5 11a5.5 5.5 0 0 0 11 0" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12 16.5v3.5M9 20.5h6" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+type SpeechRecognitionLike = {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null
+  onerror: (() => void) | null
+  onend: (() => void) | null
+  start: () => void
+  stop: () => void
+}
+
 type SourcingInputProps = {
   input: string
-  setInput: (v: string) => void
+  setInput: (v: string | ((prev: string) => string)) => void
   loading: boolean
   onSubmit: (q: string) => void
   centered?: boolean
@@ -63,9 +84,63 @@ export function SourcingInput ({
   const [modelOpen, setModelOpen] = useState(false)
   const [selectedModel, setSelectedModel] = useState<AiModelId>(DEFAULT_AI_MODEL)
   const [attachmentName, setAttachmentName] = useState<string | null>(null)
+  const [listening, setListening] = useState(false)
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
   const activeModel = AI_MODELS.find((m) => m.id === selectedModel) ?? AI_MODELS[0]
   const hasText = input.trim().length > 0
   const canSend = hasText && !loading
+  const [speechSupported, setSpeechSupported] = useState(false)
+
+  useEffect(() => {
+    const w = window as unknown as {
+      SpeechRecognition?: unknown
+      webkitSpeechRecognition?: unknown
+    }
+    setSpeechSupported(!!(w.SpeechRecognition || w.webkitSpeechRecognition))
+    return () => {
+      try {
+        recognitionRef.current?.stop()
+      } catch {
+        // ignore
+      }
+    }
+  }, [])
+
+  function toggleVoice () {
+    if (loading) return
+    const w = window as unknown as {
+      SpeechRecognition?: new () => SpeechRecognitionLike
+      webkitSpeechRecognition?: new () => SpeechRecognitionLike
+    }
+    const Ctor = w.SpeechRecognition || w.webkitSpeechRecognition
+    if (!Ctor) return
+
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop()
+      setListening(false)
+      return
+    }
+
+    const recognition = new Ctor()
+    recognition.continuous = false
+    recognition.interimResults = false
+    recognition.lang = 'en-US'
+    recognition.onresult = (event) => {
+      const transcript = event.results?.[0]?.[0]?.transcript || ''
+      if (transcript) {
+        setInput((prev) => (prev.trim() ? `${prev.trim()} ${transcript}` : transcript))
+      }
+    }
+    recognition.onerror = () => setListening(false)
+    recognition.onend = () => setListening(false)
+    recognitionRef.current = recognition
+    try {
+      recognition.start()
+      setListening(true)
+    } catch {
+      setListening(false)
+    }
+  }
 
   useEffect(() => {
     const el = textareaRef.current
@@ -223,6 +298,19 @@ export function SourcingInput ({
               >
                 <SkillsIcon />
               </button>
+              {speechSupported ? (
+                <button
+                  type="button"
+                  className={`tese-sourcing-input-icon-btn ${listening ? 'is-listening' : ''}`}
+                  disabled={loading}
+                  aria-label={listening ? 'Stop voice input' : 'Start voice input'}
+                  aria-pressed={listening}
+                  title={listening ? 'Listening…' : 'Voice input'}
+                  onClick={toggleVoice}
+                >
+                  <MicIcon />
+                </button>
+              ) : null}
             </div>
 
             <div className="tese-sourcing-input-actions tese-sourcing-model-wrap">

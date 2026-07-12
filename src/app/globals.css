@@ -5235,6 +5235,197 @@ button.tese-sourcing-sidebar-logout {
   white-space: nowrap;
 }
 
+.tese-sourcing-input-icon-btn.is-listening {
+  color: rgb(var(--tese-forest));
+  background: rgba(var(--tese-lime), 0.14);
+  box-shadow: 0 0 0 2px rgba(var(--tese-lime), 0.35);
+}
+
+.tese-sourcing-answer-wrap {
+  position: relative;
+}
+.tese-sourcing-minimap {
+  display: none;
+  position: absolute;
+  top: 1rem;
+  right: 0.65rem;
+  flex-direction: column;
+  gap: 0.35rem;
+  z-index: 2;
+}
+@media (min-width: 900px) {
+  .tese-sourcing-minimap {
+    display: flex;
+  }
+}
+.tese-sourcing-minimap-mark {
+  width: 0.35rem;
+  height: 0.85rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0;
+  background: rgba(var(--tese-ink), 0.18);
+  cursor: pointer;
+}
+.tese-sourcing-minimap-mark.is-active,
+.tese-sourcing-minimap-mark:hover {
+  background: rgb(var(--tese-forest));
+}
+
+.tese-sourcing-artifact-card {
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  border-radius: 0.875rem;
+  background: white;
+  padding: 0.875rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.tese-sourcing-artifact-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.tese-sourcing-artifact-preview {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 13px;
+  color: rgb(var(--neutral-600));
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.tese-sourcing-artifact-snippet {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(var(--neutral-600));
+}
+.tese-sourcing-artifact-open {
+  align-self: flex-start;
+  border: 1px solid rgba(var(--tese-ink), 0.12);
+  background: rgba(var(--tese-lime), 0.08);
+  color: rgb(var(--tese-ink));
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+}
+.tese-sourcing-artifact-open:hover {
+  background: rgba(var(--tese-lime), 0.16);
+}
+
+.tese-sourcing-chat.has-canvas {
+  flex-direction: row;
+}
+.tese-sourcing-chat-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.tese-sourcing-canvas {
+  width: min(24rem, 42vw);
+  border-left: 1px solid rgba(var(--tese-ink), 0.08);
+  background: #f7f8f5;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+@media (max-width: 900px) {
+  .tese-sourcing-chat.has-canvas {
+    flex-direction: column;
+  }
+  .tese-sourcing-canvas {
+    width: 100%;
+    max-height: 42vh;
+    border-left: none;
+    border-top: 1px solid rgba(var(--tese-ink), 0.08);
+  }
+}
+.tese-sourcing-canvas-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(var(--tese-ink), 0.06);
+}
+.tese-sourcing-canvas-kicker {
+  margin: 0 0 0.25rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--neutral-500));
+}
+.tese-sourcing-canvas-title {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+  padding: 0;
+}
+.tese-sourcing-canvas-title:focus {
+  outline: none;
+}
+.tese-sourcing-canvas-close {
+  border: none;
+  background: transparent;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: rgb(var(--neutral-500));
+  cursor: pointer;
+  padding: 0.15rem 0.35rem;
+}
+.tese-sourcing-canvas-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 1rem 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+.tese-sourcing-canvas-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+.tese-sourcing-canvas-check-text {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgb(var(--tese-ink));
+  padding: 0.15rem 0;
+}
+.tese-sourcing-canvas-check-text:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 0.25rem;
+}
+.tese-sourcing-canvas-editor {
+  flex: 1;
+  min-height: 12rem;
+  margin: 0.75rem 1rem 1rem;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  border-radius: 0.75rem;
+  background: white;
+  padding: 0.85rem;
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgb(var(--tese-ink));
+  resize: none;
+}
+
 /* Placeholder views */
 .tese-sourcing-placeholder {
   flex: 1;

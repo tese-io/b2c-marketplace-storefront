@@ -9,6 +9,8 @@ export type UiBlock = {
   columns?: string[]
   rows?: { cells: string[]; highlight?: string | null }[]
   entity_refs?: { name: string; kind?: string; handle?: string | null }[]
+  markdown?: string
+  items?: string[]
 }
 
 export function ComparisonBlock ({ block }: { block: UiBlock }) {
@@ -52,7 +54,56 @@ export function ComparisonBlock ({ block }: { block: UiBlock }) {
   )
 }
 
-export function UiBlockRenderer ({ blocks }: { blocks?: UiBlock[] | null }) {
+function ArtifactCard ({
+  block,
+  onOpenCanvas,
+}: {
+  block: UiBlock
+  onOpenCanvas?: (block: UiBlock) => void
+}) {
+  const isChecklist = block.type === 'checklist'
+  return (
+    <div className="tese-sourcing-artifact-card">
+      <div className="tese-sourcing-artifact-head">
+        <span className="tese-sourcing-comparison-kicker">
+          {isChecklist ? 'Checklist' : 'Document'}
+        </span>
+        <h4 className="tese-sourcing-comparison-title">{block.title || 'Sourcing artifact'}</h4>
+      </div>
+      {isChecklist && !!block.items?.length && (
+        <ul className="tese-sourcing-artifact-preview">
+          {block.items.slice(0, 4).map((item, i) => (
+            <li key={i}>{item}</li>
+          ))}
+          {block.items.length > 4 ? <li>+{block.items.length - 4} more</li> : null}
+        </ul>
+      )}
+      {!isChecklist && block.markdown ? (
+        <p className="tese-sourcing-artifact-snippet">
+          {block.markdown.slice(0, 160)}
+          {block.markdown.length > 160 ? '…' : ''}
+        </p>
+      ) : null}
+      {onOpenCanvas ? (
+        <button
+          type="button"
+          className="tese-sourcing-artifact-open"
+          onClick={() => onOpenCanvas(block)}
+        >
+          Open in canvas
+        </button>
+      ) : null}
+    </div>
+  )
+}
+
+export function UiBlockRenderer ({
+  blocks,
+  onOpenCanvas,
+}: {
+  blocks?: UiBlock[] | null
+  onOpenCanvas?: (block: UiBlock) => void
+}) {
   if (!blocks?.length) return null
   return (
     <div className="tese-sourcing-ui-blocks">
@@ -60,7 +111,11 @@ export function UiBlockRenderer ({ blocks }: { blocks?: UiBlock[] | null }) {
         if (block.type === 'comparison') {
           return <ComparisonBlock key={i} block={block} />
         }
-        // Forward-compatible: ignore unknown Phase 2 types
+        if (block.type === 'checklist' || block.type === 'doc') {
+          return (
+            <ArtifactCard key={i} block={block} onOpenCanvas={onOpenCanvas} />
+          )
+        }
         return null
       })}
     </div>
