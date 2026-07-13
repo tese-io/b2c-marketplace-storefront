@@ -20,7 +20,7 @@ import { AI_SOURCING_HOOK, AI_SOURCING_PROMO, AI_SOURCING_TAGLINE } from '@/data
 import { STAGES, quickPromptsForSector } from "./constants"
 import { SourcingInput } from "./SourcingInput"
 import { SourcingLegalNotice } from "./SourcingLegalNotice"
-import { FollowUpChips, normalizeFollowUps, type FollowUpChip } from "./FollowUpChips"
+import { FollowUpChips, normalizeFollowUps, resolveFollowUpAction, type FollowUpChip } from "./FollowUpChips"
 import { UiBlockRenderer, type UiBlock } from "./UiBlocks"
 import { AnswerMinimap, type MinimapSection } from "./AnswerMinimap"
 import { SourcingCanvas, type CanvasDoc } from "./SourcingCanvas"
@@ -764,6 +764,18 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
   }
 
   function handleFollowUp (chip: FollowUpChip) {
+    const action = resolveFollowUpAction(chip)
+    if (action.type === 'compose') {
+      setInput(action.text)
+      requestAnimationFrame(() => {
+        const el = document.getElementById('sourcing-input') as HTMLTextAreaElement | null
+        if (!el) return
+        el.focus()
+        const cursor = el.value.length
+        el.setSelectionRange(cursor, cursor)
+      })
+      return
+    }
     void runSearch(chip.prompt, {
       intent_hint: chip.intent || undefined,
     })

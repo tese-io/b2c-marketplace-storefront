@@ -32,6 +32,26 @@ export function normalizeFollowUps (raw: unknown): FollowUpChip[] {
   return out.slice(0, 6)
 }
 
+/** Clarifying questions fill the composer; action chips auto-submit. */
+export function resolveFollowUpAction (
+  chip: FollowUpChip
+): { type: 'submit' } | { type: 'compose'; text: string } {
+  const prompt = (chip.prompt || chip.label || '').trim()
+  const intent = (chip.intent || '').toLowerCase()
+  if (
+    chip.kind === 'action' ||
+    intent === 'compare' ||
+    intent === 'artifact'
+  ) {
+    return { type: 'submit' }
+  }
+  // Buyer-facing clarifying questions should be answered, not re-asked.
+  if (prompt.endsWith('?')) {
+    return { type: 'compose', text: `Regarding: ${prompt}\n\n` }
+  }
+  return { type: 'submit' }
+}
+
 export function FollowUpChips ({
   items,
   onSelect,

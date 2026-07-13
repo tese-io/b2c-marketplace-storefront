@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalizeFollowUps } from './FollowUpChips'
+import { normalizeFollowUps, resolveFollowUpAction } from './FollowUpChips'
 import { ComparisonBlock, UiBlockRenderer } from './UiBlocks'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -35,6 +35,41 @@ describe('normalizeFollowUps', () => {
     expect(chips).toHaveLength(2)
     expect(chips[0].kind).toBe('refine')
     expect(chips[1].intent).toBe('compare')
+  })
+})
+
+describe('resolveFollowUpAction', () => {
+  it('composes clarifying questions into the chat box', () => {
+    const action = resolveFollowUpAction({
+      label: 'Rooftop area?',
+      prompt: 'What is your available rooftop or ground area for solar installation (sq ft or acres)?',
+      kind: 'refine',
+    })
+    expect(action.type).toBe('compose')
+    if (action.type === 'compose') {
+      expect(action.text).toContain('Regarding:')
+      expect(action.text).toContain('rooftop or ground area')
+      expect(action.text.endsWith('\n\n')).toBe(true)
+    }
+  })
+
+  it('auto-submits action chips', () => {
+    const action = resolveFollowUpAction({
+      label: 'Compare top two',
+      prompt: 'Compare the top two suppliers',
+      kind: 'action',
+      intent: 'compare',
+    })
+    expect(action).toEqual({ type: 'submit' })
+  })
+
+  it('auto-submits non-question refine prompts', () => {
+    const action = resolveFollowUpAction({
+      label: 'Narrow to India',
+      prompt: 'Narrow to suppliers with strong service in India',
+      kind: 'refine',
+    })
+    expect(action).toEqual({ type: 'submit' })
   })
 })
 
