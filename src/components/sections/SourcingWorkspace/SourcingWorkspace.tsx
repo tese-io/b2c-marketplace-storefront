@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-import { safeExternalHref } from "@/lib/helpers/url"
 import { TeseLogoMark } from "@/components/atoms/TeseLogo/TeseLogoMark"
 import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
 import {
@@ -13,8 +12,6 @@ import {
   upsertSourcingThread,
 } from "@/lib/sourcing-history"
 
-import { SendInquiryButton } from "@/components/sections/SourcingInquiries/SendInquiryButton"
-
 import { AI_SOURCING_HOOK, AI_SOURCING_PROMO, AI_SOURCING_TAGLINE } from '@/data/explorer-copy'
 
 import { STAGES, quickPromptsForSector } from "./constants"
@@ -23,33 +20,15 @@ import { SourcingLegalNotice } from "./SourcingLegalNotice"
 import { FollowUpChips, normalizeFollowUps, resolveFollowUpAction, type FollowUpChip } from "./FollowUpChips"
 import { UiBlockRenderer, type UiBlock } from "./UiBlocks"
 import { AnswerMinimap, type MinimapSection } from "./AnswerMinimap"
-import { SourcingCanvas, type CanvasDoc } from "./SourcingCanvas"
-
-type Citation = { title?: string; url?: string }
-
-type Supplier = {
-  name: string
-  website?: string | null
-  region?: string | null
-  summary?: string
-  why_relevant?: string
-  offerings?: string[]
-  certifications?: string[]
-  citations?: Citation[]
-}
-
-type CatalogPick = {
-  handle: string
-  reason?: string
-  title?: string
-  id?: string
-  thumbnail?: string | null
-  category?: string | null
-  metadata?: Record<string, unknown>
-  price?: number | null
-  currency?: string | null
-  match_reasons?: string[]
-}
+import { type CanvasDoc } from "./SourcingCanvas"
+import {
+  SourcingResultsRail,
+  mergeRailResults,
+  latestRailResultsFromMessages,
+  type CatalogPick,
+  type Supplier,
+  type RailResults,
+} from "./SourcingResultsRail"
 
 type ContextEntity = {
   kind: "supplier" | "product" | string
@@ -152,212 +131,6 @@ function answerMinimapSections(text: string, idPrefix: string): MinimapSection[]
   return sections
 }
 
-function MetaRow({ metadata }: { metadata?: Record<string, unknown> }) {
-  if (!metadata) return null
-  const fields: [string, string][] = []
-  const push = (k: string, label: string) => {
-    const v = metadata[k]
-    if (v !== undefined && v !== null && v !== "") fields.push([label, String(v)])
-  }
-  push("unit", "Unit")
-  push("moq", "MOQ")
-  push("origin", "Origin")
-  push("lead_time_days", "Lead time (days)")
-  push("certifications", "Certifications")
-  if (!fields.length) return null
-  return (
-    <div className="flex flex-wrap gap-1.5 mt-2">
-      {fields.map(([label, value]) => (
-        <span
-          key={label}
-          className="text-[11px] rounded-full bg-tese-surface px-2 py-0.5 text-secondary border"
-        >
-          <span className="text-tese-ice font-medium">{label}:</span> {value}
-        </span>
-      ))}
-    </div>
-  )
-}
-
-function CatalogCard({
-  pick,
-  locale,
-  requirement,
-  sourcingThreadId,
-}: {
-  pick: CatalogPick
-  locale: string
-  requirement: string
-  sourcingThreadId?: string | null
-}) {
-  const price =
-    pick.price != null
-      ? new Intl.NumberFormat("en", {
-          style: "currency",
-          currency: (pick.currency || "EUR").toUpperCase(),
-          maximumFractionDigits: 0,
-        }).format(pick.price)
-      : null
-  return (
-    <div className="tese-card p-3 flex gap-3 items-start">
-      <a
-        href={`/${locale}/products/${pick.handle}`}
-        className="w-16 h-16 rounded-md bg-tese-surface overflow-hidden shrink-0"
-      >
-        {pick.thumbnail ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={pick.thumbnail}
-            alt={pick.title || pick.handle}
-            className="w-full h-full object-cover"
-          />
-        ) : null}
-      </a>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-2">
-          <a
-            href={`/${locale}/products/${pick.handle}`}
-            className="font-semibold text-primary truncate hover:underline"
-          >
-            {pick.title}
-          </a>
-          {price && <span className="text-sm font-semibold text-tese-ice shrink-0">{price}</span>}
-        </div>
-        {!!pick.match_reasons?.length && (
-          <div className="mt-1 flex flex-wrap gap-1">
-            {pick.match_reasons.slice(0, 2).map((m) => (
-              <span
-                key={m}
-                className="text-[11px] rounded-full bg-tese-lime-soft text-tese-ink px-2 py-0.5"
-              >
-                {m}
-              </span>
-            ))}
-          </div>
-        )}
-        {pick.category && (
-          <span className="text-[11px] uppercase tracking-wide text-secondary">
-            {pick.category}
-          </span>
-        )}
-        {pick.reason && <p className="text-[13px] text-secondary mt-1">{pick.reason}</p>}
-        <MetaRow metadata={pick.metadata} />
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <a
-            href={`/${locale}/products/${pick.handle}`}
-            className="inline-flex text-[12px] font-medium text-secondary hover:text-primary"
-          >
-            View product →
-          </a>
-          <SendInquiryButton
-            requirement={requirement || pick.reason || `Inquiry for ${pick.title}`}
-            title={pick.title}
-            target={{
-              productHandle: pick.handle,
-              productId: pick.id,
-              productTitle: pick.title,
-            }}
-            sourcingThreadId={sourcingThreadId}
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function SupplierCard({
-  s,
-  requirement,
-  sourcingThreadId,
-}: {
-  s: Supplier
-  requirement?: string
-  sourcingThreadId?: string | null
-}) {
-  return (
-    <div className="tese-card p-4 flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="font-semibold text-primary">{s.name}</p>
-          {s.region && <p className="text-[12px] text-secondary">{s.region}</p>}
-        </div>
-        <span className="text-[10px] uppercase tracking-wider rounded-full bg-tese-ink text-tese-lime px-2 py-1">
-          Web
-        </span>
-      </div>
-      {s.summary && <p className="text-[13px] text-secondary">{s.summary}</p>}
-      {s.why_relevant && (
-        <p className="text-[13px] text-primary">
-          <span className="text-tese-ice font-medium">Why: </span>
-          {s.why_relevant}
-        </p>
-      )}
-      {!!s.offerings?.length && (
-        <div className="flex flex-wrap gap-1.5">
-          {s.offerings.slice(0, 5).map((o, i) => (
-            <span key={i} className="text-[11px] rounded-full bg-tese-surface px-2 py-0.5 border">
-              {o}
-            </span>
-          ))}
-        </div>
-      )}
-      {!!s.certifications?.length && (
-        <div className="flex flex-wrap gap-1.5">
-          {s.certifications.slice(0, 5).map((c, i) => (
-            <span
-              key={i}
-              className="text-[11px] rounded-full bg-tese-lime-soft text-tese-ink px-2 py-0.5"
-            >
-              {c}
-            </span>
-          ))}
-        </div>
-      )}
-      <div className="flex flex-wrap items-center gap-3 mt-1">
-        {(() => {
-          const websiteHref = safeExternalHref(s.website)
-          return websiteHref ? (
-            <a
-              href={websiteHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[13px] font-medium text-tese-ice hover:underline"
-            >
-              Visit website ↗
-            </a>
-          ) : null
-        })()}
-        <SendInquiryButton
-          requirement={requirement || s.why_relevant || `Inquiry for ${s.name}`}
-          title={`Inquiry: ${s.name}`}
-          target={{
-            sellerName: s.name,
-          }}
-          sourcingThreadId={sourcingThreadId}
-        />
-        {!!s.citations?.length && (
-          <div className="flex flex-wrap gap-2">
-            {s.citations.slice(0, 3).map((c, i) => {
-              const citationHref = safeExternalHref(c.url)
-              return citationHref ? (
-                <a
-                  key={i}
-                  href={citationHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[11px] text-secondary hover:underline"
-                >
-                  [{i + 1}] {c.title || "source"}
-                </a>
-              ) : null
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
 function PendingBlock() {
   const [stage, setStage] = useState(0)
   const [elapsed, setElapsed] = useState(0)
@@ -392,19 +165,13 @@ function PendingBlock() {
 
 function AssistantBlock({
   msg,
-  locale,
   onFollowUp,
-  lastUserQuery,
-  sourcingThreadId,
   messageKey,
   scrollRoot,
   onOpenCanvas,
 }: {
   msg: Extract<Message, { role: "assistant" }>
-  locale: string
   onFollowUp: (chip: FollowUpChip) => void
-  lastUserQuery: string
-  sourcingThreadId?: string | null
   messageKey: string
   scrollRoot: HTMLElement | null
   onOpenCanvas: (block: UiBlock) => void
@@ -420,6 +187,8 @@ function AssistantBlock({
   }
   const followUps = normalizeFollowUps(r.follow_ups)
   const sections = r.answer ? answerMinimapSections(r.answer, messageKey) : []
+  const foundCount =
+    (r.catalog_picks?.length || 0) + (r.suppliers?.length || 0)
   return (
     <div className="flex flex-col gap-5 relative">
       {r.personalization?.company_name && (
@@ -452,49 +221,15 @@ function AssistantBlock({
         <div className="tese-card p-5 tese-sourcing-answer-wrap">
           <AnswerMinimap sections={sections} scrollRoot={scrollRoot} />
           <MarkdownLite text={r.answer} idPrefix={messageKey} />
+          {foundCount > 0 ? (
+            <p className="tese-sourcing-results-hint">
+              {foundCount} result{foundCount === 1 ? "" : "s"} in the Found panel →
+            </p>
+          ) : null}
         </div>
       )}
 
       <UiBlockRenderer blocks={r.ui_blocks} onOpenCanvas={onOpenCanvas} />
-
-      {!!r.catalog_picks?.length && (
-        <div className="flex flex-col gap-3">
-          <h4 className="text-sm font-semibold uppercase tracking-wide text-secondary flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-tese-lime" />
-            On tese.io ({r.catalog_picks.length})
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {r.catalog_picks.map((p) => (
-              <CatalogCard
-                key={p.handle}
-                pick={p}
-                locale={locale}
-                requirement={lastUserQuery}
-                sourcingThreadId={sourcingThreadId}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {!!r.suppliers?.length && (
-        <div className="flex flex-col gap-3">
-          <h4 className="text-sm font-semibold uppercase tracking-wide text-secondary flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-tese-ice" />
-            Discovered on the web ({r.suppliers.length})
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {r.suppliers.map((s, i) => (
-              <SupplierCard
-                key={i}
-                s={s}
-                requirement={lastUserQuery}
-                sourcingThreadId={sourcingThreadId}
-              />
-            ))}
-          </div>
-        </div>
-      )}
 
       <FollowUpChips items={followUps} onSelect={onFollowUp} />
 
@@ -546,12 +281,15 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
   const [threadCreatedAt, setThreadCreatedAt] = useState<number | undefined>()
   const [sector, setSector] = useState<string | undefined>()
   const [canvasDoc, setCanvasDoc] = useState<CanvasDoc | null>(null)
+  const [railResults, setRailResults] = useState<RailResults | null>(null)
   const [scrollEl, setScrollEl] = useState<HTMLElement | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const lastCanvasMsgRef = useRef(-1)
   const bootedRef = useRef(false)
+  const pendingIntentHintRef = useRef<string | null>(null)
 
   const hasConversation = messages.length > 0
+  const hasRail = !!(railResults && (railResults.catalog_picks.length || railResults.suppliers.length)) || !!canvasDoc
 
   useEffect(() => {
     const container = scrollContainerRef.current
@@ -568,6 +306,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
       setInput("")
       setSector(undefined)
       setCanvasDoc(null)
+      setRailResults(null)
       lastCanvasMsgRef.current = -1
       bootedRef.current = false
       return
@@ -594,6 +333,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
             )
             setMessages(loaded)
             setSector(latestSector(loaded))
+            setRailResults(latestRailResultsFromMessages(loaded))
             setInput("")
             bootedRef.current = true
             return
@@ -611,6 +351,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
         setThreadCreatedAt(thread.createdAt)
         setMessages(thread.messages as Message[])
         setSector(latestSector(thread.messages as Message[]))
+        setRailResults(latestRailResultsFromMessages(thread.messages as Message[]))
         setInput("")
         bootedRef.current = true
       }
@@ -677,6 +418,10 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
     const q = query.trim()
     if (!q || loading) return
 
+    const intentHint =
+      opts?.intent_hint || pendingIntentHintRef.current || undefined
+    pendingIntentHintRef.current = null
+
     let activeThreadId = threadId
     let activeTitle = threadTitle
     let activeCreatedAt = threadCreatedAt
@@ -712,7 +457,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
           chat_history: priorHistory,
           context_entities: priorEntities,
           thread_id: activeThreadId ?? undefined,
-          intent_hint: opts?.intent_hint || undefined,
+          intent_hint: intentHint || undefined,
         }),
       })
       const data: SourcingResult = await res.json()
@@ -720,6 +465,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
       if (data.personalization?.sector) {
         setSector(data.personalization.sector)
       }
+      setRailResults((prev) => mergeRailResults(prev, data))
       if (serverThreadId && serverThreadId !== threadId) {
         setThreadId(serverThreadId)
         // reflect it in the URL without a navigation
@@ -766,6 +512,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
   function handleFollowUp (chip: FollowUpChip) {
     const action = resolveFollowUpAction(chip)
     if (action.type === 'compose') {
+      pendingIntentHintRef.current = 'refine'
       setInput(action.text)
       requestAnimationFrame(() => {
         const el = document.getElementById('sourcing-input') as HTMLTextAreaElement | null
@@ -891,7 +638,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
   }
 
   return (
-    <div className={`tese-sourcing-chat ${canvasDoc ? 'has-canvas' : ''}`}>
+    <div className={`tese-sourcing-chat ${hasRail ? 'has-rail' : ''}`}>
       <div className="tese-sourcing-chat-main">
         <div
           ref={(el) => {
@@ -910,10 +657,7 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
                 <AssistantBlock
                   key={i}
                   msg={m}
-                  locale={locale}
                   onFollowUp={handleFollowUp}
-                  lastUserQuery={lastUserQuery}
-                  sourcingThreadId={threadId}
                   messageKey={`msg-${i}`}
                   scrollRoot={scrollEl}
                   onOpenCanvas={openCanvasFromBlock}
@@ -933,10 +677,14 @@ export function SourcingWorkspace({ locale }: { locale: string }) {
         </div>
       </div>
 
-      <SourcingCanvas
-        doc={canvasDoc}
-        onClose={() => setCanvasDoc(null)}
-        onChange={setCanvasDoc}
+      <SourcingResultsRail
+        results={railResults}
+        canvasDoc={canvasDoc}
+        onCanvasChange={setCanvasDoc}
+        onCanvasClose={() => setCanvasDoc(null)}
+        locale={locale}
+        requirement={lastUserQuery}
+        sourcingThreadId={threadId}
       />
     </div>
   )

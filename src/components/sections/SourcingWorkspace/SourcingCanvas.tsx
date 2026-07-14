@@ -14,13 +14,16 @@ type SourcingCanvasProps = {
   doc: CanvasDoc | null
   onClose: () => void
   onChange: (doc: CanvasDoc) => void
+  embedded?: boolean
 }
 
-export function SourcingCanvas ({ doc, onClose, onChange }: SourcingCanvasProps) {
+export function SourcingCanvas ({ doc, onClose, onChange, embedded = false }: SourcingCanvasProps) {
   if (!doc) return null
 
+  const Tag = embedded ? 'div' : 'aside'
+
   return (
-    <aside className="tese-sourcing-canvas" aria-label="Sourcing canvas">
+    <Tag className={`tese-sourcing-canvas ${embedded ? 'is-embedded' : ''}`} aria-label="Sourcing canvas">
       <div className="tese-sourcing-canvas-head">
         <div>
           <p className="tese-sourcing-canvas-kicker">
@@ -70,6 +73,6 @@ export function SourcingCanvas ({ doc, onClose, onChange }: SourcingCanvasProps)
           aria-label="Canvas document"
         />
       )}
-    </aside>
+    </Tag>
   )
 }
