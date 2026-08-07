@@ -9,7 +9,9 @@ export async function POST(req: NextRequest) {
   let body: {
     query?: string
     chat_history?: { role: string; content: string }[]
+    context_entities?: Record<string, unknown>[]
     thread_id?: string
+    intent_hint?: string
   } = {}
   try {
     body = await req.json()
@@ -26,7 +28,9 @@ export async function POST(req: NextRequest) {
     const data = await proxySourcingSearch({
       query,
       chat_history: body.chat_history,
+      context_entities: body.context_entities,
       thread_id: body.thread_id,
+      intent_hint: body.intent_hint,
     })
     return NextResponse.json(data)
   } catch {
@@ -36,6 +40,7 @@ export async function POST(req: NextRequest) {
       suppliers: [],
       catalog_picks: [],
       follow_ups: [],
+      ui_blocks: [],
       meta: {},
     })
   }

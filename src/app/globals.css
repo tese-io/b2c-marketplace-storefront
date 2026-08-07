@@ -4158,6 +4158,7 @@ button:disabled svg path {
 .tese-partner-badge {
   display: inline-flex;
   align-items: center;
+  gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 9999px;
   border: 1px solid rgba(var(--tese-ink), 0.1);
@@ -4170,6 +4171,16 @@ button:disabled svg path {
 .tese-partner-badge:hover {
   border-color: rgba(var(--tese-lime), 0.45);
   color: rgb(var(--tese-ink));
+}
+/* Logos vary wildly in aspect ratio (square marks and wide wordmarks), so pin
+   the height and let width follow. Rendered in full colour, unaltered — many
+   certification bodies' trademark guidelines forbid recolouring their mark. */
+.tese-partner-logo {
+  height: 20px;
+  width: auto;
+  max-width: 72px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 /* ── AI Sourcing workspace (Accio-style app shell) ── */
@@ -5159,9 +5170,383 @@ button.tese-sourcing-sidebar-logout {
 .tese-sourcing-followups-item:hover {
   background: rgba(var(--tese-lime), 0.06);
 }
+.tese-sourcing-followups-item.is-action {
+  font-weight: 550;
+  background: rgba(var(--tese-lime), 0.04);
+}
 .tese-sourcing-followups-wand {
   flex-shrink: 0;
   display: inline-flex;
+}
+
+.tese-sourcing-ui-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.tese-sourcing-comparison {
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  border-radius: 0.875rem;
+  background: white;
+  overflow: hidden;
+}
+.tese-sourcing-comparison-head {
+  padding: 0.875rem 1rem 0.5rem;
+}
+.tese-sourcing-comparison-kicker {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--neutral-500));
+  margin-bottom: 0.25rem;
+}
+.tese-sourcing-comparison-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+}
+.tese-sourcing-comparison-scroll {
+  overflow-x: auto;
+}
+.tese-sourcing-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.tese-sourcing-comparison-table th,
+.tese-sourcing-comparison-table td {
+  padding: 0.625rem 1rem;
+  text-align: left;
+  border-top: 1px solid rgba(var(--tese-ink), 0.06);
+  vertical-align: top;
+}
+.tese-sourcing-comparison-table th {
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+  background: rgba(var(--tese-ink), 0.02);
+  white-space: nowrap;
+}
+.tese-sourcing-comparison-table td.is-criterion {
+  font-weight: 550;
+  color: rgb(var(--neutral-600));
+  white-space: nowrap;
+}
+
+.tese-sourcing-input-icon-btn.is-listening {
+  color: rgb(var(--tese-forest));
+  background: rgba(var(--tese-lime), 0.14);
+  box-shadow: 0 0 0 2px rgba(var(--tese-lime), 0.35);
+}
+
+.tese-sourcing-answer-wrap {
+  position: relative;
+}
+.tese-sourcing-minimap {
+  display: none;
+  position: absolute;
+  top: 1rem;
+  right: 0.65rem;
+  flex-direction: column;
+  gap: 0.35rem;
+  z-index: 2;
+}
+@media (min-width: 900px) {
+  .tese-sourcing-minimap {
+    display: flex;
+  }
+}
+.tese-sourcing-minimap-mark {
+  width: 0.35rem;
+  height: 0.85rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0;
+  background: rgba(var(--tese-ink), 0.18);
+  cursor: pointer;
+}
+.tese-sourcing-minimap-mark.is-active,
+.tese-sourcing-minimap-mark:hover {
+  background: rgb(var(--tese-forest));
+}
+
+.tese-sourcing-artifact-card {
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  border-radius: 0.875rem;
+  background: white;
+  padding: 0.875rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.tese-sourcing-artifact-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.tese-sourcing-artifact-preview {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 13px;
+  color: rgb(var(--neutral-600));
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.tese-sourcing-artifact-snippet {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(var(--neutral-600));
+}
+.tese-sourcing-artifact-open {
+  align-self: flex-start;
+  border: 1px solid rgba(var(--tese-ink), 0.12);
+  background: rgba(var(--tese-lime), 0.08);
+  color: rgb(var(--tese-ink));
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+}
+.tese-sourcing-artifact-open:hover {
+  background: rgba(var(--tese-lime), 0.16);
+}
+
+.tese-sourcing-results-hint {
+  margin: 0.85rem 0 0;
+  font-size: 12px;
+  font-weight: 550;
+  color: rgb(var(--neutral-500));
+}
+
+.tese-sourcing-chat.has-rail,
+.tese-sourcing-chat.has-canvas {
+  flex-direction: row;
+}
+.tese-sourcing-chat-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tese-sourcing-rail {
+  width: min(26rem, 44vw);
+  border-left: 1px solid rgba(var(--tese-ink), 0.08);
+  background: #f7f8f5;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.tese-sourcing-rail-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.65rem 0.75rem 0;
+  border-bottom: 1px solid rgba(var(--tese-ink), 0.06);
+}
+.tese-sourcing-rail-tab {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(var(--neutral-500));
+  padding: 0.45rem 0.7rem 0.65rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.tese-sourcing-rail-tab.is-active {
+  color: rgb(var(--tese-ink));
+  border-bottom-color: rgb(var(--tese-forest));
+}
+.tese-sourcing-rail-count {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(var(--tese-lime), 0.25);
+  color: rgb(var(--tese-ink));
+  border-radius: 999px;
+  padding: 0.1rem 0.4rem;
+  min-width: 1.25rem;
+  text-align: center;
+}
+.tese-sourcing-rail-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.85rem 0.85rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.tese-sourcing-rail-empty {
+  margin: 1.5rem 0.5rem;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(var(--neutral-500));
+  text-align: center;
+}
+.tese-sourcing-rail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.tese-sourcing-rail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--neutral-500));
+}
+.tese-sourcing-rail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.tese-sourcing-rail-card {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: white;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  border-radius: 0.75rem;
+  padding: 0.7rem;
+}
+.tese-sourcing-rail-card.is-stack {
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.tese-sourcing-rail-thumb {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.45rem;
+  background: rgba(var(--tese-ink), 0.04);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.tese-sourcing-rail-canvas-slot {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.tese-sourcing-canvas.is-embedded {
+  width: 100%;
+  border-left: none;
+  background: transparent;
+  flex: 1;
+}
+
+.tese-sourcing-canvas {
+  width: min(24rem, 42vw);
+  border-left: 1px solid rgba(var(--tese-ink), 0.08);
+  background: #f7f8f5;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+@media (max-width: 900px) {
+  .tese-sourcing-chat.has-rail,
+  .tese-sourcing-chat.has-canvas {
+    flex-direction: column;
+  }
+  .tese-sourcing-rail,
+  .tese-sourcing-canvas {
+    width: 100%;
+    max-height: 42vh;
+    border-left: none;
+    border-top: 1px solid rgba(var(--tese-ink), 0.08);
+  }
+}
+.tese-sourcing-canvas-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(var(--tese-ink), 0.06);
+}
+.tese-sourcing-canvas-kicker {
+  margin: 0 0 0.25rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--neutral-500));
+}
+.tese-sourcing-canvas-title {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(var(--tese-ink));
+  padding: 0;
+}
+.tese-sourcing-canvas-title:focus {
+  outline: none;
+}
+.tese-sourcing-canvas-close {
+  border: none;
+  background: transparent;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: rgb(var(--neutral-500));
+  cursor: pointer;
+  padding: 0.15rem 0.35rem;
+}
+.tese-sourcing-canvas-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 1rem 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+.tese-sourcing-canvas-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+.tese-sourcing-canvas-check-text {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgb(var(--tese-ink));
+  padding: 0.15rem 0;
+}
+.tese-sourcing-canvas-check-text:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 0.25rem;
+}
+.tese-sourcing-canvas-editor {
+  flex: 1;
+  min-height: 12rem;
+  margin: 0.75rem 1rem 1rem;
+  border: 1px solid rgba(var(--tese-ink), 0.08);
+  border-radius: 0.75rem;
+  background: white;
+  padding: 0.85rem;
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgb(var(--tese-ink));
+  resize: none;
 }
 
 /* Placeholder views */
