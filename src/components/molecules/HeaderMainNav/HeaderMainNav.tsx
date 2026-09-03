@@ -93,6 +93,7 @@ function ChevronDown({ className = "" }: { className?: string }) {
 
 export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
   const t = useTranslations('nav')
+  const tServices = useTranslations('home.services')
   const [openMenu, setOpenMenu] = useState<"products" | "services" | "industries" | null>(null)
   const searchParams = useSearchParams()
 
@@ -184,14 +185,14 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
             <div className="tese-mega-menu-grid">
               {HOME_SERVICES.map((service) => {
                 const colors = SERVICE_ACCENTS[service.id]
-                const description = service.outcome
-                  ? `${service.description} Outcome: ${service.outcome}.`
-                  : service.description
+                const description = `${tServices(`${service.key}.description`)} Outcome: ${tServices(
+                  `${service.key}.outcome`
+                )}.`
                 return (
                   <MegaMenuLinkItem
                     key={service.id}
                     href={service.href}
-                    title={service.title}
+                    title={tServices(`${service.key}.title`)}
                     description={description}
                     accent={colors?.accent}
                     accentSoft={colors?.soft}
