@@ -3,7 +3,7 @@
 import { Button, Input } from "@/components/atoms"
 import { Accordion, FilterCheckboxOption, Modal } from "@/components/molecules"
 import { ListingSidebarSearch } from "@/components/molecules/ListingSidebarSearch/ListingSidebarSearch"
-import { getSectorById } from "@/data/sectors"
+
 import useFilters from "@/hooks/useFilters"
 import useGetAllSearchParams from "@/hooks/useGetAllSearchParams"
 import useUpdateSearchParams from "@/hooks/useUpdateSearchParams"
@@ -13,6 +13,7 @@ import clsx from "clsx"
 import { useSearchParams } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import { ProductListingActiveFilters } from "../ProductListingActiveFilters/ProductListingActiveFilters"
+import { useTranslations } from "next-intl"
 
 /** Algolia facet payload: { [facetValue]: count } */
 export type FacetCounts = Record<string, number>
@@ -30,6 +31,7 @@ export const FilterSections = ({
   categoryLabels?: Record<string, string>
   expandAll?: boolean
 }) => {
+  const tSectors = useTranslations('sectors')
   const { allSearchParams } = useGetAllSearchParams()
 
   return (
@@ -77,7 +79,7 @@ export const FilterSections = ({
           paramKey="sectors"
           items={facets["sectors"]}
           defaultOpen={expandAll || Boolean(allSearchParams.sectors)}
-          formatLabel={(value) => getSectorById(value).shortLabel}
+          formatLabel={(value) => tSectors(`${value}.shortLabel`)}
         />
       )}
     </>

@@ -25,6 +25,7 @@ import { categoryHref } from "@/lib/data/categories"
 import { useTranslations } from "next-intl"
 
 import { MegaMenuLinkItem, MegaMenuPanel } from "./NavMegaMenu"
+import { useTranslatedSectors } from "@/lib/i18n/sector-copy"
 
 const SERVICE_ACCENTS: Record<string, { accent: string; soft: string }> = {
   marketplace: { accent: '#0f172a', soft: 'rgba(15, 23, 42, 0.1)' },
@@ -94,6 +95,7 @@ function ChevronDown({ className = "" }: { className?: string }) {
 export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
   const t = useTranslations('nav')
   const tServices = useTranslations('home.services')
+  const translatedSectors = useTranslatedSectors(SECTORS)
   const [openMenu, setOpenMenu] = useState<"products" | "services" | "industries" | null>(null)
   const searchParams = useSearchParams()
 
@@ -232,7 +234,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
           >
             <p className="tese-mega-menu-intro">{MEGA_MENU_INDUSTRIES.subtitle}</p>
             <div className="tese-mega-menu-list">
-              {SECTORS.map((sector) => {
+              {translatedSectors.map((sector) => {
                 if (sector.id === 'all') {
                   return (
                     <MegaMenuLinkItem

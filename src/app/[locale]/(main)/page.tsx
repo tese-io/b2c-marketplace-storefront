@@ -26,6 +26,7 @@ import { listRegions } from "@/lib/data/regions"
 import { toContentLanguage } from "@/lib/helpers/hreflang"
 import { buildLanguageAlternates } from "@/lib/i18n/alternates"
 import { getCountryCode } from "@/lib/i18n/locale"
+import { getTranslatedSector } from "@/lib/i18n/sector-copy"
 
 export async function generateMetadata({
   params,
@@ -119,11 +120,12 @@ export default async function Home({
   const query = await searchParams
   const cookiePrefs = await getSectorPreferencesFromCookies()
   const { parentCategories } = await listCategories()
-  const { sector, industryHandle, sectorId } = resolveSectorPreferences(
+  const { sector: sourceSector, industryHandle, sectorId } = resolveSectorPreferences(
     query,
     cookiePrefs,
     parentCategories
   )
+  const sector = await getTranslatedSector(sourceSector.id)
 
   const headersList = await headers()
   const host = headersList.get("host")

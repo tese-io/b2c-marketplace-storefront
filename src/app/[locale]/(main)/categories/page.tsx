@@ -10,6 +10,7 @@ import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Script from 'next/script'
 import { Suspense } from 'react'
+import { getTranslatedSector } from '@/lib/i18n/sector-copy'
 
 export const revalidate = 60
 
@@ -89,11 +90,12 @@ async function AllCategories({
   const listingType = sp.listing === 'service' ? 'service' : undefined
   const cookiePrefs = await getSectorPreferencesFromCookies()
   const { parentCategories } = await listCategories()
-  const { sector, sectorId, industryHandle } = resolveSectorPreferences(
+  const { sector: sourceSector, sectorId, industryHandle } = resolveSectorPreferences(
     sp,
     cookiePrefs,
     parentCategories
   )
+  const sector = await getTranslatedSector(sourceSector.id)
 
   const headersList = await headers()
   const host = headersList.get('host')
