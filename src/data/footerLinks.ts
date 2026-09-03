@@ -1,22 +1,27 @@
+/**
+ * Footer navigation. Labels are translation keys under `footer.links` rather
+ * than copy, so the footer reads in the visitor's language. Social networks keep
+ * their brand names, which are not translated.
+ */
 const links = {
   customerServices: [
-    { label: 'FAQs', path: '#' },
-    { label: 'Track Order', path: '#' },
-    { label: 'Returns', path: '#' },
-    { label: 'Delivery', path: '#' },
-    { label: 'Payment', path: '#' },
+    { key: 'faqs', path: '#' },
+    { key: 'trackOrder', path: '#' },
+    { key: 'returns', path: '#' },
+    { key: 'delivery', path: '#' },
+    { key: 'payment', path: '#' }
   ],
   about: [
-    { label: 'About us', path: '#' },
-    { label: 'Blog', path: '#' },
-    { label: 'Privacy Policy', path: '#' },
-    { label: 'Terms & Conditions', path: '#' },
+    { key: 'aboutUs', path: '#' },
+    { key: 'blog', path: '#' },
+    { key: 'privacyPolicy', path: '#' },
+    { key: 'termsConditions', path: '#' }
   ],
   connect: [
-    { label: 'Facebook', path: 'https://facebook.com' },
-    { label: 'Instagram', path: 'https://instagram.com' },
-    { label: 'LinekdIn', path: 'https://linkedin.com' },
-  ],
+    { name: 'Facebook', path: 'https://facebook.com' },
+    { name: 'Instagram', path: 'https://instagram.com' },
+    { name: 'LinkedIn', path: 'https://linkedin.com' }
+  ]
 };
 
 export default links;

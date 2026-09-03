@@ -14,6 +14,9 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 
 import { updateRegionWithValidation } from "@/lib/data/cart"
+import { DEFAULT_LANGUAGE, isLanguageOfferedIn } from "@/lib/i18n/config"
+import { parseLocale } from "@/lib/i18n/locale"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Label } from "@medusajs/ui"
 import { toast } from "@/lib/helpers/toast"
@@ -37,9 +40,12 @@ function formatCurrencyCode (code: string) {
 const CountrySelect = ({ regions, variant = "default" }: CountrySelectProps) => {
   const [current, setCurrent] = useState<CountryOption | undefined>(undefined)
 
-  const { locale: countryCode } = useParams()
+  const t = useTranslations("header")
+  const { locale: localeSegment } = useParams()
+  const segment = String(localeSegment ?? "")
+  const { language, countryCode } = parseLocale(segment)
   const router = useRouter()
-  const currentPath = usePathname().split(`/${countryCode}`)[1]
+  const currentPath = usePathname().split(`/${segment}`)[1]
 
   const options = useMemo(() => {
     return regions
@@ -66,7 +72,17 @@ const CountrySelect = ({ regions, variant = "default" }: CountrySelectProps) => 
 
   const handleChange = async (option: CountryOption) => {
     try {
-      const result = await updateRegionWithValidation(option.country, currentPath)
+      // Switching market keeps the reader's language where we offer it there,
+      // and falls back to the default rather than 404ing on a pair we do not serve.
+      const nextLanguage = isLanguageOfferedIn(language, option.country)
+        ? language
+        : DEFAULT_LANGUAGE
+
+      const result = await updateRegionWithValidation(
+        option.country,
+        currentPath,
+        nextLanguage
+      )
 
       if (result.removedItems.length > 0) {
         const itemsList = result.removedItems.join(", ")
@@ -123,7 +139,7 @@ const CountrySelect = ({ regions, variant = "default" }: CountrySelectProps) => 
                     countryCode={current.country}
                   />
                   {isHeader ? (
-                    <span className="hidden sm:inline text-secondary">Ship to</span>
+                    <span className="hidden sm:inline text-secondary">{t("shipTo")}</span>
                   ) : null}
                   <span>{current.country.toUpperCase()}</span>
                   <span className="text-secondary font-normal" aria-hidden>

@@ -23,14 +23,17 @@ import { getSectorPreferencesFromCookies } from "@/lib/data/cookies"
 import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/constants/brand"
 import { resolveSectorPreferences } from "@/lib/helpers/sector-preferences"
 import { listRegions } from "@/lib/data/regions"
-import { toHreflang } from "@/lib/helpers/hreflang"
+import { toContentLanguage } from "@/lib/helpers/hreflang"
+import { buildLanguageAlternates } from "@/lib/i18n/alternates"
+import { getCountryCode } from "@/lib/i18n/locale"
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>
 }): Promise<Metadata> {
-  const { locale } = await params
+  const { locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
 
   const headersList = await headers()
   const host = headersList.get("host")
@@ -49,19 +52,15 @@ export async function generateMetadata({
       )
     ) as string[]
 
-    languages = locales.reduce<Record<string, string>>((acc, code) => {
-      const hrefLang = toHreflang(code)
-      acc[hrefLang] = `${baseUrl}/${code}`
-      return acc
-    }, {})
+    languages = buildLanguageAlternates(locales, baseUrl)
   } catch {
-    languages = { [toHreflang(locale)]: `${baseUrl}/${locale}` }
+    languages = buildLanguageAlternates([getCountryCode(locale)], baseUrl)
   }
 
   const title = "Home"
   const description = SITE_DESCRIPTION
   const ogImage = "/B2C_Storefront_Open_Graph.png"
-  const canonical = `${baseUrl}/${locale}`
+  const canonical = `${baseUrl}/${localeSegment}`
 
   return {
     title,
@@ -115,7 +114,8 @@ export default async function Home({
   params: Promise<{ locale: string }>
   searchParams: Promise<{ sector?: string; industry?: string }>
 }) {
-  const { locale } = await params
+  const { locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
   const query = await searchParams
   const cookiePrefs = await getSectorPreferencesFromCookies()
   const { parentCategories } = await listCategories()
@@ -161,7 +161,7 @@ export default async function Home({
             "@type": "WebSite",
             name: SITE_NAME,
             url: `${baseUrl}/${locale}`,
-            inLanguage: toHreflang(locale),
+            inLanguage: toContentLanguage(),
           }),
         }}
       />

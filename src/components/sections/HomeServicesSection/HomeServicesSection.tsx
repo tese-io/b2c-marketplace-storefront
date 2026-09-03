@@ -1,5 +1,6 @@
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
 import { HOME_SERVICES, type HomeService } from '@/data/homepage'
+import { getTranslations } from 'next-intl/server'
 
 function ServiceIcon({ icon }: { icon: HomeService['icon'] }) {
   const stroke = {
@@ -44,7 +45,8 @@ function ServiceIcon({ icon }: { icon: HomeService['icon'] }) {
   }
 }
 
-export function HomeServicesSection() {
+export async function HomeServicesSection() {
+  const t = await getTranslations("home.services")
   return (
     <section className="tese-services-section" aria-labelledby="home-services-heading">
       <div className="tese-products-section-header">
@@ -79,11 +81,11 @@ export function HomeServicesSection() {
             <div className="tese-service-card-icon">
               <ServiceIcon icon={service.icon} />
             </div>
-            <h3 className="tese-service-card-title">{service.title}</h3>
-            {service.outcome && (
-              <p className="tese-service-card-outcome">{service.outcome}</p>
+            <h3 className="tese-service-card-title">{t(`${service.key}.title`)}</h3>
+            {true && (
+              <p className="tese-service-card-outcome">{t(`${service.key}.outcome`)}</p>
             )}
-            <p className="tese-service-card-desc">{service.description}</p>
+            <p className="tese-service-card-desc">{t(`${service.key}.description`)}</p>
             <span className="tese-service-card-link">
               Learn more →
             </span>

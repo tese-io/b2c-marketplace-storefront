@@ -7,6 +7,7 @@ import OrderItems from '@/components/organisms/OrderItems/OrderItems'
 import { CartSummary } from '@/components/organisms'
 import { HttpTypes } from '@medusajs/types'
 import { format } from 'date-fns'
+import { getTranslations } from 'next-intl/server'
 
 function SuccessIcon () {
   return (
@@ -24,11 +25,12 @@ function SuccessIcon () {
   )
 }
 
-export function OrderConfirmedSection ({
+export async function OrderConfirmedSection ({
   order,
 }: {
   order: HttpTypes.StoreOrder & { order_set?: { id: string } }
 }) {
+  const t = await getTranslations("order")
   const orderSetId = order.order_set?.id ?? order.id
   const itemCount = order.items?.reduce((sum, item) => sum + (item.quantity ?? 0), 0) ?? 0
   const orderDate = order.created_at
@@ -39,8 +41,8 @@ export function OrderConfirmedSection ({
     <div className="tese-order-confirmed" data-testid="order-complete-container">
       <section className="tese-order-hero">
         <SuccessIcon />
-        <p className="tese-order-eyebrow">Order confirmed</p>
-        <h1 className="tese-order-title">Thank you — your order is in.</h1>
+        <p className="tese-order-eyebrow">{t("confirmed")}</p>
+        <h1 className="tese-order-title">{t("thankYou")}</h1>
         <p className="tese-order-lead">
           We sent confirmation to{' '}
           <span className="tese-order-email" data-testid="order-email">
@@ -51,17 +53,17 @@ export function OrderConfirmedSection ({
 
         <div className="tese-order-hero-meta">
           <div className="tese-order-meta-chip">
-            <span className="tese-order-meta-label">Order #</span>
+            <span className="tese-order-meta-label">{t("orderHash")}</span>
             <span className="tese-order-meta-value">{order.display_id}</span>
           </div>
           {orderDate && (
             <div className="tese-order-meta-chip">
-              <span className="tese-order-meta-label">Placed</span>
+              <span className="tese-order-meta-label">{t("placed")}</span>
               <span className="tese-order-meta-value">{orderDate}</span>
             </div>
           )}
           <div className="tese-order-meta-chip">
-            <span className="tese-order-meta-label">Items</span>
+            <span className="tese-order-meta-label">{t("items")}</span>
             <span className="tese-order-meta-value">
               {itemCount} {itemCount === 1 ? 'item' : 'items'}
             </span>
@@ -72,19 +74,19 @@ export function OrderConfirmedSection ({
       <div className="tese-order-layout">
         <div className="tese-order-main">
           <div className="tese-order-card">
-            <h2 className="tese-order-card-title">Order details</h2>
+            <h2 className="tese-order-card-title">{t("orderDetails")}</h2>
             <OrderDetails order={order} />
           </div>
 
           <div className="tese-order-card">
-            <h2 className="tese-order-card-title">Items ordered</h2>
+            <h2 className="tese-order-card-title">{t("itemsOrdered")}</h2>
             <OrderItems order={order} />
           </div>
         </div>
 
         <aside className="tese-order-aside">
           <div className="tese-order-card tese-order-summary-card">
-            <h2 className="tese-order-card-title">Summary</h2>
+            <h2 className="tese-order-card-title">{t("summary")}</h2>
             <CartSummary
               item_total={order.item_total ?? 0}
               shipping_total={order.shipping_subtotal ?? order.shipping_total ?? 0}
@@ -96,7 +98,7 @@ export function OrderConfirmedSection ({
           </div>
 
           <div className="tese-order-card">
-            <h2 className="tese-order-card-title">Delivery & payment</h2>
+            <h2 className="tese-order-card-title">{t("deliveryAndPayment")}</h2>
             <OrderShipping order={order} />
           </div>
         </aside>

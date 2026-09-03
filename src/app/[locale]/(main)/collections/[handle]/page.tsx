@@ -7,6 +7,7 @@ import { getRegion } from "@/lib/data/regions"
 import isBot from "@/lib/helpers/isBot"
 import { getWishlistState } from "@/lib/helpers/wishlist-state"
 import { Suspense } from "react"
+import { getCountryCode } from "@/lib/i18n/locale"
 
 const ALGOLIA_ID = process.env.NEXT_PUBLIC_ALGOLIA_ID
 const ALGOLIA_SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY
@@ -16,7 +17,8 @@ const SingleCollectionsPage = async ({
 }: {
   params: Promise<{ handle: string; locale: string }>
 }) => {
-  const { handle, locale } = await params
+  const { handle, locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
 
   const bot = isBot(navigator.userAgent)
   const collection = await getCollectionByHandle(handle)

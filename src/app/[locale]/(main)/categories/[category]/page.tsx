@@ -3,7 +3,8 @@ import { CatalogPage } from '@/components/sections/CatalogPage/CatalogPage'
 import { getCategoryByHandle, listCategories } from '@/lib/data/categories'
 import { getSectorPreferencesFromCookies } from '@/lib/data/cookies'
 import { resolveSectorPreferences } from '@/lib/helpers/sector-preferences'
-import { toHreflang } from '@/lib/helpers/hreflang'
+import { buildLanguageAlternates } from '@/lib/i18n/alternates'
+import { getCountryCode } from '@/lib/i18n/locale'
 import { listRegions } from '@/lib/data/regions'
 import type { Metadata } from 'next'
 import { headers } from 'next/headers'
@@ -20,7 +21,8 @@ export async function generateMetadata({
   params: Promise<{ category: string; locale: string }>
   searchParams: Promise<{ sector?: string; industry?: string }>
 }): Promise<Metadata> {
-  const { category: categoryHandle, locale } = await params
+  const { category: categoryHandle, locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
   const sp = await searchParams
   const headersList = await headers()
   const host = headersList.get('host')
@@ -40,14 +42,13 @@ export async function generateMetadata({
         (regions || []).flatMap((r) => r.countries?.map((c) => c.iso_2) || [])
       )
     ) as string[]
-    languages = locales.reduce<Record<string, string>>((acc, code) => {
-      acc[toHreflang(code)] = `${baseUrl}/${code}/categories/${categoryHandle}`
-      return acc
-    }, {})
+    languages = buildLanguageAlternates(locales, baseUrl, `/categories/${categoryHandle}`)
   } catch {
-    languages = {
-      [toHreflang(locale)]: `${baseUrl}/${locale}/categories/${categoryHandle}`,
-    }
+    languages = buildLanguageAlternates(
+      [getCountryCode(locale)],
+      baseUrl,
+      `/categories/${categoryHandle}`
+    )
   }
 
   const title = `${cat.name}`
@@ -58,7 +59,7 @@ export async function generateMetadata({
   if (sp.sector) query.set('sector', sp.sector)
   if (sp.industry) query.set('industry', sp.industry)
   const qs = query.toString()
-  const canonical = `${baseUrl}/${locale}/categories/${categoryHandle}${qs ? `?${qs}` : ''}`
+  const canonical = `${baseUrl}/${localeSegment}/categories/${categoryHandle}${qs ? `?${qs}` : ''}`
 
   return {
     title,
@@ -94,7 +95,8 @@ async function Category({
     page?: string
   }>
 }) {
-  const { category: categoryHandle, locale } = await params
+  const { category: categoryHandle, locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
   const sp = await searchParams
   const listingType = sp.listing === 'service' ? 'service' : undefined
 

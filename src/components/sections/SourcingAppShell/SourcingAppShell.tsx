@@ -31,6 +31,7 @@ import {
   SOURCING_HISTORY_EVENT,
 } from '@/lib/sourcing-history'
 import { SourcingPageFooter } from '@/components/sections/SourcingWorkspace/SourcingPageFooter'
+import { useTranslations } from 'next-intl'
 
 type NavItem = {
   id: string
@@ -181,6 +182,7 @@ export function SourcingAppShell ({
   user,
   children,
 }: Omit<SourcingAppShellProps, 'locale'>) {
+  const t = useTranslations("sourcing")
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const unreads = useMatrixUnreads()
@@ -254,7 +256,7 @@ export function SourcingAppShell ({
 
       <aside
         className={`tese-sourcing-sidebar ${sidebarOpen ? 'is-open' : ''}`}
-        aria-label="Sourcing workspace navigation"
+        aria-label={t("workspaceNav")}
       >
         <div className="tese-sourcing-sidebar-head">
           <TeseLogo variant="dark" className="tese-sourcing-logo" />
@@ -262,7 +264,7 @@ export function SourcingAppShell ({
             type="button"
             className="tese-sourcing-icon-btn lg:hidden"
             onClick={closeSidebar}
-            aria-label="Close navigation"
+            aria-label={t("closeNav")}
           >
             <CollapseIcon size={20} />
           </button>
@@ -298,7 +300,7 @@ export function SourcingAppShell ({
         </nav>
 
         <div className="tese-sourcing-sidebar-foot">
-          <p className="tese-sourcing-history-label">Recent</p>
+          <p className="tese-sourcing-history-label">{t("recent")}</p>
           {threads.length > 0 ? (
             <ul className="tese-sourcing-history-list">
               {threads.slice(0, 8).map((thread) => {
@@ -340,7 +342,7 @@ export function SourcingAppShell ({
             className="tese-sourcing-nav-item tese-sourcing-sidebar-marketplace"
           >
             <SidebarSparkIcon size={18} className="shrink-0 tese-sourcing-sidebar-icon" />
-            <span className="tese-sourcing-nav-item-label">Marketplace</span>
+            <span className="tese-sourcing-nav-item-label">{t("marketplace")}</span>
           </LocalizedClientLink>
         </div>
 
@@ -352,7 +354,7 @@ export function SourcingAppShell ({
               data-testid="sidebar-logout-button"
             >
               <SidebarLogoutIcon size={18} className="shrink-0 tese-sourcing-sidebar-icon" />
-              <span className="tese-sourcing-nav-item-label">Log out</span>
+              <span className="tese-sourcing-nav-item-label">{t("logOut")}</span>
             </LogoutButton>
           ) : (
             <LocalizedClientLink
@@ -361,7 +363,7 @@ export function SourcingAppShell ({
               className="tese-sourcing-nav-item tese-sourcing-sidebar-logout"
             >
               <SidebarLogoutIcon size={18} className="shrink-0 tese-sourcing-sidebar-icon" />
-              <span className="tese-sourcing-nav-item-label">Sign in</span>
+              <span className="tese-sourcing-nav-item-label">{t("signIn")}</span>
             </LocalizedClientLink>
           )}
         </div>
@@ -374,7 +376,7 @@ export function SourcingAppShell ({
               type="button"
               className="tese-sourcing-icon-btn lg:hidden"
               onClick={() => setSidebarOpen(true)}
-              aria-label="Open navigation"
+              aria-label={t("openNav")}
             >
               <HamburgerMenuIcon size={20} />
             </button>

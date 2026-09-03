@@ -17,6 +17,8 @@ import {
   setCartId
 } from './cookies';
 import { getRegion } from './regions';
+import { DEFAULT_LANGUAGE } from '@/lib/i18n/config';
+import { formatLocale } from '@/lib/i18n/locale';
 
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
@@ -467,7 +469,8 @@ export async function updateRegion(countryCode: string, currentPath: string) {
  */
 export async function updateRegionWithValidation(
   countryCode: string,
-  currentPath: string
+  currentPath: string,
+  language: string = DEFAULT_LANGUAGE
 ): Promise<{ removedItems: string[]; newPath: string }> {
   const cartId = await getCartId();
   const region = await getRegion(countryCode);
@@ -549,7 +552,7 @@ export async function updateRegionWithValidation(
 
   return {
     removedItems,
-    newPath: `/${countryCode}${currentPath}`
+    newPath: `/${formatLocale(language, countryCode)}${currentPath}`
   };
 }
 

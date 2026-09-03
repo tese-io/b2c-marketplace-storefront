@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 
 export type CanvasDoc = {
   id: string
@@ -18,12 +19,13 @@ type SourcingCanvasProps = {
 }
 
 export function SourcingCanvas ({ doc, onClose, onChange, embedded = false }: SourcingCanvasProps) {
+  const t = useTranslations("sourcing")
   if (!doc) return null
 
   const Tag = embedded ? 'div' : 'aside'
 
   return (
-    <Tag className={`tese-sourcing-canvas ${embedded ? 'is-embedded' : ''}`} aria-label="Sourcing canvas">
+    <Tag className={`tese-sourcing-canvas ${embedded ? 'is-embedded' : ''}`} aria-label={t("canvas")}>
       <div className="tese-sourcing-canvas-head">
         <div>
           <p className="tese-sourcing-canvas-kicker">
@@ -33,14 +35,14 @@ export function SourcingCanvas ({ doc, onClose, onChange, embedded = false }: So
             className="tese-sourcing-canvas-title"
             value={doc.title}
             onChange={(e) => onChange({ ...doc, title: e.target.value })}
-            aria-label="Canvas title"
+            aria-label={t("canvasTitle")}
           />
         </div>
         <button
           type="button"
           className="tese-sourcing-canvas-close"
           onClick={onClose}
-          aria-label="Close canvas"
+          aria-label={t("closeCanvas")}
         >
           ×
         </button>
@@ -70,7 +72,7 @@ export function SourcingCanvas ({ doc, onClose, onChange, embedded = false }: So
           className="tese-sourcing-canvas-editor"
           value={doc.markdown || ''}
           onChange={(e) => onChange({ ...doc, markdown: e.target.value })}
-          aria-label="Canvas document"
+          aria-label={t("canvasDocument")}
         />
       )}
     </Tag>

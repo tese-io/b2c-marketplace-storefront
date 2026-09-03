@@ -15,6 +15,7 @@ import { isStripe as isStripeFunc, paymentInfoMap } from '../../../lib/constants
 import PaymentContainer, {
   StripeCardContainer
 } from '../../organisms/PaymentContainer/PaymentContainer';
+import { useTranslations } from 'next-intl';
 
 type StoreCardPaymentMethod = any & {
   service_zone?: {
@@ -31,6 +32,7 @@ const CartPaymentSection = ({
   cart: any;
   availablePaymentMethods: StoreCardPaymentMethod[] | null;
 }) => {
+  const t = useTranslations("checkout")
   const activeSession = cart.payment_collection?.payment_sessions?.find(
     (paymentSession: any) => paymentSession.status === 'pending'
   );

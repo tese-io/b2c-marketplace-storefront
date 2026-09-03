@@ -1,6 +1,7 @@
 "use client"
 import { PaginationButton } from "@/components/atoms"
 import { CollapseIcon, MeatballsMenuIcon } from "@/icons"
+import { useTranslations } from "next-intl"
 
 export const Pagination = ({
   pages,
@@ -11,12 +12,14 @@ export const Pagination = ({
   setPage: (page: number) => void
   currentPage: number
 }) => {
+  const t = useTranslations("pagination")
+
   const renderPaginationButtons = () => {
     const buttons = [] as React.ReactNode[]
 
     if (currentPage > 2) {
       buttons.push(
-        <PaginationButton key={`gap-left`} disabled aria-label="More pages" data-testid="pagination-ellipsis-left">
+        <PaginationButton key={`gap-left`} disabled aria-label={t("morePages")} data-testid="pagination-ellipsis-left">
           <MeatballsMenuIcon />
         </PaginationButton>
       )
@@ -61,7 +64,7 @@ export const Pagination = ({
 
     if (currentPage < pages - 1) {
       buttons.push(
-        <PaginationButton key={`gap-right`} disabled aria-label="More pages" data-testid="pagination-ellipsis-right">
+        <PaginationButton key={`gap-right`} disabled aria-label={t("morePages")} data-testid="pagination-ellipsis-right">
           <MeatballsMenuIcon />
         </PaginationButton>
       )
@@ -76,7 +79,7 @@ export const Pagination = ({
         disabled={Boolean(currentPage === 1)}
         onClick={() => setPage(currentPage - 1)}
         className="border-none"
-        aria-label="Previous page"
+        aria-label={t("previousPage")}
         data-testid="pagination-previous"
       >
         <CollapseIcon size={20} className="rotate-90" />
@@ -88,7 +91,7 @@ export const Pagination = ({
         disabled={Boolean(currentPage === pages)}
         onClick={() => setPage(currentPage + 1)}
         className="border-none"
-        aria-label="Next page"
+        aria-label={t("nextPage")}
         data-testid="pagination-next"
       >
         <CollapseIcon size={20} className="-rotate-90" />

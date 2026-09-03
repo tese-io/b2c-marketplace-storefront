@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 
+import { getCountryCode } from '@/lib/i18n/locale'
+
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
 import { ChatDrawer } from '@/components/organisms/Chat/ChatDrawer'
 import { InquiryProductStrip } from '@/components/sections/SourcingInquiries/InquiryProductStrip'
@@ -67,7 +69,8 @@ function InquiryDetailSkeleton () {
 
 export function InquiryDetail ({ enquiryId }: { enquiryId: string }) {
   const params = useParams()
-  const countryCode = typeof params.locale === 'string' ? params.locale : 'en'
+  const countryCode =
+    typeof params.locale === 'string' ? getCountryCode(params.locale) : 'en'
 
   const [enquiry, setEnquiry] = useState<Enquiry | null>(null)
   const [loading, setLoading] = useState(true)

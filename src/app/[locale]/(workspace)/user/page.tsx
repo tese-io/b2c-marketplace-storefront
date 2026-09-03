@@ -10,13 +10,15 @@ import { retrieveCustomer } from '@/lib/data/customer'
 import { listEnquiries } from '@/lib/data/enquiries'
 import { listOrders } from '@/lib/data/orders'
 import { getUserWishlists } from '@/lib/data/wishlist'
+import { getCountryCode } from '@/lib/i18n/locale'
 
 export default async function UserPage ({
   params,
 }: {
   params: Promise<{ locale: string }>
 }) {
-  const { locale } = await params
+  const { locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
   const user = await retrieveCustomer()
 
   if (!user) {

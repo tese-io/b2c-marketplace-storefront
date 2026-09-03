@@ -5,16 +5,18 @@ import './globals.css';
 
 import { Toaster } from '@medusajs/ui';
 import Head from 'next/head';
+import { headers } from 'next/headers';
 
-import { HtmlLangSetter } from '@/components/atoms/HtmlLangSetter/HtmlLangSetter';
 import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/constants/brand';
+import { DEFAULT_LANGUAGE, directionOf, LANGUAGE_HEADER } from '@/lib/i18n/config';
 import { retrieveCart } from '@/lib/data/cart';
 
 import { Providers } from './providers';
 
+// Poppins covers Latin and Devanagari, so every language we serve shares one face.
 const poppins = Poppins({
   variable: '--font-poppins',
-  subsets: ['latin'],
+  subsets: ['latin', 'devanagari'],
   weight: ['300', '400', '500', '600', '700'],
   display: 'swap'
 });
@@ -48,12 +50,17 @@ export default async function RootLayout({
   const cart = await retrieveCart();
 
   const ALGOLIA_APP = process.env.NEXT_PUBLIC_ALGOLIA_ID;
-  // default lang updated by HtmlLangSetter
-  const htmlLang = 'en';
+  // Middleware resolved the language from the URL segment; the root layout sits
+  // above `[locale]` so it cannot read the param itself.
+  const htmlLang = (await headers()).get(LANGUAGE_HEADER) || DEFAULT_LANGUAGE;
+
+  // Declared from the registry so a right-to-left language only needs an entry there.
+  const direction = directionOf(htmlLang);
 
   return (
     <html
       lang={htmlLang}
+      dir={direction}
       className={poppins.variable}
     >
       <Head>
@@ -149,7 +156,6 @@ export default async function RootLayout({
         )}
       </Head>
       <body className={`${poppins.className} relative bg-primary text-secondary antialiased`}>
-        <HtmlLangSetter />
         <Providers cart={cart}>{children}</Providers>
         <Toaster position="top-right" />
       </body>

@@ -1,11 +1,13 @@
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
 import { SITE_NAME } from '@/lib/constants/brand'
+import { getTranslations } from 'next-intl/server'
 
 type AuthChromeProps = {
   children: React.ReactNode
 }
 
-export function AuthChrome ({ children }: AuthChromeProps) {
+export async function AuthChrome ({ children }: AuthChromeProps) {
+  const t = await getTranslations("auth")
   const year = new Date().getFullYear()
 
   return (

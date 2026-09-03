@@ -1,19 +1,25 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 
 export function HeroSearch({ locale }: { locale: string }) {
   const router = useRouter()
+  const params = useParams()
+  const t = useTranslations("hero")
   const [query, setQuery] = useState("")
+
+  // `locale` is the market; the URL segment carries language too.
+  const segment = String(params?.locale ?? locale)
 
   function goSearch(q: string) {
     const trimmed = q.trim()
     if (!trimmed) {
-      router.push(`/${locale}/sourcing`)
+      router.push(`/${segment}/sourcing`)
       return
     }
-    router.push(`/${locale}/sourcing?q=${encodeURIComponent(trimmed)}`)
+    router.push(`/${segment}/sourcing?q=${encodeURIComponent(trimmed)}`)
   }
 
   return (
@@ -33,11 +39,11 @@ export function HeroSearch({ locale }: { locale: string }) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Describe what you need — grade, qty, certifications, region…"
+          placeholder={t("searchPlaceholder")}
           className="tese-hero-search-input"
         />
         <button type="submit" className="tese-hero-search-btn cursor-pointer">
-          Search
+          {t("search")}
         </button>
       </form>
     </div>

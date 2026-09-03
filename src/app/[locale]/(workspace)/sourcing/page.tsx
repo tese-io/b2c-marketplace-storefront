@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 
 import { SourcingWorkspace } from '@/components/sections/SourcingWorkspace/SourcingWorkspace'
+import { getCountryCode } from '@/lib/i18n/locale'
 
 export const metadata: Metadata = {
   title: 'AI Sourcing',
@@ -22,10 +23,11 @@ export default async function SourcingPage({
 }: {
   params: Promise<{ locale: string }>
 }) {
-  const { locale } = await params
+  const { locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
   return (
     <Suspense fallback={<SourcingFallback />}>
-      <SourcingWorkspace locale={locale} />
+      <SourcingWorkspace locale={localeSegment} />
     </Suspense>
   )
 }

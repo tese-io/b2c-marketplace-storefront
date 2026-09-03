@@ -6,13 +6,15 @@ import { getRegion } from "@/lib/data/regions"
 import { getSellerByHandle } from "@/lib/data/seller"
 import { getSellerOrbitProfile } from "@/lib/data/seller-orbit"
 import { SellerProps } from "@/types/seller"
+import { getCountryCode } from "@/lib/i18n/locale"
 
 export default async function SellerPage({
   params,
 }: {
   params: Promise<{ handle: string; locale: string }>
 }) {
-  const { handle, locale } = await params
+  const { handle, locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
 
   const seller = (await getSellerByHandle(handle)) as SellerProps
 

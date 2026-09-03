@@ -1,6 +1,7 @@
 import { AuthChrome } from '@/components/sections/Auth/AuthChrome'
 import { checkRegion } from '@/lib/helpers/check-region'
 import { redirect } from 'next/navigation'
+import { getCountryCode } from '@/lib/i18n/locale'
 
 export default async function AuthLayout ({
   children,
@@ -9,7 +10,8 @@ export default async function AuthLayout ({
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }>) {
-  const { locale } = await params
+  const { locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
   const regionCheck = await checkRegion(locale)
 
   if (!regionCheck) {

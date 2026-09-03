@@ -28,6 +28,7 @@ export function B2BCatalogProductShell({
   listings,
   catalogHandle,
   locale,
+  localeSegment,
   user,
   wishlist,
   sectorLabels,
@@ -38,6 +39,7 @@ export function B2BCatalogProductShell({
   listings: CatalogListing[]
   catalogHandle: string
   locale: string
+  localeSegment: string
   user: HttpTypes.StoreCustomer | null
   wishlist?: Wishlist
   sectorLabels?: string[]
@@ -88,8 +90,8 @@ export function B2BCatalogProductShell({
       const query = params.toString()
       router.replace(
         query
-          ? `/${locale}/products/${catalogHandle}?${query}`
-          : `/${locale}/products/${catalogHandle}`,
+          ? `/${localeSegment}/products/${catalogHandle}?${query}`
+          : `/${localeSegment}/products/${catalogHandle}`,
         { scroll: false }
       )
     },

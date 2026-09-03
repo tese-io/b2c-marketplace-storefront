@@ -22,6 +22,7 @@ import {
   SECTOR_COOKIE,
 } from "@/lib/helpers/sector-preferences"
 import { categoryHref } from "@/lib/data/categories"
+import { useTranslations } from "next-intl"
 
 import { MegaMenuLinkItem, MegaMenuPanel } from "./NavMegaMenu"
 
@@ -91,6 +92,7 @@ function ChevronDown({ className = "" }: { className?: string }) {
 }
 
 export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
+  const t = useTranslations('nav')
   const [openMenu, setOpenMenu] = useState<"products" | "services" | "industries" | null>(null)
   const searchParams = useSearchParams()
 
@@ -118,7 +120,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
           )}
           aria-expanded={openMenu === "products"}
         >
-          Products
+          {t('products')}
           <ChevronDown className={openMenu === "products" ? "rotate-180" : ""} />
         </button>
         {openMenu === "products" && (
@@ -167,7 +169,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
           )}
           aria-expanded={openMenu === "services"}
         >
-          Services
+          {t('services')}
           <ChevronDown className={openMenu === "services" ? "rotate-180" : ""} />
         </button>
         {openMenu === "services" && (
@@ -215,7 +217,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
           )}
           aria-expanded={openMenu === "industries"}
         >
-          Industries
+          {t('industries')}
           <ChevronDown className={openMenu === "industries" ? "rotate-180" : ""} />
         </button>
         {openMenu === "industries" && (
@@ -267,11 +269,11 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
       </div>
 
       <LocalizedClientLink href="/sourcing" className="tese-nav-link">
-        AI Sourcing
+        {t('aiSourcing')}
       </LocalizedClientLink>
 
       <LocalizedClientLink href={`/categories${catalogQuery}`} className="tese-nav-link">
-        Catalogue
+        {t('catalogue')}
       </LocalizedClientLink>
     </nav>
   )

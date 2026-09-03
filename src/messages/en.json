@@ -1,0 +1,326 @@
+{
+  "nav": {
+    "products": "Products",
+    "services": "Services",
+    "industries": "Industries",
+    "aiSourcing": "AI Sourcing",
+    "catalogue": "Catalogue"
+  },
+  "header": {
+    "getInTouch": "Get in touch",
+    "shipTo": "Ship to",
+    "marketplacePulse": "Marketplace Pulse",
+    "accountAndCart": "Account and cart",
+    "wishlist": "Wishlist",
+    "language": "Language",
+    "changeLanguage": "Change language"
+  },
+  "hero": {
+    "eyebrow": "Procurement aligned with your ESG goals",
+    "headlineLead": "The sustainability-focused marketplace",
+    "headlineFor": "for",
+    "headlineAccent": "responsible procurement",
+    "personalisedFor": "Personalised for {sector}",
+    "searchPlaceholder": "Describe what you need — grade, qty, certifications, region…",
+    "search": "Search",
+    "proof": {
+      "verifiedListings": "Verified listings",
+      "sustainableCategories": "Sustainable categories",
+      "certificationData": "Certification data",
+      "avgSearchTime": "Avg. AI search time"
+    }
+  },
+  "footer": {
+    "tagline": "Personalise by sector in the header to focus on the materials that matter for your sustainability programme.",
+    "openSourcing": "Open AI Sourcing →",
+    "buyerServices": "Buyer services",
+    "company": "Company",
+    "connect": "Connect",
+    "customerServicesNav": "Customer services navigation",
+    "aboutNav": "About navigation",
+    "socialNav": "Social media navigation",
+    "goToPage": "Go to {name} page",
+    "copyright": "Sustainability-focused marketplace",
+    "links": {
+      "faqs": "FAQs",
+      "trackOrder": "Track order",
+      "returns": "Returns",
+      "delivery": "Delivery",
+      "payment": "Payment",
+      "aboutUs": "About us",
+      "blog": "Blog",
+      "privacyPolicy": "Privacy policy",
+      "termsConditions": "Terms & conditions"
+    }
+  },
+  "account": {
+    "goToProfile": "Go to user profile",
+    "aiSourcing": "AI Sourcing",
+    "orders": "Orders",
+    "returns": "Returns",
+    "addresses": "Addresses",
+    "reviews": "Reviews",
+    "wishlist": "Wishlist",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "createAccount": "Create account"
+  },
+  "cart": {
+    "goToCart": "Go to cart",
+    "shoppingCart": "Shopping cart",
+    "empty": "Your shopping cart is currently empty.",
+    "explore": "Explore",
+    "exploreHome": "Explore Home Page"
+  },
+  "pagination": {
+    "morePages": "More pages",
+    "previousPage": "Previous page",
+    "nextPage": "Next page"
+  },
+  "auth": {
+    "legal": "Legal",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy"
+  },
+  "checkout": {
+    "checkout": "Checkout",
+    "yourCart": "Your cart",
+    "orderSummary": "Order summary",
+    "paymentMethod": "Payment method",
+    "paymentDetails": "Payment details",
+    "noShippingOptions": "No shipping options available",
+    "chooseDelivery": "Choose delivery option",
+    "method": "Method"
+  },
+  "common": {
+    "loading": "Loading..."
+  },
+  "order": {
+    "items": "Items",
+    "delivery": "Delivery",
+    "giftCard": "Gift card",
+    "total": "Total",
+    "shippingAddress": "Shipping address",
+    "contact": "Contact",
+    "deliveryMethod": "Delivery method",
+    "paymentMethod": "Payment method",
+    "orderNumber": "Order number",
+    "orderDate": "Order date",
+    "email": "Email",
+    "currency": "Currency",
+    "confirmed": "Order confirmed",
+    "thankYou": "Thank you — your order is in.",
+    "orderHash": "Order #",
+    "placed": "Placed",
+    "orderDetails": "Order details",
+    "itemsOrdered": "Items ordered",
+    "summary": "Summary",
+    "deliveryAndPayment": "Delivery & payment"
+  },
+  "filters": {
+    "filters": "Filters",
+    "closeFilters": "Close filters"
+  },
+  "sourcing": {
+    "workspaceNav": "Sourcing workspace navigation",
+    "closeNav": "Close navigation",
+    "openNav": "Open navigation",
+    "recent": "Recent",
+    "marketplace": "Marketplace",
+    "logOut": "Log out",
+    "signIn": "Sign in",
+    "skills": "Skills",
+    "sourcingSkills": "Sourcing skills",
+    "closeSkills": "Close skills",
+    "browseSkills": "Browse skills",
+    "removeAttachment": "Remove attachment",
+    "attachFile": "Attach file",
+    "describeNeeds": "Describe your needs…",
+    "canvas": "Sourcing canvas",
+    "canvasTitle": "Canvas title",
+    "closeCanvas": "Close canvas",
+    "canvasDocument": "Canvas document",
+    "signInToView": "Sign in to view inquiries",
+    "noInquiries": "You haven't sent any inquiries yet",
+    "inquiries": "Inquiries"
+  },
+  "product": {
+    "quantityOptional": "Quantity (optional)",
+    "notesOptional": "Notes (optional)",
+    "quotePlaceholder": "Delivery location, target date, specs…",
+    "quantity": "Quantity",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity"
+  },
+  "pulse": {
+    "suppliers": {
+      "headline": "142+ verified suppliers",
+      "detail": "Vetted sellers across recycled materials, renewables, and services"
+    },
+    "rpet": {
+      "headline": "New listings: GRS-certified rPET flakes",
+      "detail": "Compare MOQ, origin, and quote-ready specs"
+    },
+    "aiSourcing": {
+      "headline": "AI Sourcing",
+      "detail": "Describe your need — match certified suppliers in seconds"
+    },
+    "trust": {
+      "headline": "Trust signals on every listing",
+      "detail": "ASI · GRS · ISO 14001 · chain-of-custody verification"
+    },
+    "carbon": {
+      "headline": "Embodied carbon & EPD data",
+      "detail": "Filter listings by sector and sustainability metadata"
+    }
+  },
+  "home": {
+    "services": {
+      "marketplace": {
+        "title": "Marketplace",
+        "outcome": "Compare suppliers side by side",
+        "description": "Browse vetted sustainable listings with MOQ, origin, certifications, and embodied carbon data — filter by sector and quote in one workflow."
+      },
+      "sourcing": {
+        "title": "AI Sourcing",
+        "outcome": "Reduce sourcing time",
+        "description": "Describe what you need in plain language. tese.io matches certified suppliers, checks credentials, and scans the web for alternatives."
+      },
+      "verification": {
+        "title": "Verification & chain of custody",
+        "outcome": "De-risk procurement decisions",
+        "description": "Mill certificates, GRS/ASI traceability, and chain-of-custody verification services — evidence you can attach to RFQs and audits."
+      },
+      "logistics": {
+        "title": "Logistics & fulfilment",
+        "outcome": "Consolidate multi-supplier delivery",
+        "description": "Worldwide seller fulfilment zones, shipping quotes, and consolidated delivery options for multi-supplier orders."
+      },
+      "finance": {
+        "title": "Finance matchmaking",
+        "outcome": "Match capital to procurement",
+        "description": "Connect procurement to impact and sustainable finance — green loans, transition credit, and ESG-linked funding matched to your products and services."
+      }
+    },
+    "stats": {
+      "listedSuppliers": "Listed suppliers",
+      "sustainableCategories": "Sustainable categories",
+      "fulfilmentCoverage": "Fulfilment coverage",
+      "worldwide": "Worldwide"
+    },
+    "testimonials": {
+      "1": {
+        "quote": "tese.io cut our supplier discovery time from weeks to days. Certification data on every listing means our procurement team can sign off faster.",
+        "role": "Head of Sustainable Procurement"
+      },
+      "2": {
+        "quote": "The AI sourcing workspace found three lower-carbon aluminium alternatives we had never seen on traditional marketplaces. Game changer for our ESG targets.",
+        "role": "Materials Engineer"
+      },
+      "3": {
+        "quote": "Multi-vendor comparison on a single product page is exactly what B2B buyers need. We consolidated four solar suppliers into one RFQ workflow.",
+        "role": "Renewables Buyer"
+      }
+    },
+    "insights": {
+      "1": {
+        "title": "How to verify recycled content claims on industrial metals",
+        "excerpt": "A practical guide to mill certificates, ASI chain-of-custody, and what to ask suppliers before signing.",
+        "category": "Procurement guide"
+      },
+      "2": {
+        "title": "Embodied carbon benchmarks for construction materials",
+        "excerpt": "Compare EPD-backed data across cement alternatives, recycled steel, and low-carbon aggregates.",
+        "category": "Sustainability"
+      },
+      "3": {
+        "title": "Solar procurement: multi-vendor RFQ best practices",
+        "excerpt": "How to evaluate inverters, panels, and storage from multiple certified sellers on one platform.",
+        "category": "Energy"
+      },
+      "4": {
+        "title": "GRS and responsible sourcing for textile inputs",
+        "excerpt": "What certification evidence to expect when sourcing recycled yarns and fibres for apparel supply chains.",
+        "category": "Textiles"
+      }
+    },
+    "secondaryCta": {
+      "eyebrow": "For suppliers",
+      "heading": "List your sustainable products on tese.io",
+      "description": "Reach procurement teams actively searching for certified, low-carbon materials. Onboard in minutes and start receiving qualified RFQs.",
+      "primaryLabel": "Create account on tese.io",
+      "secondaryLabel": "Talk to an expert"
+    }
+  },
+  "sectors": {
+    "all": {
+      "label": "All sectors",
+      "shortLabel": "All",
+      "headline": "Source sustainable materials across every sector",
+      "subheadline": "Compare vetted suppliers on tese.io with certification data, embodied carbon, and AI discovery — personalise by sector to focus your browse experience.",
+      "explorerIntro": "Search and filter across industrial materials, construction, energy, and textiles — one catalogue for certified, low-carbon procurement.",
+      "topicTags": [
+        "Circular economy",
+        "Embodied carbon",
+        "Chain of custody",
+        "Recycled content"
+      ]
+    },
+    "industrial-materials": {
+      "label": "Industrial materials",
+      "shortLabel": "Industrial",
+      "headline": "Source low-carbon metals, polymers & chemicals",
+      "subheadline": "Recycled and certified industrial inputs for mills and manufacturers — mill certificates, MOQs, and traceability on tese.io.",
+      "explorerIntro": "Procurement teams use this sector for metals, polymers, chemicals, and circular feedstocks — with ASI, GRS, and mill-test evidence where suppliers disclose it.",
+      "topicTags": [
+        "Recycled metals",
+        "Post-consumer polymers",
+        "Mill certificates",
+        "Scope 3 inputs",
+        "Circular manufacturing"
+      ]
+    },
+    "construction": {
+      "label": "Construction & infrastructure",
+      "shortLabel": "Construction",
+      "headline": "Source greener construction & packaging inputs",
+      "subheadline": "Low-carbon and circular materials for builders and infrastructure — quoted with certification evidence on tese.io.",
+      "explorerIntro": "Builders and infrastructure buyers source cement alternatives, structural materials, and packaging here — prioritising EPDs, embodied carbon, and regional supply.",
+      "topicTags": [
+        "Low-carbon cement",
+        "Circular packaging",
+        "Embodied carbon",
+        "Infrastructure",
+        "EPD-backed materials"
+      ]
+    },
+    "energy": {
+      "label": "Energy & renewables",
+      "shortLabel": "Energy",
+      "headline": "Source renewable energy components",
+      "subheadline": "Solar, storage, and clean-energy inputs from vetted suppliers — accelerate your transition on tese.io.",
+      "explorerIntro": "Renewables buyers compare modules, inverters, storage, and balance-of-system components — with efficiency, warranty, and supplier credentials in one place.",
+      "topicTags": [
+        "Solar & storage",
+        "Grid components",
+        "Energy transition",
+        "Efficiency data",
+        "Clean deployment"
+      ]
+    },
+    "textiles": {
+      "label": "Textiles & fibres",
+      "shortLabel": "Textiles",
+      "headline": "Source responsible yarns, fibres & textiles",
+      "subheadline": "Recycled and certified textile inputs with full chain-of-custody traceability — sourced through tese.io.",
+      "explorerIntro": "Apparel and technical textile programmes source recycled yarns and certified fibres here — with GRS and chain-of-custody documentation on request.",
+      "topicTags": [
+        "Recycled fibres",
+        "GRS certified",
+        "Chain of custody",
+        "Technical textiles",
+        "Responsible sourcing"
+      ]
+    }
+  }
+}
