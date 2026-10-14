@@ -6,13 +6,24 @@ import { getRegion } from "@/lib/data/regions"
 import { getSellerByHandle } from "@/lib/data/seller"
 import { getSellerOrbitProfile } from "@/lib/data/seller-orbit"
 import { SellerProps } from "@/types/seller"
+import { getCountryCode } from "@/lib/i18n/locale"
+import { ratingsEnabled } from "@/lib/flags"
+import { redirect } from "next/navigation"
 
 export default async function SellerReviewsPage({
   params,
 }: {
   params: Promise<{ handle: string; locale: string }>
 }) {
-  const { handle, locale } = await params
+  const { handle, locale: localeSegment } = await params
+
+  // D-05 / B-18: reviews are dark at launch — the page itself must not
+  // be reachable by URL while the flag is off.
+  if (!ratingsEnabled()) {
+    redirect(`/${localeSegment}/sellers/${handle}`)
+  }
+
+  const locale = getCountryCode(localeSegment)
 
   const seller = (await getSellerByHandle(handle)) as SellerProps
   const currency_code = (await getRegion(locale))?.currency_code || "usd"

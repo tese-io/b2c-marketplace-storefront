@@ -48,7 +48,7 @@ export type AiModel = {
 export const AI_MODELS: AiModel[] = [
   {
     id: 'tesera',
-    label: 'Tesera AI',
+    label: 'Anaya AI',
     description: 'Catalogue match + live web sourcing',
     available: true,
   },

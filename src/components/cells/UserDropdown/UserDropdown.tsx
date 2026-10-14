@@ -12,12 +12,14 @@ import { ProfileIcon } from "@/icons"
 import { HttpTypes } from "@medusajs/types"
 import { useMatrixUnreads } from "@/components/providers/Matrix/MatrixProvider"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 
 export const UserDropdown = ({
   isLoggedIn,
 }: {
   isLoggedIn: boolean
 }) => {
+  const t = useTranslations("account")
   const [open, setOpen] = useState(false)
 
   const unreads = useMatrixUnreads()
@@ -32,7 +34,7 @@ export const UserDropdown = ({
       <LocalizedClientLink
         href={isLoggedIn ? "/user" : "/login"}
         className="relative"
-        aria-label="Go to user profile"
+        aria-label={t("goToProfile")}
       >
         <ProfileIcon size={20} />
       </LocalizedClientLink>
@@ -44,8 +46,8 @@ export const UserDropdown = ({
                 Your account
               </h3>
             </div>
-            <NavigationItem href="/sourcing">AI Sourcing</NavigationItem>
-            <NavigationItem href="/user/orders">Orders</NavigationItem>
+            <NavigationItem href="/sourcing">{t("aiSourcing")}</NavigationItem>
+            <NavigationItem href="/user/orders">{t("orders")}</NavigationItem>
             <NavigationItem href="/user/messages" className="relative">
               Messages
               {unreads > 0 && (
@@ -54,18 +56,18 @@ export const UserDropdown = ({
                 </Badge>
               )}
             </NavigationItem>
-            <NavigationItem href="/user/returns">Returns</NavigationItem>
-            <NavigationItem href="/user/addresses">Addresses</NavigationItem>
-            <NavigationItem href="/user/reviews">Reviews</NavigationItem>
-            <NavigationItem href="/user/wishlist">Wishlist</NavigationItem>
+            <NavigationItem href="/user/returns">{t("returns")}</NavigationItem>
+            <NavigationItem href="/user/addresses">{t("addresses")}</NavigationItem>
+            <NavigationItem href="/user/reviews">{t("reviews")}</NavigationItem>
+            <NavigationItem href="/user/wishlist">{t("wishlist")}</NavigationItem>
             <Divider />
-            <NavigationItem href="/user/settings">Settings</NavigationItem>
+            <NavigationItem href="/user/settings">{t("settings")}</NavigationItem>
             <LogoutButton />
           </div>
         ) : (
           <div className="p-1">
-            <NavigationItem href="/login">Sign in</NavigationItem>
-            <NavigationItem href="/register">Create account</NavigationItem>
+            <NavigationItem href="/login">{t("signIn")}</NavigationItem>
+            <NavigationItem href="/register">{t("createAccount")}</NavigationItem>
           </div>
         )}
       </Dropdown>

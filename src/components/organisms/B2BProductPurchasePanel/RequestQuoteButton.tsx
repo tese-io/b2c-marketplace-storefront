@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
 import type { CreateEnquiryInput } from '@/types/enquiry'
+import { useTranslations } from 'next-intl'
 
 /**
  * PDP "Request a quote" — creates a real product_page enquiry (RFQ) for this
@@ -27,6 +28,7 @@ export function RequestQuoteButton({
   sellerEmail?: string
   isLoggedIn: boolean
 }) {
+  const t = useTranslations("product")
   const [open, setOpen] = useState(false)
   const [quantity, setQuantity] = useState('')
   const [note, setNote] = useState('')
@@ -112,7 +114,7 @@ export function RequestQuoteButton({
   return (
     <div className="tese-pdp-quote-form" data-testid="request-quote-form">
       <label className="tese-pdp-quote-field">
-        <span>Quantity (optional)</span>
+        <span>{t("quantityOptional")}</span>
         <input
           type="text"
           value={quantity}
@@ -122,11 +124,11 @@ export function RequestQuoteButton({
         />
       </label>
       <label className="tese-pdp-quote-field">
-        <span>Notes (optional)</span>
+        <span>{t("notesOptional")}</span>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Delivery location, target date, specs…"
+          placeholder={t("quotePlaceholder")}
           rows={3}
           className="tese-pdp-quote-input"
         />

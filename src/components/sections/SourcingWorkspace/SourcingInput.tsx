@@ -6,6 +6,7 @@ import { ArrowRightIcon, SparkIcon } from '@/icons'
 import { TeseLogoMark } from '@/components/atoms/TeseLogo/TeseLogoMark'
 
 import { AI_MODELS, DEFAULT_AI_MODEL, QUICK_PROMPTS, type AiModelId } from './constants'
+import { useTranslations } from 'next-intl'
 
 function ChevronDownIcon ({ size = 12, color = 'currentColor' }: { size?: number; color?: string }) {
   return (
@@ -77,6 +78,7 @@ export function SourcingInput ({
   centered = false,
   inputId = 'sourcing-input',
 }: SourcingInputProps) {
+  const t = useTranslations("sourcing")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -198,14 +200,14 @@ export function SourcingInput ({
 
       <div className="tese-sourcing-input-wrap" ref={menuRef}>
         {menuOpen && (
-          <div className="tese-sourcing-skills-menu" role="dialog" aria-label="Sourcing skills">
+          <div className="tese-sourcing-skills-menu" role="dialog" aria-label={t("sourcingSkills")}>
             <div className="tese-sourcing-skills-head">
-              <span className="tese-sourcing-skills-title">Skills</span>
+              <span className="tese-sourcing-skills-title">{t("skills")}</span>
               <button
                 type="button"
                 className="tese-sourcing-skills-close"
                 onClick={() => setMenuOpen(false)}
-                aria-label="Close skills"
+                aria-label={t("closeSkills")}
               >
                 ×
               </button>
@@ -240,7 +242,7 @@ export function SourcingInput ({
               <button
                 type="button"
                 onClick={() => setAttachmentName(null)}
-                aria-label="Remove attachment"
+                aria-label={t("removeAttachment")}
               >
                 ×
               </button>
@@ -259,7 +261,7 @@ export function SourcingInput ({
               }
             }}
             rows={centered ? 2 : 1}
-            placeholder="Describe your needs…"
+            placeholder={t("describeNeeds")}
             disabled={loading}
             className="tese-sourcing-textarea"
           />
@@ -278,8 +280,8 @@ export function SourcingInput ({
                 type="button"
                 className="tese-sourcing-input-icon-btn"
                 disabled={loading}
-                aria-label="Attach file"
-                title="Attach file"
+                aria-label={t("attachFile")}
+                title={t("attachFile")}
                 onClick={() => fileRef.current?.click()}
               >
                 <AttachIcon />
@@ -288,9 +290,9 @@ export function SourcingInput ({
                 type="button"
                 className={`tese-sourcing-input-icon-btn ${menuOpen ? 'is-active' : ''}`}
                 disabled={loading}
-                aria-label="Browse skills"
+                aria-label={t("browseSkills")}
                 aria-expanded={menuOpen}
-                title="Skills"
+                title={t("skills")}
                 onClick={() => {
                   setMenuOpen((open) => !open)
                   setModelOpen(false)

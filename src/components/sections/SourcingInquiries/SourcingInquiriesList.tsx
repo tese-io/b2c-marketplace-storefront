@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
+import { useTranslations } from 'next-intl'
 import {
   enquiryStatusLabel,
   type Enquiry,
@@ -12,6 +13,7 @@ import {
 const statusLabel = enquiryStatusLabel
 
 export function SourcingInquiriesList() {
+  const t = useTranslations("sourcing")
   const [items, setItems] = useState<Enquiry[]>([])
   const [loading, setLoading] = useState(true)
   const [needsAuth, setNeedsAuth] = useState(false)
@@ -118,7 +120,7 @@ export function SourcingInquiriesList() {
             <path d="M22 20h20M22 28h20M22 36h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </div>
-        <h1 className="tese-sourcing-placeholder-title">Sign in to view inquiries</h1>
+        <h1 className="tese-sourcing-placeholder-title">{t("signInToView")}</h1>
         <p className="tese-sourcing-placeholder-desc">
           Save RFQs from AI sourcing and track supplier responses in one place.
         </p>
@@ -138,7 +140,7 @@ export function SourcingInquiriesList() {
             <path d="M22 20h20M22 28h20M22 36h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </div>
-        <h1 className="tese-sourcing-placeholder-title">You haven&apos;t sent any inquiries yet</h1>
+        <h1 className="tese-sourcing-placeholder-title">{t("noInquiries")}</h1>
         <p className="tese-sourcing-placeholder-desc">
           Send requirements to multiple suppliers at once from AI sourcing results.
         </p>
@@ -152,7 +154,7 @@ export function SourcingInquiriesList() {
   return (
     <div className="tese-sourcing-inquiries">
       <header className="tese-sourcing-inquiries-head">
-        <h1 className="tese-sourcing-inquiries-title">Inquiries</h1>
+        <h1 className="tese-sourcing-inquiries-title">{t("inquiries")}</h1>
         <p className="tese-sourcing-inquiries-sub">
           {items.length} saved {items.length === 1 ? 'inquiry' : 'inquiries'}
         </p>

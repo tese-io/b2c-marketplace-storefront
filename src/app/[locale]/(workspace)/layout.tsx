@@ -5,6 +5,7 @@ import { MatrixProvider } from '@/components/providers'
 import { SourcingAppShell } from '@/components/sections/SourcingAppShell/SourcingAppShell'
 import { retrieveCustomer } from '@/lib/data/customer'
 import { checkRegion } from '@/lib/helpers/check-region'
+import { getCountryCode } from '@/lib/i18n/locale'
 
 function WorkspaceShellFallback () {
   return (
@@ -21,7 +22,8 @@ export default async function WorkspaceLayout({
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }>) {
-  const { locale } = await params
+  const { locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
 
   const user = await retrieveCustomer()
   const regionCheck = await checkRegion(locale)

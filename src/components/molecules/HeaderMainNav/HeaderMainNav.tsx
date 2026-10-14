@@ -22,8 +22,10 @@ import {
   SECTOR_COOKIE,
 } from "@/lib/helpers/sector-preferences"
 import { categoryHref } from "@/lib/data/categories"
+import { useTranslations } from "next-intl"
 
 import { MegaMenuLinkItem, MegaMenuPanel } from "./NavMegaMenu"
+import { useTranslatedSectors } from "@/lib/i18n/sector-copy"
 
 const SERVICE_ACCENTS: Record<string, { accent: string; soft: string }> = {
   marketplace: { accent: '#0f172a', soft: 'rgba(15, 23, 42, 0.1)' },
@@ -91,6 +93,9 @@ function ChevronDown({ className = "" }: { className?: string }) {
 }
 
 export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
+  const t = useTranslations('nav')
+  const tServices = useTranslations('home.services')
+  const translatedSectors = useTranslatedSectors(SECTORS)
   const [openMenu, setOpenMenu] = useState<"products" | "services" | "industries" | null>(null)
   const searchParams = useSearchParams()
 
@@ -118,7 +123,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
           )}
           aria-expanded={openMenu === "products"}
         >
-          Products
+          {t('products')}
           <ChevronDown className={openMenu === "products" ? "rotate-180" : ""} />
         </button>
         {openMenu === "products" && (
@@ -167,7 +172,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
           )}
           aria-expanded={openMenu === "services"}
         >
-          Services
+          {t('services')}
           <ChevronDown className={openMenu === "services" ? "rotate-180" : ""} />
         </button>
         {openMenu === "services" && (
@@ -182,14 +187,14 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
             <div className="tese-mega-menu-grid">
               {HOME_SERVICES.map((service) => {
                 const colors = SERVICE_ACCENTS[service.id]
-                const description = service.outcome
-                  ? `${service.description} Outcome: ${service.outcome}.`
-                  : service.description
+                const description = `${tServices(`${service.key}.description`)} Outcome: ${tServices(
+                  `${service.key}.outcome`
+                )}.`
                 return (
                   <MegaMenuLinkItem
                     key={service.id}
                     href={service.href}
-                    title={service.title}
+                    title={tServices(`${service.key}.title`)}
                     description={description}
                     accent={colors?.accent}
                     accentSoft={colors?.soft}
@@ -215,7 +220,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
           )}
           aria-expanded={openMenu === "industries"}
         >
-          Industries
+          {t('industries')}
           <ChevronDown className={openMenu === "industries" ? "rotate-180" : ""} />
         </button>
         {openMenu === "industries" && (
@@ -229,7 +234,7 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
           >
             <p className="tese-mega-menu-intro">{MEGA_MENU_INDUSTRIES.subtitle}</p>
             <div className="tese-mega-menu-list">
-              {SECTORS.map((sector) => {
+              {translatedSectors.map((sector) => {
                 if (sector.id === 'all') {
                   return (
                     <MegaMenuLinkItem
@@ -267,11 +272,11 @@ export function HeaderMainNav({ parentCategories }: HeaderMainNavProps) {
       </div>
 
       <LocalizedClientLink href="/sourcing" className="tese-nav-link">
-        AI Sourcing
+        {t('aiSourcing')}
       </LocalizedClientLink>
 
       <LocalizedClientLink href={`/categories${catalogQuery}`} className="tese-nav-link">
-        Catalogue
+        {t('catalogue')}
       </LocalizedClientLink>
     </nav>
   )

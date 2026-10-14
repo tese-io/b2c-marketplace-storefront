@@ -1,174 +1,89 @@
+/**
+ * Homepage content.
+ *
+ * Copy lives in the message catalogs under `home.*`; these entries carry only
+ * what is language-independent — routes, icons, accent colours, and proper
+ * nouns such as people's names, company names and certification schemes, which
+ * are never translated. `key` indexes the catalog.
+ */
+
 export type HomeService = {
   id: string
-  title: string
-  description: string
+  key: string
   href: string
   icon: 'marketplace' | 'sourcing' | 'verification' | 'logistics' | 'finance'
-  outcome?: string
 }
 
-export type HomeServiceWithOutcome = HomeService & { outcome: string }
-
-export const HOME_SERVICES: HomeServiceWithOutcome[] = [
-  {
-    id: 'marketplace',
-    title: 'Marketplace',
-    outcome: 'Compare suppliers side by side',
-    description:
-      'Browse vetted sustainable listings with MOQ, origin, certifications, and embodied carbon data — filter by sector and quote in one workflow.',
-    href: '/categories',
-    icon: 'marketplace',
-  },
-  {
-    id: 'sourcing',
-    title: 'AI Sourcing',
-    outcome: 'Reduce sourcing time',
-    description:
-      'Describe what you need in plain language. tese.io matches certified suppliers, checks credentials, and scans the web for alternatives.',
-    href: '/sourcing',
-    icon: 'sourcing',
-  },
+export const HOME_SERVICES: HomeService[] = [
+  { id: 'marketplace', key: 'marketplace', href: '/categories', icon: 'marketplace' },
+  { id: 'sourcing', key: 'sourcing', href: '/sourcing', icon: 'sourcing' },
   {
     id: 'verification',
-    title: 'Verification & chain of custody',
-    outcome: 'De-risk procurement decisions',
-    description:
-      'Mill certificates, GRS/ASI traceability, and chain-of-custody verification services — evidence you can attach to RFQs and audits.',
+    key: 'verification',
     href: '/categories?listing=service',
-    icon: 'verification',
+    icon: 'verification'
   },
   {
     id: 'logistics',
-    title: 'Logistics & fulfilment',
-    outcome: 'Consolidate multi-supplier delivery',
-    description:
-      'Worldwide seller fulfilment zones, shipping quotes, and consolidated delivery options for multi-supplier orders.',
+    key: 'logistics',
     href: '/categories?listing=service',
-    icon: 'logistics',
+    icon: 'logistics'
   },
-  {
-    id: 'finance',
-    title: 'Finance matchmaking',
-    outcome: 'Match capital to procurement',
-    description:
-      'Connect procurement to impact and sustainable finance — green loans, transition credit, and ESG-linked funding matched to your products and services.',
-    href: '/sourcing?intent=finance',
-    icon: 'finance',
-  },
+  { id: 'finance', key: 'finance', href: '/sourcing?intent=finance', icon: 'finance' }
 ]
 
 export type HomePartnerStat = {
+  /** A translation key when the value is a word, or a literal when it is a figure. */
   value: string
-  label: string
+  valueKey?: string
+  labelKey: string
 }
+
+export const HOME_PARTNER_STATS: HomePartnerStat[] = [
+  { value: '50+', labelKey: 'listedSuppliers' },
+  { value: '8', labelKey: 'sustainableCategories' },
+  { value: '', valueKey: 'worldwide', labelKey: 'fulfilmentCoverage' }
+]
 
 export type HomeTestimonial = {
   id: string
-  quote: string
   name: string
-  role: string
   company: string
   rating: number
 }
 
+export const HOME_TESTIMONIALS: HomeTestimonial[] = [
+  { id: '1', name: 'Elena Müller', company: 'NordBuild GmbH', rating: 5 },
+  { id: '2', name: 'James Okonkwo', company: 'GreenRail Infrastructure', rating: 5 },
+  { id: '3', name: 'Sofia Andersson', company: 'Helios Energy AB', rating: 5 }
+]
+
 export type HomeInsight = {
   id: string
-  title: string
-  excerpt: string
-  category: string
   href: string
   accent: string
 }
 
-export type HomePartner = {
-  id: string
-  label: string
-}
-
-export type HomeSecondaryCta = {
-  eyebrow: string
-  heading: string
-  description: string
-  primaryLabel: string
-  primaryHref: string
-  secondaryLabel: string
-  secondaryHref: string
-}
-
-export const HOME_PARTNER_STATS: HomePartnerStat[] = [
-  { value: '50+', label: 'Listed suppliers' },
-  { value: '8', label: 'Sustainable categories' },
-  { value: 'Worldwide', label: 'Fulfilment coverage' },
-]
-
-export const HOME_TESTIMONIALS: HomeTestimonial[] = [
-  {
-    id: '1',
-    quote:
-      'tese.io cut our supplier discovery time from weeks to days. Certification data on every listing means our procurement team can sign off faster.',
-    name: 'Elena Müller',
-    role: 'Head of Sustainable Procurement',
-    company: 'NordBuild GmbH',
-    rating: 5,
-  },
-  {
-    id: '2',
-    quote:
-      'The AI sourcing workspace found three lower-carbon aluminium alternatives we had never seen on traditional marketplaces. Game changer for our ESG targets.',
-    name: 'James Okonkwo',
-    role: 'Materials Engineer',
-    company: 'GreenRail Infrastructure',
-    rating: 5,
-  },
-  {
-    id: '3',
-    quote:
-      'Multi-vendor comparison on a single product page is exactly what B2B buyers need. We consolidated four solar suppliers into one RFQ workflow.',
-    name: 'Sofia Andersson',
-    role: 'Renewables Buyer',
-    company: 'Helios Energy AB',
-    rating: 5,
-  },
-]
-
 export const HOME_INSIGHTS: HomeInsight[] = [
   {
     id: '1',
-    title: 'How to verify recycled content claims on industrial metals',
-    excerpt:
-      'A practical guide to mill certificates, ASI chain-of-custody, and what to ask suppliers before signing.',
-    category: 'Procurement guide',
     href: '/categories?sector=industrial-materials&industry=metals-%26-alloys',
-    accent: '#475569',
+    accent: '#475569'
   },
   {
     id: '2',
-    title: 'Embodied carbon benchmarks for construction materials',
-    excerpt:
-      'Compare EPD-backed data across cement alternatives, recycled steel, and low-carbon aggregates.',
-    category: 'Sustainability',
     href: '/categories?sector=construction&industry=construction-materials',
-    accent: '#059669',
+    accent: '#059669'
   },
-  {
-    id: '3',
-    title: 'Solar procurement: multi-vendor RFQ best practices',
-    excerpt:
-      'How to evaluate inverters, panels, and storage from multiple certified sellers on one platform.',
-    category: 'Energy',
-    href: '/categories?sector=energy&industry=renewable-energy',
-    accent: '#0891B2',
-  },
-  {
-    id: '4',
-    title: 'GRS and responsible sourcing for textile inputs',
-    excerpt:
-      'What certification evidence to expect when sourcing recycled yarns and fibres for apparel supply chains.',
-    category: 'Textiles',
-    href: '/categories?sector=textiles&industry=textiles-%26-fibres',
-    accent: '#E11D48',
-  },
+  { id: '3', href: '/categories?sector=energy&industry=renewable-energy', accent: '#0891B2' },
+  { id: '4', href: '/categories?sector=textiles&industry=textiles-%26-fibres', accent: '#E11D48' }
 ]
+
+export type HomePartner = {
+  id: string
+  /** Certification scheme names are proper nouns and stay untranslated. */
+  label: string
+}
 
 export const HOME_PARTNERS: HomePartner[] = [
   { id: 'grs', label: 'GRS' },
@@ -178,16 +93,10 @@ export const HOME_PARTNERS: HomePartner[] = [
   { id: 'fsc', label: 'FSC' },
   { id: 'epd', label: 'EPD Verified' },
   { id: 'reach', label: 'REACH Compliant' },
-  { id: 'coc', label: 'Chain of Custody' },
+  { id: 'coc', label: 'Chain of Custody' }
 ]
 
-export const HOME_SECONDARY_CTA: HomeSecondaryCta = {
-  eyebrow: 'For suppliers',
-  heading: 'List your sustainable products on tese.io',
-  description:
-    'Reach procurement teams actively searching for certified, low-carbon materials. Onboard in minutes and start receiving qualified RFQs.',
-  primaryLabel: 'Create account on tese.io',
+export const HOME_SECONDARY_CTA = {
   primaryHref: '/register',
-  secondaryLabel: 'Talk to an expert',
-  secondaryHref: '/sourcing',
+  secondaryHref: '/sourcing'
 }

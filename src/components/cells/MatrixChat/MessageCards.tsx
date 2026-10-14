@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
+
+import { getCountryCode } from '@/lib/i18n/locale';
 import { useState } from 'react';
 
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink';
@@ -34,7 +36,7 @@ export function ProductCardMessage({ card }: { card: ProductCardPayload }) {
       await addToCart({
         variantId: product.variant_id,
         quantity: 1,
-        countryCode: String(locale || 'pl')
+        countryCode: getCountryCode(String(locale || 'pl'))
       });
       setAdded(true);
     } catch (error) {

@@ -3,10 +3,17 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { PROTECTED_ROUTES } from './lib/constants';
 import { isTokenExpired } from './lib/helpers/token';
+import { DEFAULT_LANGUAGE, LANGUAGE_HEADER } from './lib/i18n/config';
+import { formatLocale, parseLocale } from './lib/i18n/locale';
 
 const BACKEND_URL = process.env.MEDUSA_BACKEND_URL;
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY;
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || 'us';
+
+/** A composite `{language}-{market}` segment, e.g. `en-fr`. */
+const COMPOSITE_SEGMENT = /^[a-z]{2}-[a-z]{2}$/i;
+/** A legacy bare market segment, e.g. `fr`. */
+const BARE_SEGMENT = /^[a-z]{2}$/i;
 
 const makeAuthRedirect = (
   req: NextRequest,
@@ -24,6 +31,14 @@ const makeAuthRedirect = (
   }
 
   return response;
+};
+
+const passThrough = (request: NextRequest, language: string) => {
+  const requestHeaders = new Headers(request.headers);
+
+  requestHeaders.set(LANGUAGE_HEADER, language);
+
+  return NextResponse.next({ request: { headers: requestHeaders } });
 };
 
 const regionMapCache = {
@@ -78,19 +93,23 @@ async function getRegionMap(cacheId: string) {
   return regionMapCache.regionMap;
 }
 
-async function getCountryCode(
+/**
+ * Resolves which market to serve when the URL does not already name a valid one:
+ * the market in the URL if it exists, else the visitor's country, else the
+ * configured default.
+ */
+async function resolveMarket(
   request: NextRequest,
-  regionMap: Map<string, HttpTypes.StoreRegion | number>
+  regionMap: Map<string, HttpTypes.StoreRegion | number>,
+  urlMarket: string
 ) {
   try {
     let countryCode;
 
     const vercelCountryCode = request.headers.get('x-vercel-ip-country')?.toLowerCase();
 
-    const urlCountryCode = request.nextUrl.pathname.split('/')[1]?.toLowerCase();
-
-    if (urlCountryCode && regionMap.has(urlCountryCode)) {
-      countryCode = urlCountryCode;
+    if (urlMarket && regionMap.has(urlMarket)) {
+      countryCode = urlMarket;
     } else if (vercelCountryCode && regionMap.has(vercelCountryCode)) {
       countryCode = vercelCountryCode;
     } else if (regionMap.has(DEFAULT_REGION)) {
@@ -119,10 +138,13 @@ export async function middleware(request: NextRequest) {
   const cacheIdCookie = request.cookies.get('_medusa_cache_id');
   const cacheId = cacheIdCookie?.value || crypto.randomUUID();
 
-  const urlSegment = pathname.split('/')[1];
-  const looksLikeLocale = /^[a-z]{2}$/i.test(urlSegment || '');
+  const urlSegment = pathname.split('/')[1] ?? '';
+  const isComposite = COMPOSITE_SEGMENT.test(urlSegment);
+  const isBareMarket = !isComposite && BARE_SEGMENT.test(urlSegment);
+  const hasLocaleSegment = isComposite || isBareMarket;
 
-  const pathnameWithoutLocale = looksLikeLocale ? pathname.replace(/^\/[^/]+/, '') : pathname;
+  const pathnameWithoutLocale = hasLocaleSegment ? pathname.replace(/^\/[^/]+/, '') : pathname;
+  const queryString = request.nextUrl.search ?? '';
 
   const isProtectedRoute = PROTECTED_ROUTES.some(route => pathnameWithoutLocale.startsWith(route));
 
@@ -130,7 +152,9 @@ export async function middleware(request: NextRequest) {
     const jwtCookie = request.cookies.get('_medusa_jwt');
     const token = jwtCookie?.value;
 
-    const locale = looksLikeLocale ? urlSegment : DEFAULT_REGION;
+    const locale = isComposite
+      ? urlSegment.toLowerCase()
+      : formatLocale(DEFAULT_LANGUAGE, isBareMarket ? urlSegment : DEFAULT_REGION);
 
     // Not logged in before
     if (!jwtCookie) {
@@ -143,12 +167,23 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Fast path: URL already has a locale segment and cache cookie exists
-  if (looksLikeLocale && cacheIdCookie) {
-    return NextResponse.next();
+  // A legacy `/{market}` URL maps deterministically onto `/{defaultLanguage}-{market}`,
+  // so redirect permanently and let search engines forget the old shape.
+  if (isBareMarket) {
+    const canonical = formatLocale(DEFAULT_LANGUAGE, urlSegment);
+    const redirectUrl = `${request.nextUrl.origin}/${canonical}${pathnameWithoutLocale}${queryString}`;
+
+    return NextResponse.redirect(redirectUrl, 301);
   }
 
-  let response = NextResponse.next();
+  const { language, countryCode: urlMarket } = parseLocale(urlSegment);
+
+  // Fast path: the URL already carries both axes and we have a cache id.
+  if (isComposite && cacheIdCookie) {
+    return passThrough(request, language);
+  }
+
+  const response = passThrough(request, language);
 
   // Ensure cache id cookie exists (set without redirect)
   if (!cacheIdCookie) {
@@ -158,18 +193,23 @@ export async function middleware(request: NextRequest) {
   }
 
   const regionMap = await getRegionMap(cacheId);
-  const countryCode = regionMap && (await getCountryCode(request, regionMap));
-  const urlHasCountryCode = countryCode && pathname.split('/')[1].includes(countryCode);
+  const market = regionMap && (await resolveMarket(request, regionMap, urlMarket));
 
-  // If no country code in URL but we can resolve one, redirect to locale-prefixed path
-  if (!urlHasCountryCode && countryCode) {
-    const redirectPath = pathname === '/' ? '' : pathname;
-    const queryString = request.nextUrl.search ? request.nextUrl.search : '';
-    const redirectUrl = `${request.nextUrl.origin}/${countryCode}${redirectPath}${queryString}`;
-    return NextResponse.redirect(redirectUrl, 307);
+  if (!market) {
+    return response;
   }
 
-  return response;
+  // The URL already names a market we serve, in a language we serve.
+  if (isComposite && market === urlMarket) {
+    return response;
+  }
+
+  // Which market to serve depends on the visitor, so this one is temporary.
+  const canonical = formatLocale(language, market);
+  const redirectPath = hasLocaleSegment ? pathnameWithoutLocale : pathname === '/' ? '' : pathname;
+  const redirectUrl = `${request.nextUrl.origin}/${canonical}${redirectPath}${queryString}`;
+
+  return NextResponse.redirect(redirectUrl, 307);
 }
 
 export const config = {

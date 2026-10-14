@@ -1,4 +1,5 @@
 import { HOME_TESTIMONIALS } from '@/data/homepage'
+import { getTranslations } from 'next-intl/server'
 
 function StarRow({ count }: { count: number }) {
   return (
@@ -24,7 +25,8 @@ function getInitials(name: string) {
     .toUpperCase()
 }
 
-export function HomeTestimonials() {
+export async function HomeTestimonials() {
+  const t = await getTranslations("home.testimonials")
   return (
     <section className="tese-testimonials-section" aria-labelledby="home-testimonials-heading">
       <div className="tese-products-section-header">
@@ -51,7 +53,7 @@ export function HomeTestimonials() {
           >
             <StarRow count={item.rating} />
             <blockquote className="tese-testimonial-quote">
-              &ldquo;{item.quote}&rdquo;
+              &ldquo;{t(`${item.id}.quote`)}&rdquo;
             </blockquote>
             <footer className="tese-testimonial-author">
               <div className="tese-testimonial-avatar" aria-hidden>
@@ -60,7 +62,7 @@ export function HomeTestimonials() {
               <div>
                 <p className="tese-testimonial-name">{item.name}</p>
                 <p className="tese-testimonial-role">
-                  {item.role}, {item.company}
+                  {t(`${item.id}.role`)}, {item.company}
                 </p>
               </div>
             </footer>

@@ -9,6 +9,7 @@ import { WorkspaceAccountPage } from '@/components/sections/SourcingAppShell/Wor
 import { retrieveCustomer } from '@/lib/data/customer'
 import { getUserWishlists } from '@/lib/data/wishlist'
 import { Wishlist as WishlistType } from '@/types/wishlist'
+import { getCountryCode } from '@/lib/i18n/locale'
 
 export default async function WishlistPage ({
   params,
@@ -16,7 +17,8 @@ export default async function WishlistPage ({
   params: Promise<{ locale: string }>
 }) {
   const user = await retrieveCustomer()
-  const { locale } = await params
+  const { locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
 
   let wishlist: WishlistType = { products: [] }
   if (user) {

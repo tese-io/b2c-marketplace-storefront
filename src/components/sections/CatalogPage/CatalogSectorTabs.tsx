@@ -2,8 +2,9 @@ import { SECTORS, type SectorDefinition, type SectorId } from '@/data/sectors'
 import { buildCatalogQuery, type ListingType } from '@/lib/helpers/sector-preferences'
 
 import { CatalogSectorLink } from './CatalogActiveSectorChip'
+import { getTranslatedSectors } from '@/lib/i18n/sector-copy'
 
-export function CatalogSectorTabs({
+export async function CatalogSectorTabs({
   activeSectorId,
   basePath,
   industryHandle,
@@ -14,9 +15,11 @@ export function CatalogSectorTabs({
   industryHandle?: string
   listingType?: ListingType
 }) {
+  const sectors = await getTranslatedSectors(SECTORS)
+
   return (
     <div className="tese-catalog-tabs" role="tablist" aria-label="Industry sectors">
-      {SECTORS.map((sector) => {
+      {sectors.map((sector) => {
         const isActive = sector.id === activeSectorId
         const href = `${basePath}${buildCatalogQuery(
           sector.id,

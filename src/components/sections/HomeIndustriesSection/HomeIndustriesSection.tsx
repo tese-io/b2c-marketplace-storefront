@@ -2,16 +2,16 @@ import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedL
 import { SECTORS, type SectorId } from '@/data/sectors'
 import { getSectorVisual } from '@/data/sector-visuals'
 import { buildCatalogQuery } from '@/lib/helpers/sector-preferences'
+import { getTranslatedSectors } from '@/lib/i18n/sector-copy'
 
 function truncate(text: string, maxLength: number) {
   if (text.length <= maxLength) return text
   return `${text.slice(0, maxLength).trim()}…`
 }
 
-export function HomeIndustriesSection() {
-  const industries = SECTORS.filter(
-    (s): s is typeof SECTORS[number] & { id: Exclude<SectorId, 'all'> } =>
-      s.id !== 'all'
+export async function HomeIndustriesSection() {
+  const industries = (await getTranslatedSectors(SECTORS)).filter(
+    (s): s is (typeof SECTORS)[number] & { id: Exclude<SectorId, 'all'> } => s.id !== 'all'
   )
 
   return (

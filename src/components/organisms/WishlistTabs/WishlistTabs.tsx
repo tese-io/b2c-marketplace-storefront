@@ -2,6 +2,7 @@ import { TabsContent, TabsList } from "@/components/molecules"
 import { Suspense } from "react"
 // import { ProductsList } from "../ProductsList/ProductsList"
 import { ProductsPagination } from "../ProductsPagination/ProductsPagination"
+import { getTranslations } from "next-intl/server"
 // import { listProducts } from "@/lib/data/products"
 
 export const wishlistTabs = [
@@ -11,6 +12,7 @@ export const wishlistTabs = [
 ]
 
 export const WishlistTabs = async ({ tab }: { tab: string }) => {
+  const t = await getTranslations("common")
   // const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "gb"
 
   // const { response } = await listProducts({
@@ -22,7 +24,7 @@ export const WishlistTabs = async ({ tab }: { tab: string }) => {
     <div>
       <TabsList list={wishlistTabs} activeTab={tab} />
       <TabsContent value="all" activeTab={tab}>
-        <Suspense fallback={<>Loading...</>}>
+        <Suspense fallback={<>{t("loading")}</>}>
           <div className="grid sm:grid-cols-2 xl:grid-cols-4 mt-8">
             {/* <ProductsList products={products} /> */}
           </div>
@@ -30,7 +32,7 @@ export const WishlistTabs = async ({ tab }: { tab: string }) => {
         </Suspense>
       </TabsContent>
       <TabsContent value="products" activeTab={tab}>
-        <Suspense fallback={<>Loading...</>}>
+        <Suspense fallback={<>{t("loading")}</>}>
           <div className="grid sm:grid-cols-2 xl:grid-cols-4 mt-8">
             {/* <ProductsList products={products} /> */}
           </div>
@@ -38,7 +40,7 @@ export const WishlistTabs = async ({ tab }: { tab: string }) => {
         </Suspense>
       </TabsContent>
       <TabsContent value="collections" activeTab={tab}>
-        <Suspense fallback={<>Loading...</>}>
+        <Suspense fallback={<>{t("loading")}</>}>
           <div className="grid sm:grid-cols-2 xl:grid-cols-4 mt-8">
             {/* <ProductsList products={products} /> */}
           </div>

@@ -1,6 +1,7 @@
 import { StarRating } from '@/components/atoms'
 import { SellerAvatar } from '@/components/cells/SellerAvatar/SellerAvatar'
 import { TRUST_PROGRAM_NAME } from '@/data/explorer-copy'
+import { ratingsEnabled } from '@/lib/flags'
 import { SellerOrbitProfile } from '@/lib/data/seller-orbit'
 import { getSellerTrustStage } from '@/lib/helpers/trust-labels'
 import { SellerProps } from '@/types/seller'
@@ -71,13 +72,17 @@ export const SellerPageHeader = ({
               )}
             </div>
             <div className="tese-seller-stats">
-              <span className="tese-seller-stat">
-                <StarRating starSize={14} rate={rating || 0} />
-                <span>{rating ? rating.toFixed(1) : 'New'}</span>
-              </span>
-              <span className="tese-seller-stat">
-                {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
-              </span>
+              {ratingsEnabled() && (
+                <>
+                  <span className="tese-seller-stat">
+                    <StarRating starSize={14} rate={rating || 0} />
+                    <span>{rating ? rating.toFixed(1) : 'New'}</span>
+                  </span>
+                  <span className="tese-seller-stat">
+                    {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+                  </span>
+                </>
+              )}
               <span className="tese-seller-stat">
                 Joined {format(seller.created_at, 'MMM yyyy')}
               </span>

@@ -3,12 +3,14 @@ import { CatalogPage } from '@/components/sections/CatalogPage/CatalogPage'
 import { getSectorPreferencesFromCookies } from '@/lib/data/cookies'
 import { resolveSectorPreferences } from '@/lib/helpers/sector-preferences'
 import { listCategories } from '@/lib/data/categories'
-import { toHreflang } from '@/lib/helpers/hreflang'
+import { buildLanguageAlternates } from '@/lib/i18n/alternates'
+import { getCountryCode } from '@/lib/i18n/locale'
 import { listRegions } from '@/lib/data/regions'
 import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Script from 'next/script'
 import { Suspense } from 'react'
+import { getTranslatedSector } from '@/lib/i18n/sector-copy'
 
 export const revalidate = 60
 
@@ -19,7 +21,8 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>
   searchParams: Promise<{ sector?: string; industry?: string; listing?: string }>
 }): Promise<Metadata> {
-  const { locale } = await params
+  const { locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
   const sp = await searchParams
   const headersList = await headers()
   const host = headersList.get('host')
@@ -34,12 +37,9 @@ export async function generateMetadata({
         (regions || []).flatMap((r) => r.countries?.map((c) => c.iso_2) || [])
       )
     ) as string[]
-    languages = locales.reduce<Record<string, string>>((acc, code) => {
-      acc[toHreflang(code)] = `${baseUrl}/${code}/categories`
-      return acc
-    }, {})
+    languages = buildLanguageAlternates(locales, baseUrl, '/categories')
   } catch {
-    languages = { [toHreflang(locale)]: `${baseUrl}/${locale}/categories` }
+    languages = buildLanguageAlternates([getCountryCode(locale)], baseUrl, '/categories')
   }
 
   const title = sp.listing === 'service' ? 'Services' : 'Products & services'
@@ -51,7 +51,7 @@ export async function generateMetadata({
   if (sp.industry) query.set('industry', sp.industry)
   if (sp.listing === 'service') query.set('listing', 'service')
   const qs = query.toString()
-  const canonical = `${baseUrl}/${locale}/categories${qs ? `?${qs}` : ''}`
+  const canonical = `${baseUrl}/${localeSegment}/categories${qs ? `?${qs}` : ''}`
 
   return {
     title,
@@ -84,16 +84,18 @@ async function AllCategories({
     page?: string
   }>
 }) {
-  const { locale } = await params
+  const { locale: localeSegment } = await params
+  const locale = getCountryCode(localeSegment)
   const sp = await searchParams
   const listingType = sp.listing === 'service' ? 'service' : undefined
   const cookiePrefs = await getSectorPreferencesFromCookies()
   const { parentCategories } = await listCategories()
-  const { sector, sectorId, industryHandle } = resolveSectorPreferences(
+  const { sector: sourceSector, sectorId, industryHandle } = resolveSectorPreferences(
     sp,
     cookiePrefs,
     parentCategories
   )
+  const sector = await getTranslatedSector(sourceSector.id)
 
   const headersList = await headers()
   const host = headersList.get('host')

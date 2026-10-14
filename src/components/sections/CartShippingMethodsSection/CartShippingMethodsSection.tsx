@@ -16,6 +16,7 @@ import { calculatePriceForShippingOption } from '@/lib/data/fulfillment';
 import { convertToLocale } from '@/lib/helpers/money';
 
 import { CartShippingMethodRow } from './CartShippingMethodRow';
+import { useTranslations } from 'next-intl'
 
 // Extended cart item product type to include seller
 type ExtendedStoreProduct = HttpTypes.StoreProduct & {
@@ -57,6 +58,7 @@ type ShippingProps = {
 };
 
 const CartShippingMethodsSection: FC<ShippingProps> = ({ cart, availableShippingMethods }) => {
+  const t = useTranslations("checkout")
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [calculatedPricesMap, setCalculatedPricesMap] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);

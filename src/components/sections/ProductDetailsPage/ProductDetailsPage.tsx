@@ -32,11 +32,14 @@ import { HomeProductSection } from '../HomeProductSection/HomeProductSection'
 export const ProductDetailsPage = async ({
   handle,
   locale,
+  localeSegment,
   brand,
   sectorId = 'all',
 }: {
   handle: string
   locale: string
+  /** Full `{language}-{market}` segment — links must keep the language. */
+  localeSegment: string
   brand?: string
   sectorId?: SectorId
 }) => {
@@ -60,7 +63,7 @@ export const ProductDetailsPage = async ({
 
   if (getCatalogHandle(prod) && prod.handle !== catalogHandle) {
     redirect(
-      `/${locale}/products/${catalogHandle}?brand=${encodeURIComponent(getBrandSlug(prod))}`
+      `/${localeSegment}/products/${catalogHandle}?brand=${encodeURIComponent(getBrandSlug(prod))}`
     )
   }
 
@@ -119,6 +122,7 @@ export const ProductDetailsPage = async ({
 
       {isCatalog ? (
         <B2BCatalogProductShell
+          localeSegment={localeSegment}
           listings={listings}
           catalogHandle={catalogHandle}
           locale={locale}

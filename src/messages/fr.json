@@ -1,0 +1,326 @@
+{
+  "nav": {
+    "products": "Produits",
+    "services": "Services",
+    "industries": "Secteurs",
+    "aiSourcing": "Sourcing IA",
+    "catalogue": "Catalogue"
+  },
+  "header": {
+    "getInTouch": "Nous contacter",
+    "shipTo": "Livrer en",
+    "marketplacePulse": "Actualité du marché",
+    "accountAndCart": "Compte et panier",
+    "wishlist": "Favoris",
+    "language": "Langue",
+    "changeLanguage": "Changer de langue"
+  },
+  "hero": {
+    "eyebrow": "Des achats alignés sur vos objectifs ESG",
+    "headlineLead": "La marketplace dédiée à la durabilité",
+    "headlineFor": "pour",
+    "headlineAccent": "des achats responsables",
+    "personalisedFor": "Personnalisé pour {sector}",
+    "searchPlaceholder": "Décrivez votre besoin — qualité, quantité, certifications, région…",
+    "search": "Rechercher",
+    "proof": {
+      "verifiedListings": "Annonces vérifiées",
+      "sustainableCategories": "Catégories durables",
+      "certificationData": "Données de certification",
+      "avgSearchTime": "Temps de recherche IA moyen"
+    }
+  },
+  "footer": {
+    "tagline": "Personnalisez par secteur dans l'en-tête pour vous concentrer sur les matériaux qui comptent pour votre programme de durabilité.",
+    "openSourcing": "Ouvrir le Sourcing IA →",
+    "buyerServices": "Services acheteurs",
+    "company": "Entreprise",
+    "connect": "Nous suivre",
+    "customerServicesNav": "Navigation services clients",
+    "aboutNav": "Navigation à propos",
+    "socialNav": "Navigation réseaux sociaux",
+    "goToPage": "Aller à la page {name}",
+    "copyright": "La marketplace dédiée à la durabilité",
+    "links": {
+      "faqs": "FAQ",
+      "trackOrder": "Suivre ma commande",
+      "returns": "Retours",
+      "delivery": "Livraison",
+      "payment": "Paiement",
+      "aboutUs": "À propos",
+      "blog": "Blog",
+      "privacyPolicy": "Politique de confidentialité",
+      "termsConditions": "Conditions générales"
+    }
+  },
+  "account": {
+    "goToProfile": "Accéder au profil",
+    "aiSourcing": "Sourcing IA",
+    "orders": "Commandes",
+    "returns": "Retours",
+    "addresses": "Adresses",
+    "reviews": "Avis",
+    "wishlist": "Favoris",
+    "settings": "Paramètres",
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte"
+  },
+  "cart": {
+    "goToCart": "Voir le panier",
+    "shoppingCart": "Panier",
+    "empty": "Votre panier est actuellement vide.",
+    "explore": "Explorer",
+    "exploreHome": "Explorer la page d'accueil"
+  },
+  "pagination": {
+    "morePages": "Plus de pages",
+    "previousPage": "Page précédente",
+    "nextPage": "Page suivante"
+  },
+  "auth": {
+    "legal": "Mentions légales",
+    "terms": "Conditions générales",
+    "privacy": "Politique de confidentialité"
+  },
+  "checkout": {
+    "checkout": "Commander",
+    "yourCart": "Votre panier",
+    "orderSummary": "Récapitulatif de commande",
+    "paymentMethod": "Moyen de paiement",
+    "paymentDetails": "Détails du paiement",
+    "noShippingOptions": "Aucune option de livraison disponible",
+    "chooseDelivery": "Choisir le mode de livraison",
+    "method": "Mode"
+  },
+  "common": {
+    "loading": "Chargement…"
+  },
+  "order": {
+    "items": "Articles",
+    "delivery": "Livraison",
+    "giftCard": "Carte cadeau",
+    "total": "Total",
+    "shippingAddress": "Adresse de livraison",
+    "contact": "Contact",
+    "deliveryMethod": "Mode de livraison",
+    "paymentMethod": "Moyen de paiement",
+    "orderNumber": "Numéro de commande",
+    "orderDate": "Date de commande",
+    "email": "E-mail",
+    "currency": "Devise",
+    "confirmed": "Commande confirmée",
+    "thankYou": "Merci — votre commande est enregistrée.",
+    "orderHash": "Commande n°",
+    "placed": "Passée le",
+    "orderDetails": "Détails de la commande",
+    "itemsOrdered": "Articles commandés",
+    "summary": "Récapitulatif",
+    "deliveryAndPayment": "Livraison et paiement"
+  },
+  "filters": {
+    "filters": "Filtres",
+    "closeFilters": "Fermer les filtres"
+  },
+  "sourcing": {
+    "workspaceNav": "Navigation de l'espace sourcing",
+    "closeNav": "Fermer la navigation",
+    "openNav": "Ouvrir la navigation",
+    "recent": "Récent",
+    "marketplace": "Marketplace",
+    "logOut": "Se déconnecter",
+    "signIn": "Se connecter",
+    "skills": "Compétences",
+    "sourcingSkills": "Compétences de sourcing",
+    "closeSkills": "Fermer les compétences",
+    "browseSkills": "Parcourir les compétences",
+    "removeAttachment": "Supprimer la pièce jointe",
+    "attachFile": "Joindre un fichier",
+    "describeNeeds": "Décrivez vos besoins…",
+    "canvas": "Canevas de sourcing",
+    "canvasTitle": "Titre du canevas",
+    "closeCanvas": "Fermer le canevas",
+    "canvasDocument": "Document du canevas",
+    "signInToView": "Connectez-vous pour voir vos demandes",
+    "noInquiries": "Vous n'avez encore envoyé aucune demande",
+    "inquiries": "Demandes"
+  },
+  "product": {
+    "quantityOptional": "Quantité (facultatif)",
+    "notesOptional": "Notes (facultatif)",
+    "quotePlaceholder": "Lieu de livraison, date cible, spécifications…",
+    "quantity": "Quantité",
+    "decreaseQuantity": "Diminuer la quantité",
+    "increaseQuantity": "Augmenter la quantité"
+  },
+  "pulse": {
+    "suppliers": {
+      "headline": "142+ fournisseurs vérifiés",
+      "detail": "Vendeurs contrôlés : matériaux recyclés, énergies renouvelables et services"
+    },
+    "rpet": {
+      "headline": "Nouveautés : paillettes de rPET certifiées GRS",
+      "detail": "Comparez quantité minimale, origine et spécifications prêtes à devis"
+    },
+    "aiSourcing": {
+      "headline": "Sourcing IA",
+      "detail": "Décrivez votre besoin — trouvez des fournisseurs certifiés en quelques secondes"
+    },
+    "trust": {
+      "headline": "Des gages de confiance sur chaque annonce",
+      "detail": "ASI · GRS · ISO 14001 · vérification de la chaîne de contrôle"
+    },
+    "carbon": {
+      "headline": "Carbone incorporé et données EPD",
+      "detail": "Filtrez les annonces par secteur et métadonnées de durabilité"
+    }
+  },
+  "home": {
+    "services": {
+      "marketplace": {
+        "title": "Marketplace",
+        "outcome": "Comparez les fournisseurs côte à côte",
+        "description": "Parcourez des annonces durables contrôlées avec quantité minimale, origine, certifications et données de carbone incorporé — filtrez par secteur et demandez un devis en un seul parcours."
+      },
+      "sourcing": {
+        "title": "Sourcing IA",
+        "outcome": "Réduisez le temps de sourcing",
+        "description": "Décrivez votre besoin en langage courant. tese.io identifie des fournisseurs certifiés, vérifie leurs références et explore le web pour trouver des alternatives."
+      },
+      "verification": {
+        "title": "Vérification et chaîne de contrôle",
+        "outcome": "Sécurisez vos décisions d'achat",
+        "description": "Certificats d'usine, traçabilité GRS/ASI et services de vérification de la chaîne de contrôle — des preuves à joindre à vos appels d'offres et à vos audits."
+      },
+      "logistics": {
+        "title": "Logistique et expédition",
+        "outcome": "Regroupez les livraisons multi-fournisseurs",
+        "description": "Zones d'expédition des vendeurs dans le monde entier, devis de transport et options de livraison groupée pour les commandes multi-fournisseurs."
+      },
+      "finance": {
+        "title": "Mise en relation financière",
+        "outcome": "Alignez capital et achats",
+        "description": "Reliez vos achats à la finance durable et à impact — prêts verts, crédit de transition et financements indexés ESG adaptés à vos produits et services."
+      }
+    },
+    "stats": {
+      "listedSuppliers": "Fournisseurs référencés",
+      "sustainableCategories": "Catégories durables",
+      "fulfilmentCoverage": "Couverture d'expédition",
+      "worldwide": "Monde entier"
+    },
+    "testimonials": {
+      "1": {
+        "quote": "tese.io a réduit notre temps de recherche de fournisseurs de plusieurs semaines à quelques jours. Les données de certification sur chaque annonce permettent à notre équipe achats de valider plus vite.",
+        "role": "Directrice des achats durables"
+      },
+      "2": {
+        "quote": "L'espace de sourcing IA a trouvé trois alternatives à l'aluminium bas carbone que nous n'avions jamais vues sur les marketplaces traditionnelles. Décisif pour nos objectifs ESG.",
+        "role": "Ingénieur matériaux"
+      },
+      "3": {
+        "quote": "La comparaison multi-vendeurs sur une seule fiche produit correspond exactement aux besoins des acheteurs B2B. Nous avons regroupé quatre fournisseurs solaires dans un seul appel d'offres.",
+        "role": "Acheteuse énergies renouvelables"
+      }
+    },
+    "insights": {
+      "1": {
+        "title": "Comment vérifier les allégations de contenu recyclé sur les métaux industriels",
+        "excerpt": "Un guide pratique des certificats d'usine, de la chaîne de contrôle ASI et des questions à poser avant de signer.",
+        "category": "Guide achats"
+      },
+      "2": {
+        "title": "Références de carbone incorporé pour les matériaux de construction",
+        "excerpt": "Comparez des données issues d'EPD sur les alternatives au ciment, l'acier recyclé et les granulats bas carbone.",
+        "category": "Durabilité"
+      },
+      "3": {
+        "title": "Achats solaires : bonnes pratiques d'appel d'offres multi-vendeurs",
+        "excerpt": "Comment évaluer onduleurs, panneaux et stockage auprès de plusieurs vendeurs certifiés sur une seule plateforme.",
+        "category": "Énergie"
+      },
+      "4": {
+        "title": "GRS et approvisionnement responsable pour les intrants textiles",
+        "excerpt": "Quelles preuves de certification attendre lors de l'achat de fils et fibres recyclés pour les chaînes d'approvisionnement textiles.",
+        "category": "Textile"
+      }
+    },
+    "secondaryCta": {
+      "eyebrow": "Pour les fournisseurs",
+      "heading": "Référencez vos produits durables sur tese.io",
+      "description": "Touchez des équipes achats à la recherche active de matériaux certifiés et bas carbone. Inscrivez-vous en quelques minutes et recevez des appels d'offres qualifiés.",
+      "primaryLabel": "Créer un compte sur tese.io",
+      "secondaryLabel": "Parler à un expert"
+    }
+  },
+  "sectors": {
+    "all": {
+      "label": "Tous les secteurs",
+      "shortLabel": "Tous",
+      "headline": "Achetez des matériaux durables dans tous les secteurs",
+      "subheadline": "Comparez des fournisseurs contrôlés sur tese.io grâce aux données de certification, au carbone incorporé et à la découverte par IA — personnalisez par secteur pour cibler votre navigation.",
+      "explorerIntro": "Recherchez et filtrez parmi les matériaux industriels, la construction, l'énergie et le textile — un seul catalogue pour des achats certifiés et bas carbone.",
+      "topicTags": [
+        "Économie circulaire",
+        "Carbone incorporé",
+        "Chaîne de contrôle",
+        "Contenu recyclé"
+      ]
+    },
+    "industrial-materials": {
+      "label": "Matériaux industriels",
+      "shortLabel": "Industrie",
+      "headline": "Achetez métaux, polymères et produits chimiques bas carbone",
+      "subheadline": "Intrants industriels recyclés et certifiés pour usines et fabricants — certificats d'usine, quantités minimales et traçabilité sur tese.io.",
+      "explorerIntro": "Les équipes achats utilisent ce secteur pour les métaux, polymères, produits chimiques et matières premières circulaires — avec preuves ASI, GRS et essais d'usine lorsque les fournisseurs les communiquent.",
+      "topicTags": [
+        "Métaux recyclés",
+        "Polymères post-consommation",
+        "Certificats d'usine",
+        "Intrants Scope 3",
+        "Fabrication circulaire"
+      ]
+    },
+    "construction": {
+      "label": "Construction et infrastructures",
+      "shortLabel": "Construction",
+      "headline": "Achetez des intrants de construction et d'emballage plus verts",
+      "subheadline": "Matériaux bas carbone et circulaires pour bâtisseurs et infrastructures — chiffrés avec preuves de certification sur tese.io.",
+      "explorerIntro": "Les acheteurs du bâtiment et des infrastructures trouvent ici alternatives au ciment, matériaux structurels et emballages — en priorisant EPD, carbone incorporé et approvisionnement régional.",
+      "topicTags": [
+        "Ciment bas carbone",
+        "Emballage circulaire",
+        "Carbone incorporé",
+        "Infrastructures",
+        "Matériaux avec EPD"
+      ]
+    },
+    "energy": {
+      "label": "Énergie et renouvelables",
+      "shortLabel": "Énergie",
+      "headline": "Achetez des composants d'énergie renouvelable",
+      "subheadline": "Solaire, stockage et intrants d'énergie propre auprès de fournisseurs contrôlés — accélérez votre transition sur tese.io.",
+      "explorerIntro": "Les acheteurs du renouvelable comparent modules, onduleurs, stockage et composants annexes — avec rendement, garantie et références fournisseurs au même endroit.",
+      "topicTags": [
+        "Solaire et stockage",
+        "Composants réseau",
+        "Transition énergétique",
+        "Données de rendement",
+        "Déploiement propre"
+      ]
+    },
+    "textiles": {
+      "label": "Textiles et fibres",
+      "shortLabel": "Textile",
+      "headline": "Achetez fils, fibres et textiles responsables",
+      "subheadline": "Intrants textiles recyclés et certifiés avec traçabilité complète de la chaîne de contrôle — sourcés via tese.io.",
+      "explorerIntro": "Les programmes d'habillement et de textiles techniques trouvent ici fils recyclés et fibres certifiées — avec documentation GRS et chaîne de contrôle sur demande.",
+      "topicTags": [
+        "Fibres recyclées",
+        "Certifié GRS",
+        "Chaîne de contrôle",
+        "Textiles techniques",
+        "Achat responsable"
+      ]
+    }
+  }
+}

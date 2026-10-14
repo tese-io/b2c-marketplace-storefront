@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "products": "Bidhaa",
+    "services": "Huduma",
+    "industries": "Sekta",
+    "aiSourcing": "Utafutaji wa AI",
+    "catalogue": "Katalogi"
+  },
+  "header": {
+    "getInTouch": "Wasiliana nasi",
+    "shipTo": "Tuma kwenda",
+    "marketplacePulse": "Habari za soko",
+    "accountAndCart": "Akaunti na kikapu",
+    "wishlist": "Vipendwa",
+    "language": "Lugha",
+    "changeLanguage": "Badilisha lugha"
+  },
+  "hero": {
+    "eyebrow": "Manunuzi yanayolingana na malengo yako ya ESG",
+    "headlineLead": "Soko linalozingatia uendelevu",
+    "headlineFor": "kwa",
+    "headlineAccent": "manunuzi yenye uwajibikaji",
+    "personalisedFor": "Imebinafsishwa kwa {sector}",
+    "searchPlaceholder": "Eleza unachohitaji — daraja, kiasi, vyeti, eneo…",
+    "search": "Tafuta",
+    "proof": {
+      "verifiedListings": "Matangazo yaliyothibitishwa",
+      "sustainableCategories": "Kategoria endelevu",
+      "certificationData": "Taarifa za vyeti",
+      "avgSearchTime": "Wastani wa muda wa utafutaji wa AI"
+    }
+  },
+  "footer": {
+    "tagline": "Binafsisha kwa sekta kwenye kichwa ili kuzingatia malighafi muhimu kwa mpango wako wa uendelevu.",
+    "openSourcing": "Fungua Utafutaji wa AI →",
+    "buyerServices": "Huduma kwa wanunuzi",
+    "company": "Kampuni",
+    "connect": "Tufuate",
+    "customerServicesNav": "Urambazaji wa huduma kwa wateja",
+    "aboutNav": "Urambazaji wa kuhusu sisi",
+    "socialNav": "Urambazaji wa mitandao ya kijamii",
+    "goToPage": "Nenda kwenye ukurasa wa {name}",
+    "copyright": "Soko linalozingatia uendelevu",
+    "links": {
+      "faqs": "Maswali ya mara kwa mara",
+      "trackOrder": "Fuatilia agizo",
+      "returns": "Marejesho",
+      "delivery": "Uwasilishaji",
+      "payment": "Malipo",
+      "aboutUs": "Kuhusu sisi",
+      "blog": "Blogu",
+      "privacyPolicy": "Sera ya faragha",
+      "termsConditions": "Sheria na masharti"
+    }
+  },
+  "account": {
+    "goToProfile": "Nenda kwenye wasifu",
+    "aiSourcing": "Utafutaji wa AI",
+    "orders": "Maagizo",
+    "returns": "Marejesho",
+    "addresses": "Anwani",
+    "reviews": "Maoni",
+    "wishlist": "Vipendwa",
+    "settings": "Mipangilio",
+    "signIn": "Ingia",
+    "createAccount": "Fungua akaunti"
+  },
+  "cart": {
+    "goToCart": "Nenda kwenye kikapu",
+    "shoppingCart": "Kikapu",
+    "empty": "Kikapu chako hakina kitu kwa sasa.",
+    "explore": "Chunguza",
+    "exploreHome": "Chunguza ukurasa wa mwanzo"
+  },
+  "pagination": {
+    "morePages": "Kurasa zaidi",
+    "previousPage": "Ukurasa uliopita",
+    "nextPage": "Ukurasa unaofuata"
+  },
+  "auth": {
+    "legal": "Kisheria",
+    "terms": "Sheria na masharti",
+    "privacy": "Sera ya faragha"
+  },
+  "checkout": {
+    "checkout": "Lipa",
+    "yourCart": "Kikapu chako",
+    "orderSummary": "Muhtasari wa agizo",
+    "paymentMethod": "Njia ya malipo",
+    "paymentDetails": "Maelezo ya malipo",
+    "noShippingOptions": "Hakuna njia za usafirishaji zinazopatikana",
+    "chooseDelivery": "Chagua njia ya uwasilishaji",
+    "method": "Njia"
+  },
+  "common": {
+    "loading": "Inapakia…"
+  },
+  "filters": {
+    "filters": "Vichujio",
+    "closeFilters": "Funga vichujio"
+  },
+  "product": {
+    "quantityOptional": "Kiasi (hiari)",
+    "notesOptional": "Maelezo (hiari)",
+    "quotePlaceholder": "Mahali pa kuwasilisha, tarehe lengwa, vipimo…",
+    "quantity": "Kiasi",
+    "decreaseQuantity": "Punguza kiasi",
+    "increaseQuantity": "Ongeza kiasi"
+  }
+}

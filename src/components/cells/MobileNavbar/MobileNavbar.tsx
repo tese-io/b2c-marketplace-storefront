@@ -13,6 +13,8 @@ import { CloseIcon, HamburgerMenuIcon } from '@/icons';
 import { buildCatalogQuery } from '@/lib/helpers/sector-preferences';
 
 import { MobileCategoryNavbar } from './components';
+import { useTranslations } from 'next-intl'
+import { useTranslatedSectors } from '@/lib/i18n/sector-copy'
 
 export const MobileNavbar = ({
   categories,
@@ -21,6 +23,8 @@ export const MobileNavbar = ({
   categories: HttpTypes.StoreProductCategory[];
   parentCategories: HttpTypes.StoreProductCategory[];
 }) => {
+  const tServices = useTranslations('home.services')
+  const translatedSectors = useTranslatedSectors(SECTORS)
   const [isOpen, setIsOpen] = useState(false);
 
   const closeMenuHandler = () => {
@@ -92,7 +96,7 @@ export const MobileNavbar = ({
                   onClick={closeMenuHandler}
                   className="px-2 py-2 text-sm text-primary hover:opacity-80"
                 >
-                  {service.title}
+                  {tServices(`${service.key}.title`)}
                 </LocalizedClientLink>
               ))}
               <LocalizedClientLink
@@ -105,7 +109,7 @@ export const MobileNavbar = ({
               <p className="px-2 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-secondary">
                 Industries
               </p>
-              {SECTORS.filter((s) => s.id !== 'all').map((sector) => (
+              {translatedSectors.filter((s) => s.id !== 'all').map((sector) => (
                 <LocalizedClientLink
                   key={sector.id}
                   href={`/categories${buildCatalogQuery(sector.id)}`}

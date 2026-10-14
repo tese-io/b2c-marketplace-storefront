@@ -6,7 +6,8 @@ import { useCallback, useMemo } from 'react'
 import { HttpTypes } from '@medusajs/types'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-import { getSectorById } from '@/data/sectors'
+
+import { useTranslatedSector } from '@/lib/i18n/sector-copy'
 import {
   INDUSTRY_COOKIE,
   SECTOR_COOKIE,
@@ -26,7 +27,7 @@ export function SectorIndustryBar({
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const sector = getSectorById(sectorId)
+  const sector = useTranslatedSector(sectorId)
 
   const industries = useMemo(() => {
     if (sector.id === 'all') return categories

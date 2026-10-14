@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/atoms';
 import { useCartContext } from '@/components/providers';
 import { toast } from '@/lib/helpers/toast';
+import { useTranslations } from 'next-intl'
 
 export const UpdateCartItemButton = ({
   quantity,
@@ -15,6 +16,7 @@ export const UpdateCartItemButton = ({
   quantity: number;
   lineItemId: string;
 }) => {
+  const t = useTranslations("product")
   const { updateCartItem, isUpdatingItem } = useCartContext();
   const [pendingQuantity, setPendingQuantity] = useState(quantity);
   const debounceTimerRef = useRef<NodeJS.Timeout>(null);
@@ -64,13 +66,13 @@ export const UpdateCartItemButton = ({
   const isIncreaseDisabled = isUpdatingItem || !lineItemId;
 
   return (
-    <div className="tese-cart-qty" role="group" aria-label="Quantity">
+    <div className="tese-cart-qty" role="group" aria-label={t("quantity")}>
       <Button
         variant="tonal"
         className="tese-cart-qty-btn"
         disabled={isDecreaseDisabled}
         onClick={() => handleQuantityChange(pendingQuantity - 1)}
-        aria-label="Decrease quantity"
+        aria-label={t("decreaseQuantity")}
       >
         −
       </Button>
@@ -88,7 +90,7 @@ export const UpdateCartItemButton = ({
         className="tese-cart-qty-btn"
         disabled={isIncreaseDisabled}
         onClick={() => handleQuantityChange(pendingQuantity + 1)}
-        aria-label="Increase quantity"
+        aria-label={t("increaseQuantity")}
       >
         +
       </Button>

@@ -9,6 +9,7 @@ import {
   FilterSections,
 } from "@/components/organisms/ProductSidebar/AlgoliaProductSidebar"
 import { CloseIcon } from "@/icons"
+import { useTranslations } from "next-intl"
 
 const FACET_PARAM_KEYS = [
   "certifications",
@@ -49,6 +50,7 @@ export const CatalogFilterDrawer = ({
   showCategories?: boolean
   categoryLabels?: Record<string, string>
 }) => {
+  const t = useTranslations("filters")
   const [isOpen, setIsOpen] = useState(false)
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -133,7 +135,7 @@ export const CatalogFilterDrawer = ({
           className="fixed inset-0 z-50"
           role="dialog"
           aria-modal="true"
-          aria-label="Filters"
+          aria-label={t("filters")}
         >
           <div
             className="absolute inset-0 bg-black/40"
@@ -142,7 +144,7 @@ export const CatalogFilterDrawer = ({
           />
           <div className="absolute right-0 top-0 h-full w-full max-w-md bg-primary shadow-2xl flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b">
-              <h2 className="heading-sm">Filters</h2>
+              <h2 className="heading-sm">{t("filters")}</h2>
               <div className="flex items-center gap-4">
                 {activeCount > 0 && (
                   <button
@@ -154,7 +156,7 @@ export const CatalogFilterDrawer = ({
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  aria-label="Close filters"
+                  aria-label={t("closeFilters")}
                   data-testid="catalog-close-filters"
                 >
                   <CloseIcon size={20} className="cursor-pointer" />

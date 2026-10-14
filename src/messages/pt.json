@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "products": "Produtos",
+    "services": "Serviços",
+    "industries": "Setores",
+    "aiSourcing": "Sourcing com IA",
+    "catalogue": "Catálogo"
+  },
+  "header": {
+    "getInTouch": "Fale connosco",
+    "shipTo": "Enviar para",
+    "marketplacePulse": "Atualidade do mercado",
+    "accountAndCart": "Conta e carrinho",
+    "wishlist": "Favoritos",
+    "language": "Idioma",
+    "changeLanguage": "Mudar de idioma"
+  },
+  "hero": {
+    "eyebrow": "Compras alinhadas com os seus objetivos ESG",
+    "headlineLead": "O marketplace focado na sustentabilidade",
+    "headlineFor": "para",
+    "headlineAccent": "compras responsáveis",
+    "personalisedFor": "Personalizado para {sector}",
+    "searchPlaceholder": "Descreva o que precisa — qualidade, quantidade, certificações, região…",
+    "search": "Pesquisar",
+    "proof": {
+      "verifiedListings": "Anúncios verificados",
+      "sustainableCategories": "Categorias sustentáveis",
+      "certificationData": "Dados de certificação",
+      "avgSearchTime": "Tempo médio de pesquisa com IA"
+    }
+  },
+  "footer": {
+    "tagline": "Personalize por setor no cabeçalho para se concentrar nos materiais que importam para o seu programa de sustentabilidade.",
+    "openSourcing": "Abrir Sourcing com IA →",
+    "buyerServices": "Serviços para compradores",
+    "company": "Empresa",
+    "connect": "Siga-nos",
+    "customerServicesNav": "Navegação de serviços ao cliente",
+    "aboutNav": "Navegação sobre nós",
+    "socialNav": "Navegação de redes sociais",
+    "goToPage": "Ir para a página {name}",
+    "copyright": "O marketplace focado na sustentabilidade",
+    "links": {
+      "faqs": "Perguntas frequentes",
+      "trackOrder": "Seguir encomenda",
+      "returns": "Devoluções",
+      "delivery": "Entrega",
+      "payment": "Pagamento",
+      "aboutUs": "Sobre nós",
+      "blog": "Blog",
+      "privacyPolicy": "Política de privacidade",
+      "termsConditions": "Termos e condições"
+    }
+  },
+  "account": {
+    "goToProfile": "Ir para o perfil",
+    "aiSourcing": "Sourcing com IA",
+    "orders": "Encomendas",
+    "returns": "Devoluções",
+    "addresses": "Moradas",
+    "reviews": "Avaliações",
+    "wishlist": "Favoritos",
+    "settings": "Definições",
+    "signIn": "Iniciar sessão",
+    "createAccount": "Criar conta"
+  },
+  "cart": {
+    "goToCart": "Ver carrinho",
+    "shoppingCart": "Carrinho",
+    "empty": "O seu carrinho está vazio.",
+    "explore": "Explorar",
+    "exploreHome": "Explorar a página inicial"
+  },
+  "pagination": {
+    "morePages": "Mais páginas",
+    "previousPage": "Página anterior",
+    "nextPage": "Página seguinte"
+  },
+  "auth": {
+    "legal": "Informação legal",
+    "terms": "Termos e condições",
+    "privacy": "Política de privacidade"
+  },
+  "checkout": {
+    "checkout": "Finalizar compra",
+    "yourCart": "O seu carrinho",
+    "orderSummary": "Resumo da encomenda",
+    "paymentMethod": "Método de pagamento",
+    "paymentDetails": "Detalhes do pagamento",
+    "noShippingOptions": "Sem opções de envio disponíveis",
+    "chooseDelivery": "Escolher opção de entrega",
+    "method": "Método"
+  },
+  "common": {
+    "loading": "A carregar…"
+  },
+  "filters": {
+    "filters": "Filtros",
+    "closeFilters": "Fechar filtros"
+  },
+  "product": {
+    "quantityOptional": "Quantidade (opcional)",
+    "notesOptional": "Notas (opcional)",
+    "quotePlaceholder": "Local de entrega, data prevista, especificações…",
+    "quantity": "Quantidade",
+    "decreaseQuantity": "Diminuir quantidade",
+    "increaseQuantity": "Aumentar quantidade"
+  }
+}

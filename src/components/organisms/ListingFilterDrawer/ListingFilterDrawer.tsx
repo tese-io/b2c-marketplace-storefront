@@ -9,6 +9,7 @@ import {
   FilterSections,
 } from '@/components/organisms/ProductSidebar/AlgoliaProductSidebar'
 import { CloseIcon, FilterIcon } from '@/icons'
+import { useTranslations } from 'next-intl'
 
 const FACET_PARAM_KEYS = [
   'certifications',
@@ -33,6 +34,7 @@ export function ListingFilterDrawer ({
   resultCount: number
   showSectors?: boolean
 }) {
+  const t = useTranslations("filters")
   const [isOpen, setIsOpen] = useState(false)
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -83,7 +85,7 @@ export function ListingFilterDrawer ({
         data-testid="listing-open-filters"
       >
         <FilterIcon size={18} />
-        <span>Filters</span>
+        <span>{t("filters")}</span>
         {activeCount > 0 && (
           <span className="tese-listing-filter-btn-count">{activeCount}</span>
         )}
@@ -94,7 +96,7 @@ export function ListingFilterDrawer ({
           className="tese-listing-filter-drawer"
           role="dialog"
           aria-modal="true"
-          aria-label="Filters"
+          aria-label={t("filters")}
         >
           <div
             className="tese-listing-filter-drawer-scrim"
@@ -103,7 +105,7 @@ export function ListingFilterDrawer ({
           />
           <div className="tese-listing-filter-drawer-panel">
             <div className="tese-listing-filter-drawer-header">
-              <h2 className="tese-listing-filter-drawer-title">Filters</h2>
+              <h2 className="tese-listing-filter-drawer-title">{t("filters")}</h2>
               <div className="tese-listing-filter-drawer-header-actions">
                 {activeCount > 0 && (
                   <button
@@ -118,7 +120,7 @@ export function ListingFilterDrawer ({
                   type="button"
                   className="tese-listing-filter-drawer-close"
                   onClick={() => setIsOpen(false)}
-                  aria-label="Close filters"
+                  aria-label={t("closeFilters")}
                   data-testid="listing-close-filters"
                 >
                   <CloseIcon size={20} />

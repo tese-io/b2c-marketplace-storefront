@@ -4,8 +4,10 @@ import { Button } from '@/components/atoms';
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink';
 import { CartEmpty, CartItems, CartSummary } from '@/components/organisms';
 import { useCartContext } from '@/components/providers';
+import { useTranslations } from 'next-intl'
 
 export const Cart = () => {
+  const t = useTranslations("checkout")
   const { cart } = useCartContext();
   const itemCount = cart?.items?.reduce((sum, item) => sum + (item.quantity ?? 0), 0) ?? 0;
 
@@ -21,8 +23,8 @@ export const Cart = () => {
     <div className="tese-cart-layout">
       <header className="tese-cart-head col-span-full">
         <div>
-          <p className="tese-cart-eyebrow">Checkout</p>
-          <h1 className="tese-cart-title">Your cart</h1>
+          <p className="tese-cart-eyebrow">{t("checkout")}</p>
+          <h1 className="tese-cart-title">{t("yourCart")}</h1>
           <p className="tese-cart-sub">
             {itemCount} {itemCount === 1 ? 'item' : 'items'} from verified marketplace suppliers
           </p>
@@ -38,7 +40,7 @@ export const Cart = () => {
 
       <aside className="tese-cart-aside">
         <div className="tese-cart-summary-card">
-          <h2 className="tese-cart-summary-title">Order summary</h2>
+          <h2 className="tese-cart-summary-title">{t("orderSummary")}</h2>
           <CartSummary
             item_total={cart?.item_subtotal || 0}
             shipping_total={cart?.shipping_subtotal || 0}

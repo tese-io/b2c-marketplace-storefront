@@ -4,6 +4,7 @@ import { AlgoliaProductsListing, ProductListing } from '@/components/sections'
 import { TabsContent } from '@/components/molecules'
 import { SellerReviewTab } from '@/components/cells'
 import LocalizedClientLink from '@/components/molecules/LocalizedLink/LocalizedLink'
+import { ratingsEnabled } from '@/lib/flags'
 import clsx from 'clsx'
 import type { SellerOrbitProfile } from '@/lib/data/seller-orbit'
 import { getWishlistState } from '@/lib/helpers/wishlist-state'
@@ -33,10 +34,15 @@ export const SellerTabs = async ({
 
   const tabsList = [
     { label: 'products', link: `/sellers/${seller_handle}/` },
-    {
-      label: 'reviews',
-      link: `/sellers/${seller_handle}/reviews`,
-    },
+    // D-05 / B-18: reviews stay dark until the ratings flag is on.
+    ...(ratingsEnabled()
+      ? [
+          {
+            label: 'reviews',
+            link: `/sellers/${seller_handle}/reviews`,
+          },
+        ]
+      : []),
   ]
 
   return (
